@@ -13,7 +13,9 @@ SportHub is a sports tournament management platform supporting football, volleyb
 - **Database:** PostgreSQL 16 with Kysely (type-safe query builder, no ORM)
 - **Cache & Realtime:** Redis (caching, pub/sub for GraphQL subscriptions, sessions)
 - **Auth:** JWT (access 15min + refresh 7d rotation)
-- **Monorepo:** pnpm workspaces
+- **Frontend:** Next.js 15 (App Router) + React 19 + shadcn/ui + Tailwind CSS v4
+- **GraphQL Client:** Apollo Client + @apollo/experimental-nextjs-app-support
+- **Monorepo:** yarn 4 workspaces
 - **Testing:** Vitest + Supertest
 - **Validation:** Zod
 - **Containerization:** Docker + Docker Compose
@@ -25,22 +27,26 @@ SportHub is a sports tournament management platform supporting football, volleyb
 docker compose up -d              # Start PostgreSQL 16 + Redis 7
 
 # Dependencies
-pnpm install                      # Install all workspace dependencies
+yarn install                          # Install all workspace dependencies
 
 # Database
-pnpm --filter @sporthub/db migrate    # Run migrations
-pnpm --filter @sporthub/db seed       # Run seed data
-pnpm --filter @sporthub/db generate   # Kysely codegen (regenerate DB types)
-pnpm --filter @sporthub/db reset      # Drop & recreate database
+yarn workspace @sporthub/db migrate   # Run migrations
+yarn workspace @sporthub/db seed      # Run seed data
+yarn workspace @sporthub/db generate  # Kysely codegen (regenerate DB types)
+yarn workspace @sporthub/db reset     # Drop & recreate database
 
 # API server
-pnpm --filter @sporthub/api dev       # Start dev server (http://localhost:4000/graphql)
-pnpm --filter @sporthub/api build     # Build for production
+yarn workspace @sporthub/api dev      # Start dev server (http://localhost:4000/graphql)
+yarn workspace @sporthub/api build    # Build for production
+
+# Web frontend
+yarn workspace @sporthub/web dev      # Start dev server (http://localhost:3000)
+yarn workspace @sporthub/web build    # Build for production
 
 # Testing
-pnpm --filter @sporthub/api test              # Run all tests
-pnpm --filter @sporthub/api test -- bracket   # Run a single test file by name
-pnpm --filter @sporthub/shared test           # Run shared package tests
+yarn workspace @sporthub/api test              # Run all tests
+yarn workspace @sporthub/api test -- bracket   # Run a single test file by name
+yarn workspace @sporthub/shared test           # Run shared package tests
 ```
 
 ## Architecture
@@ -51,6 +57,7 @@ pnpm --filter @sporthub/shared test           # Run shared package tests
 packages/db/        — Kysely instance, migrations, seeds, generated DB types
 packages/shared/    — Constants (sport rules, enums), utilities (bracket/round-robin/standings algorithms), shared types
 apps/api/           — GraphQL API server (Express + Apollo Server v4)
+apps/web/           — Next.js 15 frontend (App Router, shadcn/ui, Apollo Client)
 scripts/            — CLI scripts for migrate, seed, codegen, reset-db
 ```
 
@@ -62,6 +69,22 @@ Each domain in `apps/api/src/schema/` follows a consistent three-file pattern:
 - `*.service.ts` — Business logic (Kysely queries, validation, side effects)
 
 Modules: `auth`, `user`, `tournament`, `team`, `player`, `match`, `standing`, `venue`, `checkin`, `payment`, `notification`, `public`
+
+### Frontend Architecture (`apps/web/`)
+
+Route groups:
+- `(auth)/` — Login, register, forgot/reset password (centered card layout, no sidebar)
+- `(public)/t/` — Public tournament pages (SSR for SEO, public navbar + footer)
+- `(dashboard)/` — Authenticated pages (sidebar + topbar, protected by auth guard)
+
+Key directories:
+- `src/components/ui/` — shadcn/ui primitives (button, card, dialog, table, etc.)
+- `src/components/layout/` — Sidebar, topbar, public navbar, footer
+- `src/components/shared/` — Data table, loading skeleton, empty state, role gate, confirm dialog
+- `src/components/{tournament,match,team,player,standing,checkin,payment,notification,dashboard,public}/` — Feature components
+- `src/graphql/{fragments,queries,mutations,subscriptions}/` — GraphQL documents
+- `src/lib/apollo/` — Apollo Client setup (browser + RSC)
+- `src/lib/auth/` — Token management, AuthContext, ProtectedRoute
 
 ### GraphQL Context
 

@@ -7,6 +7,8 @@
   ],
   "scripts": {
     "dev": "yarn workspace @sporthub/api dev",
+    "dev:web": "yarn workspace @sporthub/web dev",
+    "build:web": "yarn workspace @sporthub/web build",
     "build": "yarn workspaces foreach -A run build",
     "test": "yarn workspaces foreach -A run test",
     "lint": "yarn workspaces foreach -A run lint",
@@ -20,5 +22,8 @@
   "engines": {
     "node": ">=20"
   },
-  "packageManager": "yarn@4.6.0"
+  "packageManager": "yarn@4.6.0",
+  "devDependencies": {
+    "playwright": "^1.59.1"
+  }
 }

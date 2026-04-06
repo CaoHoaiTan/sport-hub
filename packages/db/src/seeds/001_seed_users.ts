@@ -15,7 +15,7 @@ export async function seed(db: Kysely<Database>): Promise<void> {
 
   // bcrypt hash of "Admin@123" with 12 rounds
   const passwordHash =
-    '$2a$12$LJ3m4ys3Lk0TSwMGfXO3rOJCVdnMs.ViAmcPFzl1c8fqpXGJKGYi6';
+    '$2b$12$CHjo9Lu0yIC2HVCC1hWqA.JjizRQ/gfTedu5JkrLPadQED.BbdaVG';
 
   await db
     .insertInto('users')
