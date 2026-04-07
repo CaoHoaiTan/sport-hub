@@ -32,10 +32,10 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">
-          Welcome back, {user.fullName}
+          Chào mừng trở lại, {user.fullName}
         </h1>
         <p className="text-muted-foreground">
-          Here is what is happening with your sports activities.
+          Đây là những hoạt động thể thao mới nhất của bạn.
         </p>
       </div>
 
@@ -50,7 +50,7 @@ export default function DashboardPage() {
 }
 
 function SimpleDashboard({ role }: { role: string }) {
-  const roleLabel = role === 'team_manager' ? 'Team Manager' : 'Referee';
+  const roleLabel = role === 'team_manager' ? 'Quản lý đội' : 'Trọng tài';
 
   return (
     <Card>
@@ -62,7 +62,7 @@ function SimpleDashboard({ role }: { role: string }) {
       </CardHeader>
       <CardContent>
         <p className="text-sm text-muted-foreground">
-          View your upcoming tournaments and matches from the sidebar navigation.
+          Xem các giải đấu và trận đấu sắp tới từ thanh điều hướng bên.
         </p>
       </CardContent>
     </Card>

@@ -25,14 +25,14 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
       </div>
       <div className="space-y-2 text-center">
         <h1 className="text-2xl font-bold tracking-tight">
-          Something went wrong
+          Đã xảy ra lỗi
         </h1>
         <p className="max-w-md text-muted-foreground">
-          An unexpected error occurred. Please try again or contact support if
-          the problem persists.
+          Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ hỗ trợ nếu lỗi
+          tiếp tục.
         </p>
       </div>
-      <Button onClick={reset}>Try again</Button>
+      <Button onClick={reset}>Thử lại</Button>
     </div>
   );
 }

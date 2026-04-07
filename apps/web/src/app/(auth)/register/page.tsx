@@ -31,13 +31,13 @@ import {
 
 const registerSchema = z
   .object({
-    fullName: z.string().min(1, 'Full name is required'),
-    email: z.string().email('Please enter a valid email address'),
-    password: z.string().min(8, 'Password must be at least 8 characters'),
+    fullName: z.string().min(1, 'Vui lòng nhập họ tên'),
+    email: z.string().email('Vui lòng nhập email hợp lệ'),
+    password: z.string().min(8, 'Mật khẩu phải có ít nhất 8 ký tự'),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: 'Passwords do not match',
+    message: 'Mật khẩu không khớp',
     path: ['confirmPassword'],
   });
 
@@ -71,7 +71,7 @@ export default function RegisterPage() {
       const message =
         error instanceof Error
           ? error.message
-          : 'Registration failed. Please try again.';
+          : 'Đăng ký thất bại. Vui lòng thử lại.';
       toast.error(message);
     } finally {
       setIsSubmitting(false);
@@ -81,9 +81,9 @@ export default function RegisterPage() {
   return (
     <Card>
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl">Create an account</CardTitle>
+        <CardTitle className="text-2xl">Tạo tài khoản</CardTitle>
         <CardDescription>
-          Enter your details to get started with SportHub
+          Nhập thông tin để bắt đầu sử dụng SportHub
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -94,10 +94,10 @@ export default function RegisterPage() {
               name="fullName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Full name</FormLabel>
+                  <FormLabel>Họ và tên</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="John Doe"
+                      placeholder="Nguyễn Văn A"
                       autoComplete="name"
                       {...field}
                     />
@@ -129,11 +129,11 @@ export default function RegisterPage() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>Mật khẩu</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
-                      placeholder="At least 8 characters"
+                      placeholder="Ít nhất 8 ký tự"
                       autoComplete="new-password"
                       {...field}
                     />
@@ -147,11 +147,11 @@ export default function RegisterPage() {
               name="confirmPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Confirm password</FormLabel>
+                  <FormLabel>Xác nhận mật khẩu</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
-                      placeholder="Re-enter your password"
+                      placeholder="Nhập lại mật khẩu"
                       autoComplete="new-password"
                       {...field}
                     />
@@ -161,19 +161,19 @@ export default function RegisterPage() {
               )}
             />
             <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? 'Creating account...' : 'Create account'}
+              {isSubmitting ? 'Đang tạo tài khoản...' : 'Tạo tài khoản'}
             </Button>
           </form>
         </Form>
       </CardContent>
       <CardFooter className="justify-center">
         <p className="text-sm text-muted-foreground">
-          Already have an account?{' '}
+          Đã có tài khoản?{' '}
           <Link
             href={ROUTES.login}
             className="font-medium text-primary hover:underline"
           >
-            Sign in
+            Đăng nhập
           </Link>
         </p>
       </CardFooter>

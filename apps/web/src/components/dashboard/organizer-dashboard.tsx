@@ -32,7 +32,7 @@ export function OrganizerDashboard() {
   if (!dashboard) {
     return (
       <div className="text-center text-muted-foreground py-12">
-        Unable to load dashboard data.
+        Không thể tải dữ liệu bảng điều khiển.
       </div>
     );
   }
@@ -41,22 +41,22 @@ export function OrganizerDashboard() {
     <div className="space-y-8">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          title="Active Tournaments"
+          title="Giải đang diễn ra"
           value={dashboard.activeTournaments}
           icon={Trophy}
         />
         <StatCard
-          title="Total Teams"
+          title="Tổng số đội"
           value={dashboard.totalTeams}
           icon={Users}
         />
         <StatCard
-          title="Total Players"
+          title="Tổng số VĐV"
           value={dashboard.totalPlayers}
           icon={UserCheck}
         />
         <StatCard
-          title="Revenue"
+          title="Doanh thu"
           value={formatVND(dashboard.financialSummary?.totalRevenue ?? 0)}
           icon={DollarSign}
         />
@@ -67,7 +67,7 @@ export function OrganizerDashboard() {
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base">
               <Calendar className="h-4 w-4 text-muted-foreground" />
-              Upcoming Matches
+              Trận đấu sắp tới
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -79,7 +79,7 @@ export function OrganizerDashboard() {
               </div>
             ) : (
               <p className="text-sm text-muted-foreground py-4 text-center">
-                No upcoming matches
+                Không có trận đấu sắp tới
               </p>
             )}
           </CardContent>
@@ -89,7 +89,7 @@ export function OrganizerDashboard() {
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base">
               <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
-              Recent Results
+              Kết quả gần đây
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -101,7 +101,7 @@ export function OrganizerDashboard() {
               </div>
             ) : (
               <p className="text-sm text-muted-foreground py-4 text-center">
-                No recent results
+                Không có kết quả gần đây
               </p>
             )}
           </CardContent>
@@ -113,28 +113,28 @@ export function OrganizerDashboard() {
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base">
               <DollarSign className="h-4 w-4 text-muted-foreground" />
-              Financial Summary
+              Tổng hợp tài chính
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <FinancialItem
-                label="Total Revenue"
+                label="Tổng doanh thu"
                 amount={dashboard.financialSummary.totalRevenue}
                 variant="default"
               />
               <FinancialItem
-                label="Paid"
+                label="Đã thanh toán"
                 amount={dashboard.financialSummary.totalPaid}
                 variant="success"
               />
               <FinancialItem
-                label="Pending"
+                label="Chờ xử lý"
                 amount={dashboard.financialSummary.totalPending}
                 variant="warning"
               />
               <FinancialItem
-                label="Refunded"
+                label="Hoàn tiền"
                 amount={dashboard.financialSummary.totalRefunded}
                 variant="destructive"
               />

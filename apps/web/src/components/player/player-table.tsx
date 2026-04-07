@@ -18,14 +18,14 @@ interface PlayerTableProps {
   players: Player[];
   isLoading?: boolean;
   onEdit?: (player: Player) => void;
-  onRemove?: (playerId: string) => void;
+  onXóa?: (playerId: string) => void;
 }
 
 export function PlayerTable({
   players,
   isLoading = false,
   onEdit,
-  onRemove,
+  onXóa,
 }: PlayerTableProps) {
   const columns = [
     {
@@ -46,7 +46,7 @@ export function PlayerTable({
           <span className="font-medium">{row.fullName}</span>
           {row.isCaptain && (
             <Badge variant="secondary" className="text-[10px]">
-              Captain
+              Đội trưởng
             </Badge>
           )}
         </div>
@@ -54,7 +54,7 @@ export function PlayerTable({
     },
     {
       key: 'position',
-      header: 'Position',
+      header: 'Vị trí',
       render: (row: Player) => (
         <span className="capitalize text-sm">
           {row.position?.replace('_', ' ') ?? '-'}
@@ -69,11 +69,11 @@ export function PlayerTable({
           variant={row.isActive ? 'success' : 'secondary'}
           className="text-[10px]"
         >
-          {row.isActive ? 'Active' : 'Inactive'}
+          {row.isActive ? 'Hoạt động' : 'Ngưng hoạt động'}
         </Badge>
       ),
     },
-    ...(onEdit || onRemove
+    ...(onEdit || onXóa
       ? [
           {
             key: 'actions',
@@ -91,12 +91,12 @@ export function PlayerTable({
                     <Pencil className="h-3.5 w-3.5" />
                   </Button>
                 )}
-                {onRemove && (
+                {onXóa && (
                   <Button
                     variant="ghost"
                     size="sm"
                     className="h-7 w-7 p-0 text-destructive hover:text-destructive"
-                    onClick={() => onRemove(row.id)}
+                    onClick={() => onXóa(row.id)}
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>

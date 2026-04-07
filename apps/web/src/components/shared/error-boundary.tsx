@@ -44,13 +44,13 @@ export class ErrorBoundary extends Component<
             <AlertTriangle className="h-6 w-6 text-destructive" />
           </div>
           <div className="space-y-1">
-            <h3 className="font-semibold">Something went wrong</h3>
+            <h3 className="font-semibold">Đã xảy ra lỗi</h3>
             <p className="text-sm text-muted-foreground">
               {this.state.error?.message ?? 'An unexpected error occurred.'}
             </p>
           </div>
           <Button variant="outline" onClick={this.handleReset}>
-            Try again
+            Thử lại
           </Button>
         </div>
       );

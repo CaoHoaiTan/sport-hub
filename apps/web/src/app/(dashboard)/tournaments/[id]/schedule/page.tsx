@@ -100,12 +100,12 @@ export default function TournamentSchedulePage() {
             <DialogTrigger asChild>
               <Button>
                 <Wand2 className="mr-2 h-4 w-4" />
-                Generate Matches
+                Tạo lịch thi đấu
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Generate Matches</DialogTitle>
+                <DialogTitle>Tạo lịch thi đấu</DialogTitle>
                 <DialogDescription>
                   This will automatically generate the match schedule based on
                   the tournament format and registered teams. Existing matches
@@ -114,7 +114,7 @@ export default function TournamentSchedulePage() {
               </DialogHeader>
               <DialogFooter>
                 <DialogClose asChild>
-                  <Button variant="outline">Cancel</Button>
+                  <Button variant="outline">Hủy</Button>
                 </DialogClose>
                 <Button onClick={handleGenerate} disabled={generating}>
                   {generating && (
@@ -136,7 +136,7 @@ export default function TournamentSchedulePage() {
           </p>
           {canManage && (
             <p className="text-sm text-muted-foreground">
-              Use the &quot;Generate Matches&quot; button to create the schedule.
+              Use the &quot;Tạo lịch thi đấu&quot; button to create the schedule.
             </p>
           )}
         </div>

@@ -40,15 +40,15 @@ export default function VenuesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Venues</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Địa điểm</h1>
           <p className="text-sm text-muted-foreground">
-            Manage sports venues and facilities.
+            Quản lý địa điểm và cơ sở thể thao.
           </p>
         </div>
         {canCreate && (
           <Button onClick={() => router.push(ROUTES.venueNew)}>
             <Plus className="mr-2 h-4 w-4" />
-            Add Venue
+            Thêm địa điểm
           </Button>
         )}
       </div>
@@ -57,10 +57,10 @@ export default function VenuesPage() {
         <EmptyState
           icon={MapPin}
           title="No venues"
-          description="Add venues to assign them to tournament matches."
+          description="Thêm địa điểm để phân bổ cho các trận đấu."
           action={
             canCreate
-              ? { label: 'Add Venue', onClick: () => router.push(ROUTES.venueNew) }
+              ? { label: 'Thêm địa điểm', onClick: () => router.push(ROUTES.venueNew) }
               : undefined
           }
         />
@@ -92,7 +92,7 @@ export default function VenuesPage() {
                   {venue.capacity && (
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <Users className="h-3.5 w-3.5" />
-                      <span>Capacity: {venue.capacity}</span>
+                      <span>Sức chứa: {venue.capacity}</span>
                     </div>
                   )}
                   <div className="flex flex-wrap gap-1">

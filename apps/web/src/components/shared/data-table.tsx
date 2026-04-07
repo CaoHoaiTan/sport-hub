@@ -34,7 +34,7 @@ export function DataTable<T extends Record<string, unknown>>({
   columns,
   data,
   isLoading = false,
-  emptyMessage = 'No data found',
+  emptyMessage = 'Không có dữ liệu found',
   emptyDescription = 'There are no items to display.',
   keyExtractor,
 }: DataTableProps<T>) {

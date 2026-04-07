@@ -100,26 +100,26 @@ export function CommentThread({ matchId }: CommentThreadProps) {
       <form onSubmit={handleSubmit} className="space-y-3 border-t pt-4">
         {replyTo && (
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span>Replying to comment</span>
+            <span>Đang trả lời bình luận</span>
             <button
               type="button"
               className="text-destructive hover:underline"
               onClick={() => setReplyTo(null)}
             >
-              Cancel
+              Hủy
             </button>
           </div>
         )}
         {!user && (
           <Input
-            placeholder="Your name (optional)"
+            placeholder="Tên của bạn (optional)"
             value={guestName}
             onChange={(e) => setGuestName(e.target.value)}
           />
         )}
         <div className="flex gap-2">
           <Textarea
-            placeholder="Write a comment..."
+            placeholder="Viết bình luận..."
             value={content}
             onChange={(e) => setContent(e.target.value)}
             className="min-h-[60px] resize-none"
@@ -174,7 +174,7 @@ function CommentItem({
             className="text-xs text-primary hover:underline mt-1"
             onClick={() => onReply(comment.id)}
           >
-            Reply
+            Trả lời
           </button>
         </div>
       </div>

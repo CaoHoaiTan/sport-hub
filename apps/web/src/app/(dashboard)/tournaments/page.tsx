@@ -48,16 +48,16 @@ export default function TournamentsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Tournaments</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Giải đấu</h1>
           <p className="text-muted-foreground">
-            Manage and track your tournaments.
+            Quản lý và theo dõi các giải đấu của bạn.
           </p>
         </div>
         {user && isOrganizer(user.role) && (
           <Button asChild>
             <Link href={ROUTES.tournamentNew}>
               <Plus className="mr-2 h-4 w-4" />
-              Create Tournament
+              Tạo giải đấu
             </Link>
           </Button>
         )}
@@ -86,12 +86,12 @@ export default function TournamentsPage() {
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-16">
-          <p className="text-muted-foreground mb-4">No tournaments found.</p>
+          <p className="text-muted-foreground mb-4">Không tìm thấy giải đấu.</p>
           {user && isOrganizer(user.role) && (
             <Button asChild variant="outline">
               <Link href={ROUTES.tournamentNew}>
                 <Plus className="mr-2 h-4 w-4" />
-                Create your first tournament
+                Tạo giải đấu đầu tiên
               </Link>
             </Button>
           )}

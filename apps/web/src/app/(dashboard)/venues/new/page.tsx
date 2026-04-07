@@ -29,7 +29,7 @@ export default function NewVenuePage() {
 
   const [createVenue, { loading }] = useMutation(CREATE_VENUE, {
     onCompleted: () => {
-      toast.success('Venue created successfully.');
+      toast.success('Tạo địa điểm thành công.');
       router.push(ROUTES.venues);
     },
     onError: (err) => toast.error(err.message),
@@ -65,9 +65,9 @@ export default function NewVenuePage() {
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Add Venue</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Thêm địa điểm</h1>
         <p className="text-sm text-muted-foreground">
-          Create a new sports venue or facility.
+          Tạo địa điểm thi đấu mới.
         </p>
       </div>
 
@@ -75,7 +75,7 @@ export default function NewVenuePage() {
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
             <MapPin className="h-4 w-4" />
-            Venue Details
+            Thông tin địa điểm
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -92,7 +92,7 @@ export default function NewVenuePage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="venue-address">Address</Label>
+              <Label htmlFor="venue-address">Địa chỉ</Label>
               <Input
                 id="venue-address"
                 placeholder="Full street address"
@@ -104,17 +104,17 @@ export default function NewVenuePage() {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="venue-city">City</Label>
+                <Label htmlFor="venue-city">Thành phố</Label>
                 <Input
                   id="venue-city"
-                  placeholder="e.g., Ho Chi Minh City"
+                  placeholder="e.g., Ho Chi Minh Thành phố"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="venue-capacity">Capacity</Label>
+                <Label htmlFor="venue-capacity">Sức chứa</Label>
                 <Input
                   id="venue-capacity"
                   type="number"
@@ -127,7 +127,7 @@ export default function NewVenuePage() {
             </div>
 
             <div className="space-y-2">
-              <Label>Sport Types</Label>
+              <Label>Môn thể thao</Label>
               <div className="flex flex-wrap gap-4">
                 {sportOptions.map((sport) => (
                   <label
@@ -145,7 +145,7 @@ export default function NewVenuePage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="venue-surface">Surface Type</Label>
+              <Label htmlFor="venue-surface">Loại sân</Label>
               <Input
                 id="venue-surface"
                 placeholder="e.g., natural grass, synthetic turf"
@@ -156,7 +156,7 @@ export default function NewVenuePage() {
 
             <div className="space-y-2">
               <Label htmlFor="venue-amenities">
-                Amenities (comma-separated)
+                Tiện ích (phân cách bằng dấu phẩy)
               </Label>
               <Input
                 id="venue-amenities"
@@ -172,11 +172,11 @@ export default function NewVenuePage() {
                 variant="outline"
                 onClick={() => router.push(ROUTES.venues)}
               >
-                Cancel
+                Hủy
               </Button>
               <Button type="submit" disabled={loading}>
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Create Venue
+                Tạo địa điểm
               </Button>
             </div>
           </form>

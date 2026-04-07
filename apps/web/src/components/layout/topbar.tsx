@@ -49,7 +49,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
           onClick={onMenuClick}
         >
           <Menu className="h-5 w-5" />
-          <span className="sr-only">Open menu</span>
+          <span className="sr-only">Mở menu</span>
         </Button>
       </div>
 
@@ -77,7 +77,7 @@ function NotificationBell() {
     >
       <Bell className="h-5 w-5" />
       <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-destructive" />
-      <span className="sr-only">Notifications</span>
+      <span className="sr-only">Thông báo</span>
     </Button>
   );
 }
@@ -118,12 +118,12 @@ function UserMenu({ user, onProfileClick, onLogout }: UserMenuProps) {
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={onProfileClick}>
           <User className="mr-2 h-4 w-4" />
-          Profile
+          Hồ sơ
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={onLogout} className="text-destructive focus:text-destructive">
           <LogOut className="mr-2 h-4 w-4" />
-          Log out
+          Đăng xuất
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -36,37 +36,37 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   {
-    label: 'Dashboard',
+    label: 'Tổng quan',
     href: ROUTES.dashboard,
     icon: LayoutDashboard,
     visible: () => true,
   },
   {
-    label: 'Tournaments',
+    label: 'Giải đấu',
     href: ROUTES.tournaments,
     icon: Trophy,
     visible: () => true,
   },
   {
-    label: 'Venues',
+    label: 'Địa điểm',
     href: ROUTES.venues,
     icon: MapPin,
     visible: (role) => isOrganizer(role),
   },
   {
-    label: 'Notifications',
+    label: 'Thông báo',
     href: ROUTES.notifications,
     icon: Bell,
     visible: () => true,
   },
   {
-    label: 'Users',
+    label: 'Người dùng',
     href: ROUTES.adminUsers,
     icon: Users,
     visible: (role) => isAdmin(role),
   },
   {
-    label: 'Reports',
+    label: 'Báo cáo',
     href: ROUTES.adminReports,
     icon: BarChart3,
     visible: (role) => isAdmin(role),
@@ -179,7 +179,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                     <User className="h-4 w-4" />
                   </Link>
                 </TooltipTrigger>
-                <TooltipContent side="right">Profile</TooltipContent>
+                <TooltipContent side="right">Hồ sơ</TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -192,7 +192,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                     <ChevronsRight className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent side="right">Expand sidebar</TooltipContent>
+                <TooltipContent side="right">Mở rộng</TooltipContent>
               </Tooltip>
             </div>
           ) : (
@@ -206,7 +206,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
               )}
             >
               <User className="h-4 w-4 shrink-0" />
-              <span>Profile</span>
+              <span>Hồ sơ</span>
             </Link>
           )}
         </div>

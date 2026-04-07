@@ -32,11 +32,11 @@ import {
 
 const resetPasswordSchema = z
   .object({
-    newPassword: z.string().min(8, 'Password must be at least 8 characters'),
+    newPassword: z.string().min(8, 'Mật khẩu phải có ít nhất 8 ký tự'),
     confirmPassword: z.string(),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
-    message: 'Passwords do not match',
+    message: 'Mật khẩu không khớp',
     path: ['confirmPassword'],
   });
 
@@ -61,14 +61,14 @@ function ResetPasswordForm() {
     return (
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Invalid reset link</CardTitle>
+          <CardTitle className="text-2xl">Link đặt lại không hợp lệ</CardTitle>
           <CardDescription>
-            This password reset link is invalid or has expired.
+            Link đặt lại mật khẩu này không hợp lệ hoặc đã hết hạn.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Button variant="outline" className="w-full" asChild>
-            <Link href={ROUTES.forgotPassword}>Request a new link</Link>
+            <Link href={ROUTES.forgotPassword}>Yêu cầu link mới</Link>
           </Button>
         </CardContent>
       </Card>
@@ -86,13 +86,13 @@ function ResetPasswordForm() {
           },
         },
       });
-      toast.success('Password reset successfully! Please sign in.');
+      toast.success('Đặt lại mật khẩu thành công! Vui lòng đăng nhập.');
       router.push(ROUTES.login);
     } catch (error: unknown) {
       const message =
         error instanceof Error
           ? error.message
-          : 'Failed to reset password. Please try again.';
+          : 'Đặt lại mật khẩu thất bại. Vui lòng thử lại.';
       toast.error(message);
     } finally {
       setIsSubmitting(false);
@@ -102,8 +102,8 @@ function ResetPasswordForm() {
   return (
     <Card>
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl">Reset your password</CardTitle>
-        <CardDescription>Enter your new password below</CardDescription>
+        <CardTitle className="text-2xl">Đặt lại mật khẩu</CardTitle>
+        <CardDescription>Nhập mật khẩu mới của bạn bên dưới</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <Form {...form}>
@@ -113,11 +113,11 @@ function ResetPasswordForm() {
               name="newPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>New password</FormLabel>
+                  <FormLabel>Mật khẩu mới</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
-                      placeholder="At least 8 characters"
+                      placeholder="Ít nhất 8 ký tự"
                       autoComplete="new-password"
                       {...field}
                     />
@@ -131,11 +131,11 @@ function ResetPasswordForm() {
               name="confirmPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Confirm new password</FormLabel>
+                  <FormLabel>Xác nhận mật khẩu mới</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
-                      placeholder="Re-enter your new password"
+                      placeholder="Nhập lại mật khẩu mới"
                       autoComplete="new-password"
                       {...field}
                     />
@@ -145,7 +145,7 @@ function ResetPasswordForm() {
               )}
             />
             <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? 'Resetting...' : 'Reset password'}
+              {isSubmitting ? 'Đang đặt lại...' : 'Đặt lại mật khẩu'}
             </Button>
           </form>
         </Form>
@@ -155,7 +155,7 @@ function ResetPasswordForm() {
             className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            Back to sign in
+            Quay lại đăng nhập
           </Link>
         </div>
       </CardContent>

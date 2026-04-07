@@ -34,7 +34,7 @@ export default async function PublicPostsPage({ params }: Props) {
     id: string;
     title: string;
     content: string;
-    isPinned: boolean;
+    isGhim: boolean;
     createdAt: string;
     author?: { id: string; fullName: string; avatarUrl?: string | null } | null;
   }> = [];
@@ -50,7 +50,7 @@ export default async function PublicPostsPage({ params }: Props) {
   }
 
   const sortedPosts = [...posts].sort((a, b) => {
-    if (a.isPinned !== b.isPinned) return a.isPinned ? -1 : 1;
+    if (a.isGhim !== b.isGhim) return a.isGhim ? -1 : 1;
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   });
 

@@ -12,11 +12,11 @@ export default function NotFound() {
       <div className="space-y-2 text-center">
         <h1 className="text-4xl font-bold tracking-tight">404</h1>
         <p className="text-lg text-muted-foreground">
-          The page you are looking for does not exist.
+          Trang bạn tìm kiếm không tồn tại.
         </p>
       </div>
       <Button asChild>
-        <Link href="/">Back to home</Link>
+        <Link href="/">Về trang chủ</Link>
       </Button>
     </div>
   );

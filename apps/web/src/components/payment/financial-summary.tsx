@@ -34,19 +34,19 @@ export function FinancialSummary({ tournamentId }: FinancialSummaryProps) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <StatCard
-        title="Total Revenue"
+        title="Tổng doanh thu"
         value={formatVND(summary.totalRevenue)}
         description={`${summary.paidCount} paid`}
         icon={DollarSign}
       />
       <StatCard
-        title="Total Pending"
+        title="Total Chờ xử lý"
         value={formatVND(summary.totalPending)}
         description={`${summary.paymentCount - summary.paidCount - summary.overdueCount} pending`}
         icon={Clock}
       />
       <StatCard
-        title="Total Refunded"
+        title="Tổng hoàn tiền"
         value={formatVND(summary.totalRefunded)}
         icon={RotateCcw}
       />

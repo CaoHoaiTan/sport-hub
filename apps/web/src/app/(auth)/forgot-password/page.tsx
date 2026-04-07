@@ -30,7 +30,7 @@ import {
 } from '@/components/ui/form';
 
 const forgotPasswordSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
+  email: z.string().email('Vui lòng nhập email hợp lệ'),
 });
 
 type ForgotPasswordValues = z.infer<typeof forgotPasswordSchema>;
@@ -52,12 +52,12 @@ export default function ForgotPasswordPage() {
     try {
       await forgotPassword({ variables: { email: values.email } });
       setIsEmailSent(true);
-      toast.success('Reset link sent! Check your email.');
+      toast.success('Đã gửi link đặt lại! Kiểm tra email của bạn.');
     } catch (error: unknown) {
       const message =
         error instanceof Error
           ? error.message
-          : 'Failed to send reset email. Please try again.';
+          : 'Không thể gửi email. Vui lòng thử lại.';
       toast.error(message);
     } finally {
       setIsSubmitting(false);
@@ -68,9 +68,9 @@ export default function ForgotPasswordPage() {
     return (
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Check your email</CardTitle>
+          <CardTitle className="text-2xl">Kiểm tra email</CardTitle>
           <CardDescription>
-            We sent a password reset link to{' '}
+            Chúng tôi đã gửi link đặt lại mật khẩu đến{' '}
             <span className="font-medium text-foreground">
               {form.getValues('email')}
             </span>
@@ -78,14 +78,14 @@ export default function ForgotPasswordPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-center text-sm text-muted-foreground">
-            Didn&apos;t receive the email? Check your spam folder or try again.
+            Không nhận được email? Kiểm tra thư mục spam hoặc thử lại.
           </p>
           <Button
             variant="outline"
             className="w-full"
             onClick={() => setIsEmailSent(false)}
           >
-            Try another email
+            Thử email khác
           </Button>
           <div className="text-center">
             <Link
@@ -93,7 +93,7 @@ export default function ForgotPasswordPage() {
               className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
-              Back to sign in
+              Quay lại đăng nhập
             </Link>
           </div>
         </CardContent>
@@ -104,9 +104,9 @@ export default function ForgotPasswordPage() {
   return (
     <Card>
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl">Forgot password?</CardTitle>
+        <CardTitle className="text-2xl">Quên mật khẩu?</CardTitle>
         <CardDescription>
-          Enter your email and we&apos;ll send you a reset link
+          Nhập email của bạn và chúng tôi sẽ gửi link đặt lại
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -131,7 +131,7 @@ export default function ForgotPasswordPage() {
               )}
             />
             <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? 'Sending...' : 'Send reset link'}
+              {isSubmitting ? 'Đang gửi...' : 'Gửi link đặt lại'}
             </Button>
           </form>
         </Form>
@@ -141,7 +141,7 @@ export default function ForgotPasswordPage() {
             className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            Back to sign in
+            Quay lại đăng nhập
           </Link>
         </div>
       </CardContent>

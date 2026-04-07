@@ -125,7 +125,7 @@ export function PlayerForm({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            {editPlayer ? 'Edit Player' : 'Add Player'}
+            {editPlayer ? 'Edit Player' : 'Thêm VĐV'}
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -140,7 +140,7 @@ export function PlayerForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="jersey-number">Jersey Number</Label>
+            <Label htmlFor="jersey-number">Số áo</Label>
             <Input
               id="jersey-number"
               type="number"
@@ -153,7 +153,7 @@ export function PlayerForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="player-position">Position (optional)</Label>
+            <Label htmlFor="player-position">Vị trí (optional)</Label>
             <Select value={position} onValueChange={setPosition}>
               <SelectTrigger>
                 <SelectValue placeholder="Select position" />
@@ -172,12 +172,12 @@ export function PlayerForm({
           <DialogFooter>
             <DialogClose asChild>
               <Button type="button" variant="outline">
-                Cancel
+                Hủy
               </Button>
             </DialogClose>
             <Button type="submit" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {editPlayer ? 'Update' : 'Add Player'}
+              {editPlayer ? 'Update' : 'Thêm VĐV'}
             </Button>
           </DialogFooter>
         </form>

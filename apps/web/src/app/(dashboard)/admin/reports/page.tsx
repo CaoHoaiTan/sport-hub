@@ -38,8 +38,8 @@ export default function AdminReportsPage() {
     return (
       <EmptyState
         icon={Shield}
-        title="Access Denied"
-        description="You do not have permission to view this page."
+        title="Từ chối truy cập"
+        description="Bạn không có quyền xem trang này."
       />
     );
   }
@@ -57,7 +57,7 @@ export default function AdminReportsPage() {
 
   function handleExport(type: 'tournament' | 'financial') {
     if (!selectedTournament) {
-      toast.error('Please select a tournament first.');
+      toast.error('Vui lòng chọn giải đấu trước.');
       return;
     }
     const endpoint = type === 'tournament'
@@ -65,21 +65,21 @@ export default function AdminReportsPage() {
       : `${GRAPHQL_HTTP_URL.replace('/graphql', '')}/export/financial/${selectedTournament}`;
 
     window.open(endpoint, '_blank');
-    toast.success(`${type === 'tournament' ? 'Tournament' : 'Financial'} report export initiated.`);
+    toast.success(`${type === 'tournament' ? 'Tournament' : 'Financial'} đã bắt đầu xuất báo cáo.`);
   }
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Reports</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Báo cáo</h1>
         <p className="text-sm text-muted-foreground">
-          Generate and export tournament reports.
+          Tạo và xuất báo cáo giải đấu.
         </p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Select Tournament</CardTitle>
+          <CardTitle className="text-base">Chọn giải đấu</CardTitle>
         </CardHeader>
         <CardContent>
           <Select
@@ -87,7 +87,7 @@ export default function AdminReportsPage() {
             onValueChange={setSelectedTournament}
           >
             <SelectTrigger className="max-w-md">
-              <SelectValue placeholder="Choose a tournament" />
+              <SelectValue placeholder="Chọn giải đấu" />
             </SelectTrigger>
             <SelectContent>
               {tournaments.map(
@@ -107,12 +107,12 @@ export default function AdminReportsPage() {
           <CardHeader className="pb-3">
             <CardTitle className="text-sm flex items-center gap-2">
               <FileText className="h-4 w-4" />
-              Tournament Report
+              Báo cáo giải đấu
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <p className="text-xs text-muted-foreground">
-              Includes teams, matches, standings, and results.
+              Bao gồm đội, trận đấu, bảng xếp hạng và kết quả.
             </p>
             <Button
               variant="outline"
@@ -121,7 +121,7 @@ export default function AdminReportsPage() {
               disabled={!selectedTournament}
             >
               <Download className="mr-2 h-4 w-4" />
-              Export Tournament Report
+              Export Báo cáo giải đấu
             </Button>
           </CardContent>
         </Card>
@@ -130,12 +130,12 @@ export default function AdminReportsPage() {
           <CardHeader className="pb-3">
             <CardTitle className="text-sm flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
-              Financial Report
+              Báo cáo tài chính
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <p className="text-xs text-muted-foreground">
-              Includes payment plans, transactions, and revenue summary.
+              Bao gồm gói thanh toán, giao dịch và tổng hợp doanh thu.
             </p>
             <Button
               variant="outline"
@@ -144,7 +144,7 @@ export default function AdminReportsPage() {
               disabled={!selectedTournament}
             >
               <Download className="mr-2 h-4 w-4" />
-              Export Financial Report
+              Export Báo cáo tài chính
             </Button>
           </CardContent>
         </Card>

@@ -55,7 +55,7 @@ export function MatchEventForm({ matchId, teams }: MatchEventFormProps) {
   const [eventType, setEventType] = useState('');
   const [teamId, setTeamId] = useState('');
   const [playerId, setPlayerId] = useState('');
-  const [minute, setMinute] = useState('');
+  const [minute, setPhút] = useState('');
   const [description, setDescription] = useState('');
 
   const [addEvent, { loading }] = useMutation(ADD_MATCH_EVENT, {
@@ -73,7 +73,7 @@ export function MatchEventForm({ matchId, teams }: MatchEventFormProps) {
     setEventType('');
     setTeamId('');
     setPlayerId('');
-    setMinute('');
+    setPhút('');
     setDescription('');
   }
 
@@ -176,13 +176,13 @@ export function MatchEventForm({ matchId, teams }: MatchEventFormProps) {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs">Minute (optional)</Label>
+              <Label className="text-xs">Phút (optional)</Label>
               <Input
                 type="number"
                 min={0}
                 max={200}
                 value={minute}
-                onChange={(e) => setMinute(e.target.value)}
+                onChange={(e) => setPhút(e.target.value)}
                 placeholder="e.g. 45"
               />
             </div>
@@ -204,7 +204,7 @@ export function MatchEventForm({ matchId, teams }: MatchEventFormProps) {
             ) : (
               <SendHorizonal className="mr-2 h-3.5 w-3.5" />
             )}
-            Add Event
+            Thêm sự kiện
           </Button>
         </form>
       </CardContent>

@@ -7,10 +7,10 @@ export default function CreateTournamentPage() {
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">
-          Create Tournament
+          Tạo giải đấu
         </h1>
         <p className="text-muted-foreground">
-          Set up a new tournament in a few steps.
+          Thiết lập giải đấu mới qua vài bước đơn giản.
         </p>
       </div>
 

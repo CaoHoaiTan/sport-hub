@@ -53,9 +53,9 @@ export default async function PublicTournamentsPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Tournaments</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Giải đấu</h1>
         <p className="text-muted-foreground mt-1">
-          Browse all public tournaments.
+          Xem tất cả giải đấu công khai.
         </p>
       </div>
 
@@ -64,9 +64,9 @@ export default async function PublicTournamentsPage() {
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
             <Trophy className="h-8 w-8 text-muted-foreground" />
           </div>
-          <h3 className="mt-4 text-lg font-semibold">No tournaments</h3>
+          <h3 className="mt-4 text-lg font-semibold">Chưa có giải đấu</h3>
           <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-            There are no public tournaments at the moment.
+            Hiện chưa có giải đấu nào.
           </p>
         </div>
       ) : (
@@ -119,7 +119,7 @@ export default async function PublicTournamentsPage() {
                     {tournament.maxTeams && (
                       <span className="flex items-center gap-1">
                         <Users className="h-3 w-3" />
-                        {tournament.maxTeams} teams max
+                        {tournament.maxTeams} đội tối đa
                       </span>
                     )}
                   </div>

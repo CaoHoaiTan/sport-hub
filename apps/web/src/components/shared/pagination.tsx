@@ -28,7 +28,7 @@ export function Pagination({
         disabled={isLoading}
       >
         {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        {isLoading ? 'Loading...' : 'Load more'}
+        {isLoading ? 'Đang tải...' : 'Xem thêm'}
       </Button>
     </div>
   );

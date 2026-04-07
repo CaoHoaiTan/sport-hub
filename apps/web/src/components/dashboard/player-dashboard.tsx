@@ -34,7 +34,7 @@ export function PlayerDashboard() {
   if (!dashboard) {
     return (
       <div className="text-center text-muted-foreground py-12">
-        Unable to load dashboard data.
+        Không thể tải dữ liệu tổng quan.
       </div>
     );
   }
@@ -43,12 +43,12 @@ export function PlayerDashboard() {
     <div className="space-y-8">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          title="Active Tournaments"
+          title="Giải đang diễn ra"
           value={dashboard.activeTournaments}
           icon={Trophy}
         />
         <StatCard
-          title="Matches Played"
+          title="Trận đã đấu"
           value={dashboard.totalMatchesPlayed}
           icon={Swords}
         />
@@ -68,7 +68,7 @@ export function PlayerDashboard() {
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base">
             <Calendar className="h-4 w-4 text-muted-foreground" />
-            Upcoming Matches
+            Trận đấu sắp tới
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -111,7 +111,7 @@ export function PlayerDashboard() {
             </div>
           ) : (
             <p className="text-sm text-muted-foreground py-4 text-center">
-              No upcoming matches
+              Không có trận đấu sắp tới
             </p>
           )}
         </CardContent>

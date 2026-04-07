@@ -94,7 +94,7 @@ export function PaymentPlanForm({ tournamentId }: PaymentPlanFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="plan-amount">Amount (VND)</Label>
+            <Label htmlFor="plan-amount">Số tiền (VND)</Label>
             <Input
               id="plan-amount"
               type="number"
@@ -117,7 +117,7 @@ export function PaymentPlanForm({ tournamentId }: PaymentPlanFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="early-bird-amount">Early Bird Amount (VND)</Label>
+            <Label htmlFor="early-bird-amount">Early Bird Số tiền (VND)</Label>
             <Input
               id="early-bird-amount"
               type="number"
@@ -141,7 +141,7 @@ export function PaymentPlanForm({ tournamentId }: PaymentPlanFormProps) {
           <DialogFooter>
             <DialogClose asChild>
               <Button type="button" variant="outline">
-                Cancel
+                Hủy
               </Button>
             </DialogClose>
             <Button type="submit" disabled={loading}>

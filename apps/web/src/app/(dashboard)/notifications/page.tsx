@@ -31,7 +31,7 @@ export default function NotificationsPage() {
 
   const [markAllAsRead, { loading: markingAll }] = useMutation(MARK_ALL_AS_READ, {
     onCompleted: () => {
-      toast.success('All notifications marked as read.');
+      toast.success('Đã đánh dấu tất cả thông báo đã đọc.');
       refetch();
     },
     refetchQueries: [{ query: GET_UNREAD_COUNT }],
@@ -105,9 +105,9 @@ export default function NotificationsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Notifications</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Thông báo</h1>
           <p className="text-sm text-muted-foreground">
-            Stay updated on tournament activity.
+            Cập nhật hoạt động giải đấu.
           </p>
         </div>
         {notifications.length > 0 && (
@@ -122,7 +122,7 @@ export default function NotificationsPage() {
             ) : (
               <CheckCheck className="mr-2 h-4 w-4" />
             )}
-            Mark all as read
+            Đánh dấu tất cả đã đọc
           </Button>
         )}
       </div>
@@ -130,8 +130,8 @@ export default function NotificationsPage() {
       {notifications.length === 0 ? (
         <EmptyState
           icon={Bell}
-          title="No notifications"
-          description="You're all caught up! Notifications will appear here."
+          title="Không có thông báo"
+          description="Bạn đã xem hết! Thông báo mới sẽ hiện ở đây."
         />
       ) : (
         <>

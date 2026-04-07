@@ -32,7 +32,7 @@ interface Post {
   id: string;
   title: string;
   content: string;
-  isPinned: boolean;
+  isGhim: boolean;
   createdAt: string;
   author?: { id: string; fullName: string; avatarUrl?: string | null } | null;
 }
@@ -48,7 +48,7 @@ export default function PostsPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [isPinned, setIsPinned] = useState(false);
+  const [isGhim, setIsGhim] = useState(false);
 
   const { data, loading, refetch } = useQuery(GET_TOURNAMENT_POSTS, {
     variables: { tournamentId, limit: 50, offset: 0 },
@@ -84,7 +84,7 @@ export default function PostsPage() {
 
   const posts: Post[] = data?.tournamentPosts ?? [];
   const sortedPosts = [...posts].sort((a, b) => {
-    if (a.isPinned !== b.isPinned) return a.isPinned ? -1 : 1;
+    if (a.isGhim !== b.isGhim) return a.isGhim ? -1 : 1;
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   });
 
@@ -92,7 +92,7 @@ export default function PostsPage() {
     setEditingPost(null);
     setTitle('');
     setContent('');
-    setIsPinned(false);
+    setIsGhim(false);
     setFormOpen(true);
   }
 
@@ -100,7 +100,7 @@ export default function PostsPage() {
     setEditingPost(post);
     setTitle(post.title);
     setContent(post.content);
-    setIsPinned(post.isPinned);
+    setIsGhim(post.isGhim);
     setFormOpen(true);
   }
 
@@ -109,7 +109,7 @@ export default function PostsPage() {
     setEditingPost(null);
     setTitle('');
     setContent('');
-    setIsPinned(false);
+    setIsGhim(false);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -118,13 +118,13 @@ export default function PostsPage() {
       await updatePost({
         variables: {
           id: editingPost.id,
-          input: { title, content, isPinned },
+          input: { title, content, isGhim },
         },
       });
     } else {
       await createPost({
         variables: {
-          input: { tournamentId, title, content, isPinned },
+          input: { tournamentId, title, content, isGhim },
         },
       });
     }
@@ -207,15 +207,15 @@ export default function PostsPage() {
               <div>
                 <p className="text-sm font-medium">Pin Post</p>
                 <p className="text-xs text-muted-foreground">
-                  Pinned posts appear at the top
+                  Ghim posts appear at the top
                 </p>
               </div>
-              <Switch checked={isPinned} onCheckedChange={setIsPinned} />
+              <Switch checked={isGhim} onCheckedChange={setIsGhim} />
             </div>
             <DialogFooter>
               <DialogClose asChild>
                 <Button type="button" variant="outline">
-                  Cancel
+                  Hủy
                 </Button>
               </DialogClose>
               <Button type="submit" disabled={creating || updating}>

@@ -8,13 +8,13 @@ import { Toaster } from '@/components/ui/toaster';
 import './globals.css';
 
 const inter = Inter({
-  subsets: ['latin'],
+  subsets: ['latin', 'vietnamese'],
   variable: '--font-inter',
 });
 
 export const metadata: Metadata = {
   title: 'SportHub',
-  description: 'Sports Tournament Management Platform',
+  description: 'Nền tảng quản lý giải đấu thể thao',
 };
 
 export default function RootLayout({
@@ -23,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="vi" className={inter.variable}>
       <body className="min-h-screen font-sans antialiased">
         <ApolloWrapper>
           <AuthProvider>

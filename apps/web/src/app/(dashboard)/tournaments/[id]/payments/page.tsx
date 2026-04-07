@@ -74,9 +74,9 @@ export default function PaymentsPage() {
 
       <Tabs defaultValue="plans">
         <TabsList>
-          <TabsTrigger value="plans">Payment Plans</TabsTrigger>
+          <TabsTrigger value="plans">Gói thanh toán</TabsTrigger>
           {canManage && <TabsTrigger value="payments">Payments</TabsTrigger>}
-          {canManage && <TabsTrigger value="summary">Financial Summary</TabsTrigger>}
+          {canManage && <TabsTrigger value="summary">Tổng hợp tài chính</TabsTrigger>}
         </TabsList>
 
         <TabsContent value="plans" className="space-y-4 mt-4">
@@ -134,7 +134,7 @@ export default function PaymentsPage() {
                             setPayDialogOpen(true);
                           }}
                         >
-                          Pay Now
+                          Thanh toán
                         </Button>
                       )}
                     </CardContent>

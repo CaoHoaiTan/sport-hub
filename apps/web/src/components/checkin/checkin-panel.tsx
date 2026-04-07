@@ -29,9 +29,9 @@ interface CheckinPanelProps {
 }
 
 const statusConfig: Record<string, { label: string; variant: 'success' | 'warning' | 'destructive'; icon: typeof Check }> = {
-  checked_in: { label: 'Checked In', variant: 'success', icon: Check },
-  pending: { label: 'Pending', variant: 'warning', icon: Clock },
-  absent: { label: 'Absent', variant: 'destructive', icon: XCircle },
+  checked_in: { label: 'Đã điểm danh', variant: 'success', icon: Check },
+  pending: { label: 'Chờ xử lý', variant: 'warning', icon: Clock },
+  absent: { label: 'Vắng mặt', variant: 'destructive', icon: XCircle },
 };
 
 export function CheckinPanel({ matchId, teams }: CheckinPanelProps) {
@@ -136,7 +136,7 @@ export function CheckinPanel({ matchId, teams }: CheckinPanelProps) {
                           {checkingIn ? (
                             <Loader2 className="h-3 w-3 animate-spin" />
                           ) : (
-                            'Check In'
+                            'Điểm danh'
                           )}
                         </Button>
                       )}

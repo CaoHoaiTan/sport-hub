@@ -31,7 +31,7 @@ export function AdminDashboard() {
   if (!dashboard) {
     return (
       <div className="text-center text-muted-foreground py-12">
-        Unable to load dashboard data.
+        Không thể tải dữ liệu tổng quan.
       </div>
     );
   }
@@ -40,17 +40,17 @@ export function AdminDashboard() {
     <div className="space-y-8">
       <div className="grid gap-4 md:grid-cols-3">
         <StatCard
-          title="Total Users"
+          title="Tổng người dùng"
           value={dashboard.totalUsers}
           icon={Users}
         />
         <StatCard
-          title="Total Tournaments"
+          title="Tổng giải đấu"
           value={dashboard.totalTournaments}
           icon={Trophy}
         />
         <StatCard
-          title="Total Matches"
+          title="Tổng trận đấu"
           value={dashboard.totalMatches}
           icon={Swords}
         />
@@ -60,7 +60,7 @@ export function AdminDashboard() {
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base">
             <Clock className="h-4 w-4 text-muted-foreground" />
-            Recent Users
+            Người dùng gần đây
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -72,7 +72,7 @@ export function AdminDashboard() {
                   <TableHead>Email</TableHead>
                   <TableHead>Role</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Joined</TableHead>
+                  <TableHead className="text-right">Ngày tham gia</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -99,7 +99,7 @@ export function AdminDashboard() {
                     </TableCell>
                     <TableCell>
                       <Badge variant={user.isActive ? 'success' : 'destructive'}>
-                        {user.isActive ? 'Active' : 'Inactive'}
+                        {user.isActive ? 'Hoạt động' : 'Ngưng hoạt động'}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right text-sm text-muted-foreground">
@@ -113,7 +113,7 @@ export function AdminDashboard() {
             </Table>
           ) : (
             <p className="text-sm text-muted-foreground py-4 text-center">
-              No recent users
+              Không có người dùng gần đây
             </p>
           )}
         </CardContent>

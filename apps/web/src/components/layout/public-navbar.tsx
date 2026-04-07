@@ -44,7 +44,7 @@ export function PublicNavbar() {
             href={ROUTES.publicTournaments}
             className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
-            Tournaments
+            Giải đấu
           </Link>
           {!isLoading && (
             <>
@@ -62,10 +62,10 @@ export function PublicNavbar() {
               ) : (
                 <div className="flex items-center gap-2">
                   <Button variant="ghost" size="sm" asChild>
-                    <Link href={ROUTES.login}>Log in</Link>
+                    <Link href={ROUTES.login}>Đăng nhập</Link>
                   </Button>
                   <Button size="sm" asChild>
-                    <Link href={ROUTES.register}>Sign up</Link>
+                    <Link href={ROUTES.register}>Đăng ký</Link>
                   </Button>
                 </div>
               )}
@@ -77,7 +77,7 @@ export function PublicNavbar() {
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="md:hidden">
               <Menu className="h-5 w-5" />
-              <span className="sr-only">Open menu</span>
+              <span className="sr-only">Mở menu</span>
             </Button>
           </SheetTrigger>
           <SheetContent side="right" className="w-72">
@@ -93,7 +93,7 @@ export function PublicNavbar() {
                 className="text-sm font-medium"
                 onClick={() => setMobileOpen(false)}
               >
-                Tournaments
+                Giải đấu
               </Link>
               {!isLoading && (
                 <>
@@ -103,7 +103,7 @@ export function PublicNavbar() {
                       className="text-sm font-medium"
                       onClick={() => setMobileOpen(false)}
                     >
-                      Dashboard
+                      Tổng quan
                     </Link>
                   ) : (
                     <div className="flex flex-col gap-2 pt-4">
@@ -112,7 +112,7 @@ export function PublicNavbar() {
                           href={ROUTES.login}
                           onClick={() => setMobileOpen(false)}
                         >
-                          Log in
+                          Đăng nhập
                         </Link>
                       </Button>
                       <Button asChild>
@@ -120,7 +120,7 @@ export function PublicNavbar() {
                           href={ROUTES.register}
                           onClick={() => setMobileOpen(false)}
                         >
-                          Sign up
+                          Đăng ký
                         </Link>
                       </Button>
                     </div>

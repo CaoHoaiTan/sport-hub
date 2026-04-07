@@ -30,8 +30,8 @@ import {
 } from '@/components/ui/form';
 
 const loginSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  email: z.string().email('Vui lòng nhập email hợp lệ'),
+  password: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
 });
 
 type LoginValues = z.infer<typeof loginSchema>;
@@ -56,7 +56,7 @@ export default function LoginPage() {
       router.push(ROUTES.dashboard);
     } catch (error: unknown) {
       const message =
-        error instanceof Error ? error.message : 'Login failed. Please try again.';
+        error instanceof Error ? error.message : 'Đăng nhập thất bại. Vui lòng thử lại.';
       toast.error(message);
     } finally {
       setIsSubmitting(false);
@@ -66,9 +66,9 @@ export default function LoginPage() {
   return (
     <Card>
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl">Welcome back</CardTitle>
+        <CardTitle className="text-2xl">Chào mừng trở lại</CardTitle>
         <CardDescription>
-          Enter your credentials to access your account
+          Nhập thông tin đăng nhập của bạn
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -98,18 +98,18 @@ export default function LoginPage() {
               render={({ field }) => (
                 <FormItem>
                   <div className="flex items-center justify-between">
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel>Mật khẩu</FormLabel>
                     <Link
                       href={ROUTES.forgotPassword}
                       className="text-xs text-muted-foreground hover:text-primary"
                     >
-                      Forgot password?
+                      Quên mật khẩu?
                     </Link>
                   </div>
                   <FormControl>
                     <Input
                       type="password"
-                      placeholder="Enter your password"
+                      placeholder="Nhập mật khẩu"
                       autoComplete="current-password"
                       {...field}
                     />
@@ -119,19 +119,19 @@ export default function LoginPage() {
               )}
             />
             <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? 'Signing in...' : 'Sign in'}
+              {isSubmitting ? 'Đang đăng nhập...' : 'Đăng nhập'}
             </Button>
           </form>
         </Form>
       </CardContent>
       <CardFooter className="justify-center">
         <p className="text-sm text-muted-foreground">
-          Don&apos;t have an account?{' '}
+          Chưa có tài khoản?{' '}
           <Link
             href={ROUTES.register}
             className="font-medium text-primary hover:underline"
           >
-            Sign up
+            Đăng ký
           </Link>
         </p>
       </CardFooter>

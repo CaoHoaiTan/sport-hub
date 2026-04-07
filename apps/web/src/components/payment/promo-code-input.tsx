@@ -66,7 +66,7 @@ export function PromoCodeInput({
           onClick={handleApply}
           disabled={loading || !code.trim()}
         >
-          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Apply'}
+          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Áp dụng'}
         </Button>
       </div>
       {result && (

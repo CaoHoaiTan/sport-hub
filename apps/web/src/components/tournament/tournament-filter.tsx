@@ -48,7 +48,7 @@ export function TournamentFilter({ onFilterChange }: TournamentFilterProps) {
       <div className="relative flex-1">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
-          placeholder="Search tournaments..."
+          placeholder="Tìm kiếm tournaments..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="pl-9"
@@ -77,7 +77,7 @@ export function TournamentFilter({ onFilterChange }: TournamentFilterProps) {
           <SelectItem value="registration">Registration</SelectItem>
           <SelectItem value="in_progress">In Progress</SelectItem>
           <SelectItem value="completed">Completed</SelectItem>
-          <SelectItem value="cancelled">Cancelled</SelectItem>
+          <SelectItem value="cancelled">Hủyled</SelectItem>
         </SelectContent>
       </Select>
     </div>

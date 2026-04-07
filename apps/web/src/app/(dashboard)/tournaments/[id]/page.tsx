@@ -273,14 +273,14 @@ export default function TournamentOverviewPage() {
                             disabled={updating}
                           >
                             <XCircle className="mr-2 h-4 w-4" />
-                            Cancel Tournament
+                            Hủy Tournament
                           </Button>
                         </DialogTrigger>
                         <DialogContent>
                           <DialogHeader>
                             <DialogTitle className="flex items-center gap-2">
                               <AlertTriangle className="h-5 w-5 text-destructive" />
-                              Cancel Tournament
+                              Hủy Tournament
                             </DialogTitle>
                             <DialogDescription>
                               Are you sure you want to cancel this tournament?
@@ -300,7 +300,7 @@ export default function TournamentOverviewPage() {
                               {updating && (
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                               )}
-                              Yes, Cancel Tournament
+                              Yes, Hủy Tournament
                             </Button>
                           </DialogFooter>
                         </DialogContent>

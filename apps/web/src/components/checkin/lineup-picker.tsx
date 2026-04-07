@@ -68,7 +68,7 @@ export function LineupPicker({
     <Card>
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center justify-between text-sm">
-          <span>Starting Lineup</span>
+          <span>Ra sân Lineup</span>
           <span className="text-xs font-normal text-muted-foreground">
             {selected.size}/{checkedInPlayers.length} starting
           </span>
@@ -112,7 +112,7 @@ export function LineupPicker({
           ) : (
             <Users className="mr-2 h-4 w-4" />
           )}
-          Set Lineup
+          Chọn đội hình ra sân
         </Button>
       </CardContent>
     </Card>

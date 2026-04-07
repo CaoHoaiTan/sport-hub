@@ -46,7 +46,7 @@ export function PaymentTable({
 
   const [refundPayment, { loading: refunding }] = useMutation(REFUND_PAYMENT, {
     onCompleted: () => {
-      toast.success('Payment refunded.');
+      toast.success('Đã hoàn tiền thành công.');
       setRefundId(null);
       onRefunded?.();
     },
@@ -56,19 +56,19 @@ export function PaymentTable({
   const columns = [
     {
       key: 'team',
-      header: 'Team',
+      header: 'Đội',
       render: (row: Payment) => (
         <span className="font-medium">{row.team?.name ?? '-'}</span>
       ),
     },
     {
       key: 'amount',
-      header: 'Amount',
+      header: 'Số tiền',
       render: (row: Payment) => formatVND(row.amount),
     },
     {
       key: 'status',
-      header: 'Status',
+      header: 'Trạng thái',
       render: (row: Payment) => (
         <Badge variant={statusVariants[row.status] ?? 'secondary'} className="capitalize">
           {row.status}
@@ -77,21 +77,21 @@ export function PaymentTable({
     },
     {
       key: 'method',
-      header: 'Method',
+      header: 'Phương thức',
       render: (row: Payment) => (
         <span className="capitalize">{row.method?.replace('_', ' ') ?? '-'}</span>
       ),
     },
     {
       key: 'transactionId',
-      header: 'Transaction ID',
+      header: 'Mã giao dịch',
       render: (row: Payment) => (
         <span className="font-mono text-xs">{row.transactionId ?? '-'}</span>
       ),
     },
     {
       key: 'paidAt',
-      header: 'Paid At',
+      header: 'Thời gian thanh toán',
       render: (row: Payment) =>
         row.paidAt ? formatDateTime(row.paidAt) : '-',
     },
@@ -107,7 +107,7 @@ export function PaymentTable({
                   className="text-xs text-destructive hover:underline"
                   onClick={() => setRefundId(row.id)}
                 >
-                  Refund
+                  Hoàn tiền
                 </button>
               ) : null,
           },
@@ -121,8 +121,8 @@ export function PaymentTable({
         columns={columns}
         data={payments as Array<Payment & Record<string, unknown>>}
         isLoading={isLoading}
-        emptyMessage="No payments"
-        emptyDescription="No payments have been made yet."
+        emptyMessage="Chưa có thanh toán"
+        emptyDescription="Chưa có khoản thanh toán nào được thực hiện."
         keyExtractor={(row) => row.id}
       />
       <ConfirmDialog
@@ -130,10 +130,10 @@ export function PaymentTable({
         onOpenChange={(open) => {
           if (!open) setRefundId(null);
         }}
-        title="Refund Payment"
-        description="Are you sure you want to refund this payment? This action cannot be undone."
+        title="Hoàn tiền"
+        description="Bạn có chắc muốn hoàn tiền khoản này không? Hành động này không thể hoàn tác."
         variant="destructive"
-        confirmLabel="Refund"
+        confirmLabel="Hoàn tiền"
         isLoading={refunding}
         onConfirm={() => {
           if (refundId) {

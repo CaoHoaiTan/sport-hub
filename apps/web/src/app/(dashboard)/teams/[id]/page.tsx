@@ -127,7 +127,7 @@ export default function TeamDetailPage() {
                       </span>
                       {player.isCaptain && (
                         <Badge variant="secondary" className="text-[10px]">
-                          Captain
+                          Đội trưởng
                         </Badge>
                       )}
                     </div>
@@ -141,7 +141,7 @@ export default function TeamDetailPage() {
                         variant={player.isActive ? 'success' : 'secondary'}
                         className="text-[10px]"
                       >
-                        {player.isActive ? 'Active' : 'Inactive'}
+                        {player.isActive ? 'Hoạt động' : 'Ngưng hoạt động'}
                       </Badge>
                     </div>
                   </div>

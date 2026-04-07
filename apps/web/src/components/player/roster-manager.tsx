@@ -36,7 +36,7 @@ export function RosterManager({
 }: RosterManagerProps) {
   const [formOpen, setFormOpen] = useState(false);
   const [editPlayer, setEditPlayer] = useState<Player | null>(null);
-  const [removeId, setRemoveId] = useState<string | null>(null);
+  const [removeId, setXóaId] = useState<string | null>(null);
 
   const { data, loading } = useQuery(GET_PLAYERS_BY_TEAM, {
     variables: { teamId },
@@ -47,7 +47,7 @@ export function RosterManager({
     refetchQueries: [{ query: GET_PLAYERS_BY_TEAM, variables: { teamId } }],
     onCompleted: () => {
       toast.success('Player removed.');
-      setRemoveId(null);
+      setXóaId(null);
     },
     onError: (err) => toast.error(err.message),
   });
@@ -85,7 +85,7 @@ export function RosterManager({
         </div>
         <Button size="sm" onClick={handleAdd} disabled={isAtMax}>
           <Plus className="mr-2 h-4 w-4" />
-          Add Player
+          Thêm VĐV
         </Button>
       </div>
 
@@ -101,7 +101,7 @@ export function RosterManager({
         players={players}
         isLoading={loading}
         onEdit={handleEdit}
-        onRemove={(id) => setRemoveId(id)}
+        onXóa={(id) => setXóaId(id)}
       />
 
       <PlayerForm
@@ -123,12 +123,12 @@ export function RosterManager({
       <ConfirmDialog
         open={!!removeId}
         onOpenChange={(open) => {
-          if (!open) setRemoveId(null);
+          if (!open) setXóaId(null);
         }}
-        title="Remove Player"
+        title="Xóa VĐV"
         description="Are you sure you want to remove this player from the team?"
         variant="destructive"
-        confirmLabel="Remove"
+        confirmLabel="Xóa"
         isLoading={removing}
         onConfirm={() => {
           if (removeId) {

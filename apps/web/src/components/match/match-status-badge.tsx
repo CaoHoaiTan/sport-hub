@@ -23,7 +23,7 @@ const statusConfig: Record<
   live: { label: 'Live', variant: 'destructive', pulse: true },
   completed: { label: 'Completed', variant: 'success' },
   postponed: { label: 'Postponed', variant: 'outline' },
-  cancelled: { label: 'Cancelled', variant: 'destructive' },
+  cancelled: { label: 'Hủyled', variant: 'destructive' },
 };
 
 export function MatchStatusBadge({ status, className }: MatchStatusBadgeProps) {

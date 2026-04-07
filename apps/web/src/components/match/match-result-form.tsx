@@ -67,7 +67,7 @@ export function MatchResultForm({ match, tournamentSport }: MatchResultFormProps
     setSets((prev) => [...prev, { homeScore: 0, awayScore: 0 }]);
   }
 
-  function handleRemoveSet(index: number) {
+  function handleXóaSet(index: number) {
     setSets((prev) => prev.filter((_, i) => i !== index));
   }
 
@@ -143,10 +143,10 @@ export function MatchResultForm({ match, tournamentSport }: MatchResultFormProps
       await submitResult({
         variables: { id: match.id, input },
       });
-      toast.success('Match result submitted successfully.');
+      toast.success('Gửi kết quả trận đấu thành công.');
     } catch (error: unknown) {
       const message =
-        error instanceof Error ? error.message : 'Failed to submit result';
+        error instanceof Error ? error.message : 'Không thể gửi kết quả';
       toast.error(message);
     }
   }
@@ -154,7 +154,7 @@ export function MatchResultForm({ match, tournamentSport }: MatchResultFormProps
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Submit Result</CardTitle>
+        <CardTitle className="text-base">Gửi kết quả</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -202,7 +202,7 @@ export function MatchResultForm({ match, tournamentSport }: MatchResultFormProps
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8"
-                      onClick={() => handleRemoveSet(idx)}
+                      onClick={() => handleXóaSet(idx)}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
@@ -218,7 +218,7 @@ export function MatchResultForm({ match, tournamentSport }: MatchResultFormProps
                 className="w-full"
               >
                 <Plus className="h-3.5 w-3.5 mr-1" />
-                Add Set
+                Thêm set
               </Button>
             </div>
           ) : (
@@ -257,7 +257,7 @@ export function MatchResultForm({ match, tournamentSport }: MatchResultFormProps
 
           <Button type="submit" className="w-full" disabled={loading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Submit Result
+            Gửi kết quả
           </Button>
         </form>
       </CardContent>

@@ -37,8 +37,8 @@ export default function AdminUsersPage() {
     return (
       <EmptyState
         icon={Shield}
-        title="Access Denied"
-        description="You do not have permission to view this page."
+        title="Từ chối truy cập"
+        description="Bạn không có quyền xem trang này."
       />
     );
   }
@@ -94,13 +94,13 @@ export default function AdminUsersPage() {
       header: 'Status',
       render: (row: Record<string, unknown>) => (
         <Badge variant={row.isActive ? 'success' : 'destructive'} className="text-[10px]">
-          {row.isActive ? 'Active' : 'Inactive'}
+          {row.isActive ? 'Hoạt động' : 'Ngưng hoạt động'}
         </Badge>
       ),
     },
     {
       key: 'createdAt',
-      header: 'Joined',
+      header: 'Ngày tham gia',
       render: (row: Record<string, unknown>) =>
         formatDate(row.createdAt as string),
     },
@@ -130,9 +130,9 @@ export default function AdminUsersPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">User Management</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Quản lý người dùng</h1>
           <p className="text-sm text-muted-foreground">
-            {totalCount} total users
+            {totalCount} người dùng
           </p>
         </div>
       </div>
@@ -140,8 +140,8 @@ export default function AdminUsersPage() {
       {users.length === 0 ? (
         <EmptyState
           icon={Users}
-          title="No users found"
-          description="There are no registered users yet."
+          title="Không tìm thấy người dùng"
+          description="Chưa có người dùng đăng ký."
         />
       ) : (
         <>

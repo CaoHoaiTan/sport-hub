@@ -10,7 +10,7 @@ interface Post {
   id: string;
   title: string;
   content: string;
-  isPinned: boolean;
+  isGhim: boolean;
   createdAt: string;
   author?: {
     id: string;
@@ -44,10 +44,10 @@ export function PostCard({ post, onEdit, onDelete }: PostCardProps) {
           <div className="min-w-0">
             <div className="flex items-center gap-2">
               <h3 className="font-semibold text-sm truncate">{post.title}</h3>
-              {post.isPinned && (
+              {post.isGhim && (
                 <Badge variant="secondary" className="text-[10px] shrink-0">
                   <Pin className="mr-1 h-2.5 w-2.5" />
-                  Pinned
+                  Ghim
                 </Badge>
               )}
             </div>

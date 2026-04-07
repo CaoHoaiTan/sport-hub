@@ -29,8 +29,8 @@ export function ConfirmDialog({
   description,
   onConfirm,
   variant = 'default',
-  confirmLabel = 'Confirm',
-  cancelLabel = 'Cancel',
+  confirmLabel = 'Xác nhận',
+  cancelLabel = 'Hủy',
   isLoading = false,
 }: ConfirmDialogProps) {
   return (
@@ -53,7 +53,7 @@ export function ConfirmDialog({
             onClick={onConfirm}
             disabled={isLoading}
           >
-            {isLoading ? 'Loading...' : confirmLabel}
+            {isLoading ? 'Đang tải...' : confirmLabel}
           </Button>
         </DialogFooter>
       </DialogContent>

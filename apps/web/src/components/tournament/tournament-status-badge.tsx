@@ -21,7 +21,7 @@ const statusConfig: Record<
   registration: { label: 'Registration', variant: 'default' },
   in_progress: { label: 'In Progress', variant: 'success' },
   completed: { label: 'Completed', variant: 'outline' },
-  cancelled: { label: 'Cancelled', variant: 'destructive' },
+  cancelled: { label: 'Hủyled', variant: 'destructive' },
 };
 
 export function TournamentStatusBadge({

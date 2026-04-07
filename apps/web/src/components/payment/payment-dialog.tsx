@@ -28,10 +28,10 @@ interface PaymentDialogProps {
 }
 
 const methods = [
-  { value: 'bank_transfer', label: 'Bank Transfer', icon: Banknote },
+  { value: 'bank_transfer', label: 'Chuyển khoản', icon: Banknote },
   { value: 'momo', label: 'MoMo', icon: Smartphone },
   { value: 'vnpay', label: 'VNPay', icon: Globe },
-  { value: 'cash', label: 'Cash', icon: CreditCard },
+  { value: 'cash', label: 'Tiền mặt', icon: CreditCard },
 ] as const;
 
 export function PaymentDialog({
@@ -116,7 +116,7 @@ export function PaymentDialog({
           </div>
 
           <div>
-            <p className="text-sm text-muted-foreground mb-2">Promo Code</p>
+            <p className="text-sm text-muted-foreground mb-2">Mã giảm giá</p>
             <PromoCodeInput
               tournamentId={tournamentId}
               amount={amount}
@@ -144,11 +144,11 @@ export function PaymentDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            Hủy
           </Button>
           <Button onClick={handlePay} disabled={loading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Pay Now
+            Thanh toán
           </Button>
         </DialogFooter>
       </DialogContent>

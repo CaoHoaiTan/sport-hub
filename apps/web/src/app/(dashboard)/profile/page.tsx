@@ -29,7 +29,7 @@ import {
 import { UPDATE_PROFILE, CHANGE_PASSWORD } from '@/graphql/mutations/user';
 
 const profileSchema = z.object({
-  fullName: z.string().min(1, 'Full name is required'),
+  fullName: z.string().min(1, 'Vui lòng nhập họ tên'),
   phone: z.string().optional(),
   avatarUrl: z.string().url('Please enter a valid URL').optional().or(z.literal('')),
 });
@@ -38,12 +38,12 @@ type ProfileValues = z.infer<typeof profileSchema>;
 
 const passwordSchema = z
   .object({
-    currentPassword: z.string().min(1, 'Current password is required'),
-    newPassword: z.string().min(8, 'New password must be at least 8 characters'),
+    currentPassword: z.string().min(1, 'Mật khẩu hiện tại is required'),
+    newPassword: z.string().min(8, 'Mật khẩu mới must be at least 8 characters'),
     confirmPassword: z.string(),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
-    message: 'Passwords do not match',
+    message: 'Mật khẩu không khớp',
     path: ['confirmPassword'],
   });
 
@@ -53,9 +53,9 @@ export default function ProfilePage() {
   return (
     <div className="mx-auto max-w-2xl space-y-8">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Profile</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Hồ sơ</h1>
         <p className="text-muted-foreground">
-          Manage your account settings and change your password.
+          Quản lý cài đặt tài khoản và đổi mật khẩu.
         </p>
       </div>
       <ProfileForm />
@@ -91,12 +91,12 @@ function ProfileForm() {
           },
         },
       });
-      toast.success('Profile updated successfully.');
+      toast.success('Cập nhật hồ sơ thành công.');
     } catch (error: unknown) {
       const message =
         error instanceof Error
           ? error.message
-          : 'Failed to update profile.';
+          : 'Không thể cập nhật hồ sơ.';
       toast.error(message);
     } finally {
       setIsSubmitting(false);
@@ -106,9 +106,9 @@ function ProfileForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Personal Information</CardTitle>
+        <CardTitle>Thông tin cá nhân</CardTitle>
         <CardDescription>
-          Update your name, phone number, and avatar.
+          Cập nhật tên, số điện thoại và ảnh đại diện.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -119,7 +119,7 @@ function ProfileForm() {
               name="fullName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Full name</FormLabel>
+                  <FormLabel>Họ và tên</FormLabel>
                   <FormControl>
                     <Input placeholder="John Doe" {...field} />
                   </FormControl>
@@ -132,7 +132,7 @@ function ProfileForm() {
               name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Phone number</FormLabel>
+                  <FormLabel>Số điện thoại</FormLabel>
                   <FormControl>
                     <Input
                       type="tel"
@@ -149,7 +149,7 @@ function ProfileForm() {
               name="avatarUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Avatar URL</FormLabel>
+                  <FormLabel>URL ảnh đại diện</FormLabel>
                   <FormControl>
                     <Input
                       type="url"
@@ -163,7 +163,7 @@ function ProfileForm() {
             />
             <div className="flex justify-end">
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Saving...' : 'Save changes'}
+                {isSubmitting ? 'Đang lưu...' : 'Lưu thay đổi'}
               </Button>
             </div>
           </form>
@@ -197,13 +197,13 @@ function PasswordForm() {
           },
         },
       });
-      toast.success('Password changed successfully.');
+      toast.success('Đổi mật khẩu thành công.');
       form.reset();
     } catch (error: unknown) {
       const message =
         error instanceof Error
           ? error.message
-          : 'Failed to change password.';
+          : 'Không thể đổi mật khẩu.';
       toast.error(message);
     } finally {
       setIsSubmitting(false);
@@ -213,9 +213,9 @@ function PasswordForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Change Password</CardTitle>
+        <CardTitle>Đổi mật khẩu</CardTitle>
         <CardDescription>
-          Update your password to keep your account secure.
+          Đổi mật khẩu để bảo mật tài khoản.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -226,7 +226,7 @@ function PasswordForm() {
               name="currentPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Current password</FormLabel>
+                  <FormLabel>Mật khẩu hiện tại</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
@@ -244,7 +244,7 @@ function PasswordForm() {
               name="newPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>New password</FormLabel>
+                  <FormLabel>Mật khẩu mới</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
@@ -262,7 +262,7 @@ function PasswordForm() {
               name="confirmPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Confirm new password</FormLabel>
+                  <FormLabel>Xác nhận mật khẩu mới</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
@@ -277,7 +277,7 @@ function PasswordForm() {
             />
             <div className="flex justify-end">
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Changing...' : 'Change password'}
+                {isSubmitting ? 'Đang đổi...' : 'Đổi mật khẩu'}
               </Button>
             </div>
           </form>
