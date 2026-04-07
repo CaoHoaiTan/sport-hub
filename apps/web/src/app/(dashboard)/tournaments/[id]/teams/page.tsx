@@ -16,6 +16,7 @@ import { useAuth } from '@/lib/auth/context';
 import { isOrganizer } from '@/lib/utils/roles';
 import { GET_TEAMS_BY_TOURNAMENT } from '@/graphql/queries/team';
 import { GET_TOURNAMENT } from '@/graphql/queries/tournament';
+import { GET_PAYMENTS_BY_TOURNAMENT } from '@/graphql/queries/payment';
 import {
   REGISTER_TEAM,
   DELETE_TEAM,
@@ -63,6 +64,12 @@ export default function TournamentTeamsPage() {
     skip: !id,
   });
 
+  const isOrgRole = user && isOrganizer(user.role);
+  const { data: paymentsData } = useQuery(GET_PAYMENTS_BY_TOURNAMENT, {
+    variables: { tournamentId: id },
+    skip: !id || !isOrgRole,
+  });
+
   const refetchConfig = {
     refetchQueries: [
       { query: GET_TEAMS_BY_TOURNAMENT, variables: { tournamentId: id } },
@@ -86,7 +93,16 @@ export default function TournamentTeamsPage() {
 
   const tournament = tournamentData?.tournament;
   const teams = teamsData?.teamsByTournament ?? [];
+  const payments = paymentsData?.paymentsByTournament ?? [];
+  const hasFee = (tournament?.entryFee ?? 0) > 0;
   const canManage = user && isOrganizer(user.role);
+
+  function teamPaymentStatus(teamId: string): 'paid' | 'pending' | 'unpaid' {
+    const teamPayments = payments.filter((p: { teamId: string; status: string }) => p.teamId === teamId);
+    if (teamPayments.some((p: { status: string }) => p.status === 'paid')) return 'paid';
+    if (teamPayments.some((p: { status: string }) => p.status === 'pending')) return 'pending';
+    return 'unpaid';
+  }
   const isRegistrationOpen = tournament?.status === 'registration';
   const canRegister =
     user &&
@@ -227,12 +243,22 @@ export default function TournamentTeamsPage() {
               seed?: number | null;
             }) => {
               const isMyTeam = user && (team.managerId === user.id || team.manager?.id === user.id);
+              const payStatus = hasFee && canManage ? teamPaymentStatus(team.id) : null;
               return (
               <div key={team.id} className="relative group">
                 <TeamCard
                   team={team}
                   className={isMyTeam ? 'border-primary/40 bg-primary/5 ring-1 ring-primary/20' : ''}
                 />
+                {/* Payment status badge for organizer */}
+                {payStatus && (
+                  <Badge
+                    variant={payStatus === 'paid' ? 'success' : payStatus === 'pending' ? 'warning' : 'destructive'}
+                    className="absolute bottom-2 left-2 text-[9px]"
+                  >
+                    {payStatus === 'paid' ? 'Đã thanh toán' : payStatus === 'pending' ? 'Chờ TT' : 'Chưa TT'}
+                  </Badge>
+                )}
                 {canManage && (
                   <Button
                     variant="ghost"

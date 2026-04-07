@@ -19,6 +19,7 @@ export const GET_TEAM = gql`
       tournament {
         id
         sport
+        entryFee
         minPlayersPerTeam
         maxPlayersPerTeam
       }

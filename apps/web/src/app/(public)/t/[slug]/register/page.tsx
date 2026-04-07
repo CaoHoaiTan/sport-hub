@@ -118,7 +118,14 @@ export default function PublicRegisterPage() {
     return teams.find((t: { managerId?: string; manager?: { id: string } }) => t.managerId === user.id || t.manager?.id === user.id) ?? null;
   }, [user, teams]);
 
-  useEffect(() => { if (userTeam) { setStep('done'); setTeamId(userTeam.id); } }, [userTeam]);
+  useEffect(() => {
+    // Only auto-set done on initial load (user already registered before)
+    // Don't override payment step after fresh registration
+    if (userTeam && step === 'info') {
+      setStep('done');
+      setTeamId(userTeam.id);
+    }
+  }, [userTeam, step]);
   useEffect(() => {
     if (!playersInitialized && minPlayers > 0) {
       setPlayers(Array.from({ length: minPlayers }, () => ({ fullName: '', jerseyNumber: '', position: 'none' })));
@@ -158,9 +165,11 @@ export default function PublicRegisterPage() {
         setTeamId(newTeamId);
         if (hasFee) {
           setStep('payment');
+          window.scrollTo(0, 0);
           toast.success('Đã đăng ký đội! Tiếp tục thanh toán.');
         } else {
           setStep('done');
+          window.scrollTo(0, 0);
           toast.success('Đăng ký hoàn tất!');
         }
       }
