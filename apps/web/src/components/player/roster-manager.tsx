@@ -27,11 +27,13 @@ interface RosterManagerProps {
   teamId: string;
   minPlayers: number;
   maxPlayers: number;
+  sport?: string;
 }
 
 export function RosterManager({
   teamId,
   minPlayers,
+  sport,
   maxPlayers,
 }: RosterManagerProps) {
   const [formOpen, setFormOpen] = useState(false);
@@ -108,6 +110,7 @@ export function RosterManager({
         open={formOpen}
         onOpenChange={setFormOpen}
         teamId={teamId}
+        sport={sport}
         editPlayer={
           editPlayer
             ? {

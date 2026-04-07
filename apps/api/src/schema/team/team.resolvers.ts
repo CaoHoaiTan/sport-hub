@@ -28,7 +28,7 @@ export const teamResolvers = {
       { input }: { input: unknown },
       ctx: GraphQLContext
     ) => {
-      const user = requireRole(ctx.user, 'team_manager', 'organizer', 'admin');
+      const user = requireAuth(ctx.user);
       const service = new TeamService(ctx.db);
       return service.registerTeam(user.id, input);
     },

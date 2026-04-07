@@ -49,10 +49,10 @@ export default function TeamPlayersPage() {
         </Button>
         <div>
           <h1 className="text-2xl font-bold tracking-tight">
-            {team.name} - Players
+            {team.name} - Danh sách vận động viên
           </h1>
           <p className="text-sm text-muted-foreground">
-            Manage the team roster.
+            Quản lý đội hình.
           </p>
         </div>
       </div>
@@ -61,6 +61,7 @@ export default function TeamPlayersPage() {
         teamId={id}
         minPlayers={5}
         maxPlayers={25}
+        sport={team.tournament?.sport}
       />
     </div>
   );

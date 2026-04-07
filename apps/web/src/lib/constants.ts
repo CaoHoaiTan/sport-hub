@@ -33,6 +33,7 @@ export const ROUTES = {
   publicStandings: (slug: string) => `/t/${slug}/standings`,
   publicMatch: (slug: string, matchId: string) => `/t/${slug}/matches/${matchId}`,
   publicPosts: (slug: string) => `/t/${slug}/posts`,
+  publicRegister: (slug: string) => `/t/${slug}/register`,
 } as const;
 
 export const GRAPHQL_HTTP_URL =

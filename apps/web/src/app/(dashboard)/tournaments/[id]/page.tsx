@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useQuery, useMutation } from '@apollo/client';
 import { toast } from 'sonner';
@@ -13,10 +14,13 @@ import {
   CheckCircle,
   XCircle,
   Loader2,
+  ArrowRight,
+  Info,
 } from 'lucide-react';
 
 import { useAuth } from '@/lib/auth/context';
 import { isOrganizer } from '@/lib/utils/roles';
+import { ROUTES } from '@/lib/constants';
 import { formatDate, formatVND } from '@/lib/utils/format';
 import { GET_TOURNAMENT } from '@/graphql/queries/tournament';
 import { UPDATE_TOURNAMENT_STATUS } from '@/graphql/mutations/tournament';
@@ -100,13 +104,13 @@ export default function TournamentOverviewPage() {
         <div className="lg:col-span-2 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Tournament Details</CardTitle>
+              <CardTitle className="text-base">Chi tiết giải đấu</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {tournament.description && (
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">
-                    Description
+                    Mô tả
                   </p>
                   <p className="text-sm whitespace-pre-wrap">
                     {tournament.description}
@@ -119,44 +123,44 @@ export default function TournamentOverviewPage() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <InfoItem
                   icon={Calendar}
-                  label="Start Date"
+                  label="Ngày bắt đầu"
                   value={
                     tournament.startDate
                       ? formatDate(tournament.startDate)
-                      : 'Not set'
+                      : 'Chưa xác định'
                   }
                 />
                 <InfoItem
                   icon={Calendar}
-                  label="End Date"
+                  label="Ngày kết thúc"
                   value={
                     tournament.endDate
                       ? formatDate(tournament.endDate)
-                      : 'Not set'
+                      : 'Chưa xác định'
                   }
                 />
                 <InfoItem
                   icon={Users}
-                  label="Players per Team"
+                  label="Cầu thủ mỗi đội"
                   value={`${tournament.minPlayersPerTeam} - ${tournament.maxPlayersPerTeam}`}
                 />
                 <InfoItem
                   icon={Users}
-                  label="Max Teams"
-                  value={tournament.maxTeams ? String(tournament.maxTeams) : 'Unlimited'}
+                  label="Số đội tối đa"
+                  value={tournament.maxTeams ? String(tournament.maxTeams) : 'Không giới hạn'}
                 />
                 <InfoItem
                   icon={DollarSign}
-                  label="Entry Fee"
+                  label="Lệ phí"
                   value={
                     tournament.entryFee > 0
                       ? formatVND(tournament.entryFee)
-                      : 'Free'
+                      : 'Miễn phí'
                   }
                 />
                 <InfoItem
                   icon={FileText}
-                  label="Format"
+                  label="Thể thức"
                   value={
                     formatLabels[tournament.format] ?? tournament.format
                   }
@@ -169,16 +173,16 @@ export default function TournamentOverviewPage() {
                   <div className="grid gap-4 sm:grid-cols-2">
                     <InfoItem
                       icon={Calendar}
-                      label="Registration Opens"
+                      label="Mở đăng ký"
                       value={formatDate(tournament.registrationStart)}
                     />
                     <InfoItem
                       icon={Calendar}
-                      label="Registration Closes"
+                      label="Đóng đăng ký"
                       value={
                         tournament.registrationEnd
                           ? formatDate(tournament.registrationEnd)
-                          : 'Not set'
+                          : 'Chưa xác định'
                       }
                     />
                   </div>
@@ -189,7 +193,7 @@ export default function TournamentOverviewPage() {
 
               <div>
                 <p className="text-sm text-muted-foreground mb-2">
-                  Points System
+                  Hệ thống điểm
                 </p>
                 <div className="flex gap-4">
                   <Badge variant="success">W: {tournament.pointsForWin}</Badge>
@@ -203,14 +207,15 @@ export default function TournamentOverviewPage() {
 
         {canManage && (
           <div className="space-y-6">
+            {/* Status Management */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Status Management</CardTitle>
+                <CardTitle className="text-base">Quản lý trạng thái</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-muted-foreground">
-                    Current:
+                    Hiện tại:
                   </span>
                   <TournamentStatusBadge status={tournament.status} />
                 </div>
@@ -229,7 +234,7 @@ export default function TournamentOverviewPage() {
                       ) : (
                         <PlayCircle className="mr-2 h-4 w-4" />
                       )}
-                      Open Registration
+                      Mở đăng ký
                     </Button>
                   )}
 
@@ -244,7 +249,7 @@ export default function TournamentOverviewPage() {
                       ) : (
                         <PlayCircle className="mr-2 h-4 w-4" />
                       )}
-                      Start Tournament
+                      Bắt đầu giải đấu
                     </Button>
                   )}
 
@@ -259,7 +264,7 @@ export default function TournamentOverviewPage() {
                       ) : (
                         <CheckCircle className="mr-2 h-4 w-4" />
                       )}
-                      Complete Tournament
+                      Hoàn thành giải đấu
                     </Button>
                   )}
 
@@ -273,24 +278,24 @@ export default function TournamentOverviewPage() {
                             disabled={updating}
                           >
                             <XCircle className="mr-2 h-4 w-4" />
-                            Hủy Tournament
+                            Hủy giải đấu
                           </Button>
                         </DialogTrigger>
                         <DialogContent>
                           <DialogHeader>
                             <DialogTitle className="flex items-center gap-2">
                               <AlertTriangle className="h-5 w-5 text-destructive" />
-                              Hủy Tournament
+                              Hủy giải đấu
                             </DialogTitle>
                             <DialogDescription>
-                              Are you sure you want to cancel this tournament?
-                              This action cannot be undone. All registered teams
-                              and scheduled matches will be affected.
+                              Bạn có chắc muốn hủy giải đấu này? Hành động này
+                              không thể hoàn tác. Tất cả đội đã đăng ký và trận
+                              đấu đã lên lịch sẽ bị ảnh hưởng.
                             </DialogDescription>
                           </DialogHeader>
                           <DialogFooter>
                             <DialogClose asChild>
-                              <Button variant="outline">Keep Tournament</Button>
+                              <Button variant="outline">Giữ lại</Button>
                             </DialogClose>
                             <Button
                               variant="destructive"
@@ -300,13 +305,105 @@ export default function TournamentOverviewPage() {
                               {updating && (
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                               )}
-                              Yes, Hủy Tournament
+                              Xác nhận hủy
                             </Button>
                           </DialogFooter>
                         </DialogContent>
                       </Dialog>
                     )}
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Next Steps Guidance */}
+            <Card className="border-primary/20">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Info className="h-4 w-4" />
+                  Bước tiếp theo
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {tournament.status === 'draft' && (
+                  <>
+                    <StepItem
+                      done={!!tournament.startDate}
+                      label="Cài đặt ngày giờ"
+                      href={ROUTES.tournamentSettings(id)}
+                    />
+                    <StepItem
+                      done={!!tournament.registrationStart}
+                      label="Cài đặt thời gian đăng ký"
+                      href={ROUTES.tournamentSettings(id)}
+                    />
+                    <Separator />
+                    <p className="text-xs text-muted-foreground">
+                      Khi đã sẵn sàng, nhấn &quot;Mở đăng ký&quot; để cho phép
+                      các đội đăng ký tham gia.
+                    </p>
+                  </>
+                )}
+
+                {tournament.status === 'registration' && (
+                  <>
+                    <StepItem
+                      done={false}
+                      label="Chờ các đội đăng ký"
+                      href={ROUTES.tournamentTeams(id)}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Chia sẻ link công khai để các đội đăng ký. Khi đủ đội,
+                      nhấn &quot;Bắt đầu giải đấu&quot;.
+                    </p>
+                    {tournament.slug && (
+                      <div className="rounded-md bg-muted p-2 text-xs break-all">
+                        {typeof window !== 'undefined' ? window.location.origin : ''}/t/{tournament.slug}
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {tournament.status === 'in_progress' && (
+                  <>
+                    <StepItem
+                      done={false}
+                      label="Tạo lịch thi đấu"
+                      href={ROUTES.tournamentSchedule(id)}
+                    />
+                    <StepItem
+                      done={false}
+                      label="Mở check-in cho trận đấu"
+                      href={ROUTES.tournamentCheckin(id)}
+                    />
+                    <StepItem
+                      done={false}
+                      label="Nhập kết quả trận đấu"
+                      href={ROUTES.tournamentSchedule(id)}
+                    />
+                    <StepItem
+                      done={false}
+                      label="Xem bảng xếp hạng"
+                      href={ROUTES.tournamentStandings(id)}
+                    />
+                    <Separator />
+                    <p className="text-xs text-muted-foreground">
+                      Khi tất cả trận đấu hoàn thành, nhấn &quot;Hoàn thành
+                      giải đấu&quot;.
+                    </p>
+                  </>
+                )}
+
+                {tournament.status === 'completed' && (
+                  <p className="text-sm text-muted-foreground">
+                    Giải đấu đã hoàn thành. Xem kết quả tại tab Bảng xếp hạng.
+                  </p>
+                )}
+
+                {tournament.status === 'cancelled' && (
+                  <p className="text-sm text-muted-foreground">
+                    Giải đấu đã bị hủy.
+                  </p>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -333,5 +430,32 @@ function InfoItem({
         <p className="text-sm font-medium">{value}</p>
       </div>
     </div>
+  );
+}
+
+function StepItem({
+  done,
+  label,
+  href,
+}: {
+  done: boolean;
+  label: string;
+  href: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="flex items-center gap-2 rounded-md p-2 text-sm transition-colors hover:bg-accent"
+    >
+      {done ? (
+        <CheckCircle className="h-4 w-4 text-success shrink-0" />
+      ) : (
+        <div className="h-4 w-4 rounded-full border-2 border-muted-foreground/30 shrink-0" />
+      )}
+      <span className={done ? 'text-muted-foreground line-through' : ''}>
+        {label}
+      </span>
+      <ArrowRight className="ml-auto h-3 w-3 text-muted-foreground" />
+    </Link>
   );
 }

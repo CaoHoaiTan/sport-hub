@@ -30,6 +30,7 @@ interface PlayerFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   teamId: string;
+  sport?: string;
   editPlayer?: {
     id: string;
     fullName: string;
@@ -38,39 +39,46 @@ interface PlayerFormProps {
   } | null;
 }
 
-const positions = [
-  'goalkeeper',
-  'defender',
-  'midfielder',
-  'forward',
-  'setter',
-  'libero',
-  'outside_hitter',
-  'middle_blocker',
-  'opposite',
-  'singles',
-  'doubles',
-];
+const positionsBySport: Record<string, { value: string; label: string }[]> = {
+  football: [
+    { value: 'goalkeeper', label: 'Thủ môn' },
+    { value: 'defender', label: 'Hậu vệ' },
+    { value: 'midfielder', label: 'Tiền vệ' },
+    { value: 'forward', label: 'Tiền đạo' },
+  ],
+  volleyball: [
+    { value: 'setter', label: 'Chuyền hai' },
+    { value: 'libero', label: 'Libero' },
+    { value: 'outside_hitter', label: 'Chủ công' },
+    { value: 'middle_blocker', label: 'Phụ công' },
+    { value: 'opposite', label: 'Đối chuyền' },
+  ],
+  badminton: [
+    { value: 'singles', label: 'Đơn' },
+    { value: 'doubles', label: 'Đôi' },
+  ],
+};
 
 export function PlayerForm({
   open,
   onOpenChange,
   teamId,
+  sport,
   editPlayer,
 }: PlayerFormProps) {
   const [fullName, setFullName] = useState('');
   const [jerseyNumber, setJerseyNumber] = useState('');
-  const [position, setPosition] = useState<string>('');
+  const [position, setPosition] = useState<string>('none');
 
   useEffect(() => {
     if (editPlayer) {
       setFullName(editPlayer.fullName);
       setJerseyNumber(String(editPlayer.jerseyNumber));
-      setPosition(editPlayer.position ?? '');
+      setPosition(editPlayer.position ?? 'none');
     } else {
       setFullName('');
       setJerseyNumber('');
-      setPosition('');
+      setPosition('none');
     }
   }, [editPlayer]);
 
@@ -95,11 +103,11 @@ export function PlayerForm({
             input: {
               fullName,
               jerseyNumber: parseInt(jerseyNumber, 10),
-              position: position || null,
+              position: position && position !== 'none' ? position : null,
             },
           },
         });
-        toast.success('Player updated.');
+        toast.success('Cập nhật thành công.');
       } else {
         await addPlayer({
           variables: {
@@ -107,15 +115,15 @@ export function PlayerForm({
               teamId,
               fullName,
               jerseyNumber: parseInt(jerseyNumber, 10),
-              position: position || null,
+              position: position && position !== 'none' ? position : null,
             },
           },
         });
-        toast.success('Player added.');
+        toast.success('Thêm vận động viên thành công.');
       }
       onOpenChange(false);
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Operation failed';
+      const message = error instanceof Error ? error.message : 'Thao tác thất bại';
       toast.error(message);
     }
   }
@@ -125,12 +133,12 @@ export function PlayerForm({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            {editPlayer ? 'Edit Player' : 'Thêm VĐV'}
+            {editPlayer ? 'Sửa thông tin VĐV' : 'Thêm VĐV'}
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="player-name">Full Name</Label>
+            <Label htmlFor="player-name">Họ tên</Label>
             <Input
               id="player-name"
               value={fullName}
@@ -153,16 +161,16 @@ export function PlayerForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="player-position">Vị trí (optional)</Label>
+            <Label htmlFor="player-position">Vị trí (tùy chọn)</Label>
             <Select value={position} onValueChange={setPosition}>
               <SelectTrigger>
-                <SelectValue placeholder="Select position" />
+                <SelectValue placeholder="Chọn vị trí" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">None</SelectItem>
-                {positions.map((pos) => (
-                  <SelectItem key={pos} value={pos}>
-                    <span className="capitalize">{pos.replace('_', ' ')}</span>
+                <SelectItem value="none">Không chọn</SelectItem>
+                {(positionsBySport[sport ?? ''] ?? Object.values(positionsBySport).flat()).map((pos) => (
+                  <SelectItem key={pos.value} value={pos.value}>
+                    {pos.label}
                   </SelectItem>
                 ))}
               </SelectContent>

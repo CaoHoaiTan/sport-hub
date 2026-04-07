@@ -25,9 +25,25 @@ export const tournamentResolvers = {
     },
 
     myTournaments: async (_: unknown, __: unknown, ctx: GraphQLContext) => {
-      const user = requireRole(ctx.user, 'organizer', 'admin');
+      const user = requireAuth(ctx.user);
       const service = new TournamentService(ctx.db);
-      return service.getByOrganizer(user.id);
+      const isOrgOrAdmin = user.role === 'organizer' || user.role === 'admin';
+
+      const organized = isOrgOrAdmin
+        ? await service.getByOrganizer(user.id)
+        : [];
+      const participating = await service.getByParticipant(user.id);
+
+      // Merge and deduplicate by ID
+      const seen = new Set<string>();
+      const result: Tournament[] = [];
+      for (const t of [...organized, ...participating]) {
+        if (!seen.has(t.id)) {
+          seen.add(t.id);
+          result.push(t);
+        }
+      }
+      return result;
     },
   },
 

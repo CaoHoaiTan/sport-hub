@@ -276,7 +276,7 @@ export default async function PublicTournamentOverviewPage({ params }: PageProps
                   Đăng nhập để đăng ký đội tham gia giải đấu này.
                 </p>
                 <Button asChild className="w-full" size="sm">
-                  <Link href={`/tournaments/${tournament.id}/teams`}>
+                  <Link href={`/t/${tournament.slug}/register`}>
                     Đăng ký tham gia
                   </Link>
                 </Button>

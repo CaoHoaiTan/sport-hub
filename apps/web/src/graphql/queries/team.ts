@@ -16,6 +16,10 @@ export const GET_TEAM = gql`
   query GetTeam($id: ID!) {
     team(id: $id) {
       ...TeamFields
+      tournament {
+        id
+        sport
+      }
       players {
         id
         fullName

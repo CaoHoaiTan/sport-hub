@@ -1,6 +1,6 @@
 import { type ReactNode } from 'react';
 import Link from 'next/link';
-import { Calendar, BarChart3, MessageSquare, LayoutDashboard } from 'lucide-react';
+import { Calendar, BarChart3, MessageSquare, LayoutDashboard, UserPlus } from 'lucide-react';
 
 import { getClient } from '@/lib/apollo/rsc-client';
 import { GET_PUBLIC_TOURNAMENT } from '@/graphql/queries/public';
@@ -24,11 +24,16 @@ export default async function PublicTournamentLayout({ children, params }: Props
     // tournament stays null
   }
 
+  const isRegistrationOpen = tournament?.status === 'registration';
+
   const tabs = [
-    { label: 'Overview', href: `/t/${slug}`, icon: LayoutDashboard },
-    { label: 'Schedule', href: `/t/${slug}/schedule`, icon: Calendar },
-    { label: 'Standings', href: `/t/${slug}/standings`, icon: BarChart3 },
-    { label: 'Posts', href: `/t/${slug}/posts`, icon: MessageSquare },
+    { label: 'Tổng quan', href: `/t/${slug}`, icon: LayoutDashboard },
+    ...(isRegistrationOpen
+      ? [{ label: 'Đăng ký', href: `/t/${slug}/register`, icon: UserPlus }]
+      : []),
+    { label: 'Lịch thi đấu', href: `/t/${slug}/schedule`, icon: Calendar },
+    { label: 'Bảng xếp hạng', href: `/t/${slug}/standings`, icon: BarChart3 },
+    { label: 'Bài viết', href: `/t/${slug}/posts`, icon: MessageSquare },
   ];
 
   return (

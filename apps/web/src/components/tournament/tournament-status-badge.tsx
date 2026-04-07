@@ -17,11 +17,11 @@ const statusConfig: Record<
   TournamentStatus,
   { label: string; variant: BadgeProps['variant'] }
 > = {
-  draft: { label: 'Draft', variant: 'secondary' },
-  registration: { label: 'Registration', variant: 'default' },
-  in_progress: { label: 'In Progress', variant: 'success' },
-  completed: { label: 'Completed', variant: 'outline' },
-  cancelled: { label: 'Hủyled', variant: 'destructive' },
+  draft: { label: 'Nháp', variant: 'secondary' },
+  registration: { label: 'Đang đăng ký', variant: 'default' },
+  in_progress: { label: 'Đang diễn ra', variant: 'success' },
+  completed: { label: 'Hoàn thành', variant: 'outline' },
+  cancelled: { label: 'Đã hủy', variant: 'destructive' },
 };
 
 export function TournamentStatusBadge({

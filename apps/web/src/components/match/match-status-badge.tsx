@@ -18,12 +18,12 @@ const statusConfig: Record<
   MatchStatus,
   { label: string; variant: 'secondary' | 'warning' | 'destructive' | 'success' | 'outline'; pulse?: boolean }
 > = {
-  scheduled: { label: 'Scheduled', variant: 'secondary' },
-  checkin_open: { label: 'Check-in Open', variant: 'warning' },
-  live: { label: 'Live', variant: 'destructive', pulse: true },
-  completed: { label: 'Completed', variant: 'success' },
-  postponed: { label: 'Postponed', variant: 'outline' },
-  cancelled: { label: 'Hủyled', variant: 'destructive' },
+  scheduled: { label: 'Đã lên lịch', variant: 'secondary' },
+  checkin_open: { label: 'Đang check-in', variant: 'warning' },
+  live: { label: 'Đang thi đấu', variant: 'destructive', pulse: true },
+  completed: { label: 'Hoàn thành', variant: 'success' },
+  postponed: { label: 'Hoãn', variant: 'outline' },
+  cancelled: { label: 'Đã hủy', variant: 'destructive' },
 };
 
 export function MatchStatusBadge({ status, className }: MatchStatusBadgeProps) {

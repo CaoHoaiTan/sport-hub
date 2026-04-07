@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -44,8 +44,17 @@ const registerSchema = z
 type RegisterValues = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
+  return (
+    <Suspense>
+      <RegisterForm />
+    </Suspense>
+  );
+}
+
+function RegisterForm() {
   const { register: registerUser } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<RegisterValues>({
@@ -66,7 +75,8 @@ export default function RegisterPage() {
         email: values.email,
         password: values.password,
       });
-      router.push(ROUTES.dashboard);
+      const redirectTo = searchParams.get('redirect') || ROUTES.dashboard;
+      router.push(redirectTo);
     } catch (error: unknown) {
       const message =
         error instanceof Error

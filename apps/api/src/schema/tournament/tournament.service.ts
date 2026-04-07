@@ -245,4 +245,14 @@ export class TournamentService {
       .orderBy('created_at', 'desc')
       .execute();
   }
+
+  async getByParticipant(userId: string): Promise<Tournament[]> {
+    return this.db
+      .selectFrom('tournaments')
+      .selectAll('tournaments')
+      .innerJoin('teams', 'teams.tournament_id', 'tournaments.id')
+      .where('teams.manager_id', '=', userId)
+      .orderBy('tournaments.created_at', 'desc')
+      .execute();
+  }
 }
