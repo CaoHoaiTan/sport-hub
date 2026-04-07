@@ -1,4 +1,5 @@
-import type { MatchCheckin } from '@sporthub/db';
+import { GraphQLError } from 'graphql';
+import type { MatchCheckin, CheckinQrCode } from '@sporthub/db';
 import type { GraphQLContext } from '../../context.js';
 import { requireAuth, requireRole } from '../../middleware/role.guard.js';
 import { CheckinService } from './checkin.service.js';
@@ -12,6 +13,15 @@ export const checkinResolvers = {
     ) => {
       const service = new CheckinService(ctx.db);
       return service.getCheckinStatus(matchId);
+    },
+
+    checkinInfoByCode: async (
+      _: unknown,
+      { code }: { code: string },
+      ctx: GraphQLContext
+    ) => {
+      const service = new CheckinService(ctx.db);
+      return service.getCheckinInfoByCode(code);
     },
   },
 
@@ -41,6 +51,19 @@ export const checkinResolvers = {
       { code, playerId }: { code: string; playerId: string },
       ctx: GraphQLContext
     ) => {
+      const user = requireAuth(ctx.user);
+      // Verify the player belongs to this user
+      const player = await ctx.db
+        .selectFrom('team_players')
+        .select(['id', 'user_id'])
+        .where('id', '=', playerId)
+        .executeTakeFirst();
+      if (!player || player.user_id !== user.id) {
+        throw new GraphQLError(
+          'Bạn chỉ có thể check-in cho chính mình',
+          { extensions: { code: 'FORBIDDEN' } }
+        );
+      }
       const service = new CheckinService(ctx.db);
       return service.qrCheckin(code, playerId);
     },
@@ -64,6 +87,14 @@ export const checkinResolvers = {
       const service = new CheckinService(ctx.db);
       return service.setLineup(input, user.id, user.role);
     },
+  },
+
+  CheckinQrCode: {
+    matchId: (q: CheckinQrCode) => q.match_id,
+    expiresAt: (q: CheckinQrCode) => q.expires_at,
+    isUsed: (q: CheckinQrCode) => q.is_used,
+    createdAt: (q: CheckinQrCode) => q.created_at,
+    qrDataUrl: (q: CheckinQrCode & { qrDataUrl?: string }) => q.qrDataUrl ?? null,
   },
 
   MatchCheckin: {

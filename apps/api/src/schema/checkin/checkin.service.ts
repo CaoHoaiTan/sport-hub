@@ -86,7 +86,9 @@ export class CheckinService {
       .returningAll()
       .executeTakeFirstOrThrow();
 
-    const qrDataUrl = await generateQrDataUrl(code);
+    const appUrl = process.env.APP_URL ?? 'http://localhost:3000';
+    const checkinUrl = `${appUrl}/checkin?code=${code}`;
+    const qrDataUrl = await generateQrDataUrl(checkinUrl);
 
     const checkins = await this.db
       .selectFrom('match_checkins')
@@ -356,7 +358,9 @@ export class CheckinService {
 
     let qrCode: (CheckinQrCode & { qrDataUrl: string }) | null = null;
     if (qrRecord) {
-      const qrDataUrl = await generateQrDataUrl(qrRecord.code);
+      const appUrl = process.env.APP_URL ?? 'http://localhost:3000';
+      const checkinUrl = `${appUrl}/checkin?code=${qrRecord.code}`;
+      const qrDataUrl = await generateQrDataUrl(checkinUrl);
       qrCode = { ...qrRecord, qrDataUrl };
     }
 
@@ -364,6 +368,55 @@ export class CheckinService {
       matchId,
       checkins,
       qrCode,
+      isOpen: match.status === 'checkin_open',
+    };
+  }
+
+  async getCheckinInfoByCode(code: string) {
+    const qr = await this.db
+      .selectFrom('checkin_qr_codes')
+      .selectAll()
+      .where('code', '=', code)
+      .executeTakeFirst();
+
+    if (!qr) {
+      throw new GraphQLError('Mã QR không hợp lệ', { extensions: { code: 'BAD_USER_INPUT' } });
+    }
+
+    if (new Date() > qr.expires_at) {
+      throw new GraphQLError('Mã QR đã hết hạn', { extensions: { code: 'BAD_USER_INPUT' } });
+    }
+
+    const match = await this.db
+      .selectFrom('matches')
+      .selectAll()
+      .where('id', '=', qr.match_id)
+      .executeTakeFirst();
+
+    if (!match) {
+      throw new GraphQLError('Không tìm thấy trận đấu', { extensions: { code: 'NOT_FOUND' } });
+    }
+
+    const homeTeam = match.home_team_id
+      ? await this.db.selectFrom('teams').selectAll().where('id', '=', match.home_team_id).executeTakeFirst()
+      : null;
+    const awayTeam = match.away_team_id
+      ? await this.db.selectFrom('teams').selectAll().where('id', '=', match.away_team_id).executeTakeFirst()
+      : null;
+
+    const homePlayers = match.home_team_id
+      ? await this.db.selectFrom('team_players').selectAll().where('team_id', '=', match.home_team_id).where('is_active', '=', true).execute()
+      : [];
+    const awayPlayers = match.away_team_id
+      ? await this.db.selectFrom('team_players').selectAll().where('team_id', '=', match.away_team_id).where('is_active', '=', true).execute()
+      : [];
+
+    return {
+      matchId: qr.match_id,
+      homeTeam,
+      awayTeam,
+      homePlayers,
+      awayPlayers,
       isOpen: match.status === 'checkin_open',
     };
   }

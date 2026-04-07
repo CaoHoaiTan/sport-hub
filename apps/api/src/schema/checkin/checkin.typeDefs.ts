@@ -45,8 +45,18 @@ export const checkinTypeDefs = gql`
     startingPlayerIds: [ID!]!
   }
 
+  type QrCheckinInfo {
+    matchId: ID!
+    homeTeam: Team
+    awayTeam: Team
+    homePlayers: [TeamPlayer!]!
+    awayPlayers: [TeamPlayer!]!
+    isOpen: Boolean!
+  }
+
   extend type Query {
     matchCheckinStatus(matchId: ID!): CheckinStatusResponse!
+    checkinInfoByCode(code: String!): QrCheckinInfo!
   }
 
   extend type Mutation {

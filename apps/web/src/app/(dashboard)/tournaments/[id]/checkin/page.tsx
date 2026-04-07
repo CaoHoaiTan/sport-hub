@@ -63,8 +63,8 @@ export default function CheckinPage() {
     return (
       <EmptyState
         icon={QrCode}
-        title="No matches scheduled"
-        description="Create matches in the Schedule tab before managing check-ins."
+        title="Chưa có trận đấu"
+        description="Tạo lịch thi đấu ở tab Lịch thi đấu trước khi quản lý check-in."
       />
     );
   }
@@ -73,9 +73,9 @@ export default function CheckinPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold">Match Check-in</h2>
+          <h2 className="text-lg font-semibold">Check-in trận đấu</h2>
           <p className="text-sm text-muted-foreground">
-            Manage player attendance and lineups for each match.
+            Quản lý điểm danh và đội hình cho từng trận đấu.
           </p>
         </div>
       </div>
@@ -158,10 +158,12 @@ function MatchCheckinRow({
   return (
     <Card>
       <CardContent className="p-0">
-        <button
-          type="button"
-          className="flex w-full items-center justify-between gap-4 p-4 text-left hover:bg-muted/50 transition-colors"
+        <div
+          role="button"
+          tabIndex={0}
+          className="flex w-full items-center justify-between gap-4 p-4 text-left hover:bg-muted/50 transition-colors cursor-pointer"
           onClick={onToggle}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onToggle(); }}
         >
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 flex-wrap">
@@ -183,7 +185,7 @@ function MatchCheckinRow({
 
           <div className="flex items-center gap-2 shrink-0">
             <Badge variant={isOpen ? 'success' : 'secondary'} className="text-[10px]">
-              {isOpen ? 'Check-in Open' : 'Check-in Closed'}
+              {isOpen ? 'Đang mở' : 'Đã đóng'}
             </Badge>
             {canManage && (
               <Button
@@ -205,12 +207,12 @@ function MatchCheckinRow({
                 ) : isOpen ? (
                   <>
                     <Lock className="mr-1 h-3 w-3" />
-                    Close
+                    Đóng
                   </>
                 ) : (
                   <>
                     <LockOpen className="mr-1 h-3 w-3" />
-                    Open
+                    Mở
                   </>
                 )}
               </Button>
@@ -221,7 +223,7 @@ function MatchCheckinRow({
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
             )}
           </div>
-        </button>
+        </div>
 
         {isExpanded && homeWithPlayers && awayWithPlayers && (
           <div className="border-t p-4">
@@ -234,7 +236,7 @@ function MatchCheckinRow({
 
         {isExpanded && (!homeWithPlayers || !awayWithPlayers) && (
           <div className="border-t p-4 text-center text-sm text-muted-foreground">
-            Teams have not been assigned to this match yet.
+            Chưa có đội được phân vào trận đấu này.
           </div>
         )}
       </CardContent>

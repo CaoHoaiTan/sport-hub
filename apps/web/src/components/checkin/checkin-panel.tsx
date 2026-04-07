@@ -38,6 +38,7 @@ export function CheckinPanel({ matchId, teams }: CheckinPanelProps) {
   const { data, loading, refetch } = useQuery(GET_MATCH_CHECKIN_STATUS, {
     variables: { matchId },
     pollInterval: 10000,
+    fetchPolicy: 'network-only',
   });
 
   const [playerCheckin, { loading: checkingIn }] = useMutation(PLAYER_CHECKIN, {
