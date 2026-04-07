@@ -43,6 +43,7 @@ interface TabDef {
   href: string;
   icon: typeof LayoutDashboard;
   organizerOnly?: boolean;
+  hidden?: boolean;
 }
 
 export default function TournamentDetailLayout({
@@ -79,6 +80,7 @@ export default function TournamentDetailLayout({
       label: 'Standings',
       href: ROUTES.tournamentStandings(id),
       icon: BarChart3,
+      hidden: tournament?.format === 'single_elimination' || tournament?.format === 'double_elimination',
     },
     {
       label: 'Check-in',
@@ -106,7 +108,7 @@ export default function TournamentDetailLayout({
   ];
 
   const visibleTabs = tabs.filter(
-    (tab) => !tab.organizerOnly || canManage
+    (tab) => !tab.hidden && (!tab.organizerOnly || canManage)
   );
 
   return (

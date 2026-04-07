@@ -504,20 +504,36 @@ export class MatchService {
   ): Promise<void> {
     if (!match.bracket_position) return;
 
-    // Find next match: the winner of bracket_position N goes to
-    // the match at position ceil(N/2) in the next round
-    const nextBracketPosition = Math.ceil(match.bracket_position / 2);
-    const isHomeInNext = match.bracket_position % 2 === 1;
+    // Get all matches in the current round to determine position index
+    const currentRoundMatches = await this.db
+      .selectFrom('matches')
+      .selectAll()
+      .where('tournament_id', '=', match.tournament_id)
+      .where('round', '=', match.round)
+      .orderBy('bracket_position', 'asc')
+      .execute();
 
-    const nextMatch = await this.db
+    // Find position index of this match within its round (0-based)
+    const matchIndex = currentRoundMatches.findIndex((m) => m.id === match.id);
+    if (matchIndex === -1) return;
+
+    // Get all matches in the next round
+    const nextRoundMatches = await this.db
       .selectFrom('matches')
       .selectAll()
       .where('tournament_id', '=', match.tournament_id)
       .where('round', '=', match.round + 1)
-      .where('bracket_position', '=', nextBracketPosition + this.getBracketOffset(match))
-      .executeTakeFirst();
+      .orderBy('bracket_position', 'asc')
+      .execute();
 
-    if (!nextMatch) return;
+    if (nextRoundMatches.length === 0) return;
+
+    // Match index 0,1 → next match 0; index 2,3 → next match 1; etc.
+    const nextMatchIndex = Math.floor(matchIndex / 2);
+    const isHomeInNext = matchIndex % 2 === 0;
+
+    if (nextMatchIndex >= nextRoundMatches.length) return;
+    const nextMatch = nextRoundMatches[nextMatchIndex];
 
     const updateField = isHomeInNext ? 'home_team_id' : 'away_team_id';
     await this.db
@@ -525,12 +541,6 @@ export class MatchService {
       .set({ [updateField]: winnerTeamId, updated_at: new Date() })
       .where('id', '=', nextMatch.id)
       .execute();
-  }
-
-  private getBracketOffset(match: Match): number {
-    // For matches in the same round group, calculate the offset
-    // This is a simplified version; in practice bracket position is absolute
-    return 0;
   }
 
   /**

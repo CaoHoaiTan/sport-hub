@@ -32,7 +32,9 @@ export default async function PublicTournamentLayout({ children, params }: Props
       ? [{ label: 'Đăng ký', href: `/t/${slug}/register`, icon: UserPlus }]
       : []),
     { label: 'Lịch thi đấu', href: `/t/${slug}/schedule`, icon: Calendar },
-    { label: 'Bảng xếp hạng', href: `/t/${slug}/standings`, icon: BarChart3 },
+    ...(tournament?.format !== 'single_elimination' && tournament?.format !== 'double_elimination'
+      ? [{ label: 'Bảng xếp hạng', href: `/t/${slug}/standings`, icon: BarChart3 }]
+      : []),
     { label: 'Bài viết', href: `/t/${slug}/posts`, icon: MessageSquare },
   ];
 
