@@ -84,31 +84,71 @@ export function MatchResultForm({ match, tournamentSport }: MatchResultFormProps
   function validateSets(): string | null {
     if (!isSetBased) return null;
 
-    const maxSets = tournamentSport === 'volleyball' ? 5 : 3;
+    const setsToWin = tournamentSport === 'volleyball' ? 3 : 2;
+    const maxSets = setsToWin * 2 - 1;
+    const minLead = 2;
+
     if (sets.length > maxSets) {
-      return `Tối đa ${maxSets} set cho ${tournamentSport === 'volleyball' ? 'bóng chuyền' : 'cầu lông'}.`;
+      return `Tối đa ${maxSets} set.`;
     }
+
+    let homeSetsWon = 0;
+    let awaySetsWon = 0;
 
     for (let i = 0; i < sets.length; i++) {
       const set = sets[i];
-      const isFinalSet = tournamentSport === 'volleyball' && i === 4;
-      const targetPoints = isFinalSet
+      const isFinalSet = i === maxSets - 1;
+      const target = isFinalSet && tournamentSport === 'volleyball'
         ? 15
-        : tournamentSport === 'volleyball'
-          ? 25
-          : 21;
-      const maxPoints = tournamentSport === 'badminton' ? 30 : Infinity;
+        : tournamentSport === 'volleyball' ? 25 : 21;
+      const cap = tournamentSport === 'badminton' ? 30 : Infinity;
 
       const winnerScore = Math.max(set.homeScore, set.awayScore);
       const loserScore = Math.min(set.homeScore, set.awayScore);
+      const lead = winnerScore - loserScore;
 
-      if (winnerScore < targetPoints) {
-        return `Set ${i + 1}: đội thắng cần đạt ít nhất ${targetPoints} điểm.`;
+      if (set.homeScore < 0 || set.awayScore < 0) {
+        return `Set ${i + 1}: điểm không được âm.`;
       }
 
-      if (winnerScore - loserScore < 2 && winnerScore < maxPoints) {
-        return `Set ${i + 1}: cần chênh lệch ít nhất 2 điểm (hoặc đạt ${maxPoints}).`;
+      if (set.homeScore === set.awayScore) {
+        return `Set ${i + 1}: điểm hai đội không được bằng nhau.`;
       }
+
+      if (winnerScore < target) {
+        return `Set ${i + 1}: đội thắng cần đạt ít nhất ${target} điểm.`;
+      }
+
+      if (winnerScore > cap) {
+        return `Set ${i + 1}: điểm không được vượt quá ${cap}.`;
+      }
+
+      if (winnerScore === cap) {
+        // At cap (badminton 30): loser = 28 or 29
+        if (loserScore < cap - minLead || loserScore >= cap) {
+          return `Set ${i + 1}: tỉ số ${winnerScore}-${loserScore} không hợp lệ.`;
+        }
+      } else if (winnerScore === target) {
+        // Exact target (25 or 21): loser max = target - 2
+        if (loserScore > target - minLead) {
+          return `Set ${i + 1}: tỉ số ${winnerScore}-${loserScore} không hợp lệ. VD hợp lệ: ${target}-${target - minLead}.`;
+        }
+      } else {
+        // Above target (deuce): lead phải đúng 2
+        if (lead !== minLead) {
+          return `Set ${i + 1}: trong deuce cần chênh lệch đúng ${minLead} điểm (VD: ${target + 1}-${target - 1}).`;
+        }
+        if (loserScore < target - 1) {
+          return `Set ${i + 1}: tỉ số ${winnerScore}-${loserScore} không hợp lệ.`;
+        }
+      }
+
+      if (set.homeScore > set.awayScore) homeSetsWon++;
+      else awaySetsWon++;
+    }
+
+    if (homeSetsWon < setsToWin && awaySetsWon < setsToWin) {
+      return `Trận đấu chưa kết thúc: cần thắng ${setsToWin} set (hiện: ${homeSetsWon}-${awaySetsWon}).`;
     }
 
     return null;

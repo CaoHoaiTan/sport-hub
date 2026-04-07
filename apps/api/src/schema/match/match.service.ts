@@ -404,44 +404,92 @@ export class MatchService {
 
     for (const set of sets) {
       const isFinalSet = set.setNumber === setsToWin * 2 - 1;
-      const targetPoints = isFinalSet ? finalSetPoints : pointsPerSet;
+      const target = isFinalSet ? finalSetPoints : pointsPerSet;
+      const cap = maxPoints ?? Infinity;
 
-      const winner =
-        set.homeScore > set.awayScore ? 'home' : 'away';
       const winnerScore = Math.max(set.homeScore, set.awayScore);
       const loserScore = Math.min(set.homeScore, set.awayScore);
+      const lead = winnerScore - loserScore;
 
-      // Must reach target points
-      if (winnerScore < targetPoints) {
+      // Scores must be non-negative
+      if (set.homeScore < 0 || set.awayScore < 0) {
         throw new GraphQLError(
-          `Set ${set.setNumber}: winner must score at least ${targetPoints} points`,
+          `Set ${set.setNumber}: điểm không được âm`,
           { extensions: { code: 'BAD_USER_INPUT' } }
         );
       }
 
-      // Must have minimum lead (unless at max points cap)
-      if (maxPoints && winnerScore >= maxPoints) {
-        // At cap, just need to be ahead
-        if (winnerScore - loserScore < 1) {
+      // Scores must not be equal
+      if (set.homeScore === set.awayScore) {
+        throw new GraphQLError(
+          `Set ${set.setNumber}: điểm hai đội không được bằng nhau`,
+          { extensions: { code: 'BAD_USER_INPUT' } }
+        );
+      }
+
+      // Winner must reach at least target points
+      if (winnerScore < target) {
+        throw new GraphQLError(
+          `Set ${set.setNumber}: đội thắng cần đạt ít nhất ${target} điểm`,
+          { extensions: { code: 'BAD_USER_INPUT' } }
+        );
+      }
+
+      // Validate score based on game rules:
+      // Case 1: Winner scores exactly target → loser must have < target - minLead + 1
+      //   e.g., volleyball: 25-23 OK, 25-24 needs deuce → goes to 26-24
+      // Case 2: Winner scores above target (deuce) → must have exactly minLead lead
+      //   e.g., 26-24, 27-25, 28-26 OK. 28-24 NOT OK (game ended earlier)
+      // Case 3: At cap (badminton 30) → winner = cap, loser = cap - 1 or less
+      if (winnerScore > cap) {
+        throw new GraphQLError(
+          `Set ${set.setNumber}: điểm không được vượt quá ${cap}`,
+          { extensions: { code: 'BAD_USER_INPUT' } }
+        );
+      }
+
+      if (winnerScore === cap) {
+        // At cap: loser must be cap-1 or cap-2 (depending on minLead)
+        if (loserScore < cap - minLead || loserScore >= cap) {
           throw new GraphQLError(
-            `Set ${set.setNumber}: invalid score at cap`,
+            `Set ${set.setNumber}: tỉ số ${winnerScore}-${loserScore} không hợp lệ khi đạt điểm tối đa`,
             { extensions: { code: 'BAD_USER_INPUT' } }
           );
         }
-      } else if (winnerScore - loserScore < minLead && winnerScore > targetPoints) {
-        // Deuce scenario: need exact 2-point lead at deuce, or exactly at target with enough lead
-      } else if (winnerScore === targetPoints && loserScore > targetPoints - minLead) {
-        // This is fine for deuce scenarios
+      } else if (winnerScore === target) {
+        // Exact target: loser must be below target - minLead + 1
+        // e.g., target=25, minLead=2: loser max = 23
+        if (loserScore > target - minLead) {
+          throw new GraphQLError(
+            `Set ${set.setNumber}: tỉ số ${winnerScore}-${loserScore} không hợp lệ (loser quá cao, cần qua deuce)`,
+            { extensions: { code: 'BAD_USER_INPUT' } }
+          );
+        }
+      } else {
+        // Above target (deuce): must have exactly minLead lead
+        // AND loser must be at least target - minLead + 1 (they were in deuce)
+        if (lead !== minLead) {
+          throw new GraphQLError(
+            `Set ${set.setNumber}: trong deuce cần chênh lệch đúng ${minLead} điểm (hiện: ${lead})`,
+            { extensions: { code: 'BAD_USER_INPUT' } }
+          );
+        }
+        if (loserScore < target - 1) {
+          throw new GraphQLError(
+            `Set ${set.setNumber}: tỉ số ${winnerScore}-${loserScore} không hợp lệ`,
+            { extensions: { code: 'BAD_USER_INPUT' } }
+          );
+        }
       }
 
-      if (winner === 'home') homeSetsWon++;
+      if (set.homeScore > set.awayScore) homeSetsWon++;
       else awaySetsWon++;
     }
 
     // One team must have won enough sets
     if (homeSetsWon < setsToWin && awaySetsWon < setsToWin) {
       throw new GraphQLError(
-        `Match is not complete: need ${setsToWin} sets to win`,
+        `Trận đấu chưa kết thúc: cần thắng ${setsToWin} set`,
         { extensions: { code: 'BAD_USER_INPUT' } }
       );
     }

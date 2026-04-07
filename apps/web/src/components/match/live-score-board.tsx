@@ -84,7 +84,7 @@ export function LiveScoreBoard({ match, className }: LiveScoreBoardProps) {
 
       {hasSets && (
         <div className="mt-4 flex justify-center gap-3 flex-wrap">
-          {match.sets!
+          {[...match.sets!]
             .sort((a, b) => a.setNumber - b.setNumber)
             .map((set) => (
               <div
