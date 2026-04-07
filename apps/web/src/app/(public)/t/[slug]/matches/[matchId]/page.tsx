@@ -56,7 +56,7 @@ export default function PublicMatchDetailPage() {
   if (!match) {
     return (
       <div className="container mx-auto px-4 py-12 text-center text-muted-foreground">
-        Match not found.
+        Không tìm thấy trận đấu.
       </div>
     );
   }
@@ -67,7 +67,7 @@ export default function PublicMatchDetailPage() {
         <Button variant="ghost" size="sm" asChild>
           <Link href={ROUTES.publicSchedule(slug)}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Schedule
+            Quay lại lịch thi đấu
           </Link>
         </Button>
       </div>
@@ -116,12 +116,12 @@ function MatchReactions({ matchId }: { matchId: string }) {
       <CardHeader>
         <CardTitle className="text-base flex items-center gap-2">
           <ThumbsUp className="h-4 w-4" />
-          Reactions
+          Cảm xúc
         </CardTitle>
       </CardHeader>
       <CardContent>
         {reactions.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No reactions yet.</p>
+          <p className="text-sm text-muted-foreground">Chưa có cảm xúc nào.</p>
         ) : (
           <div className="flex flex-wrap gap-2">
             {reactions.map(
@@ -152,7 +152,7 @@ function MatchComments({ matchId }: { matchId: string }) {
       <CardHeader>
         <CardTitle className="text-base flex items-center gap-2">
           <MessageCircle className="h-4 w-4" />
-          Comments
+          Bình luận
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -163,7 +163,7 @@ function MatchComments({ matchId }: { matchId: string }) {
           </div>
         ) : comments.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            No comments yet. Be the first to comment!
+            Chưa có bình luận. Hãy là người đầu tiên bình luận!
           </p>
         ) : (
           <div className="space-y-4">
@@ -189,7 +189,7 @@ function MatchComments({ matchId }: { matchId: string }) {
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-xs font-medium">
-                        {comment.user?.fullName ?? comment.guestName ?? 'Anonymous'}
+                        {comment.user?.fullName ?? comment.guestName ?? 'Ẩn danh'}
                       </p>
                       <p className="text-sm text-foreground">{comment.content}</p>
                     </div>
@@ -204,7 +204,7 @@ function MatchComments({ matchId }: { matchId: string }) {
                           </div>
                           <div className="min-w-0 flex-1">
                             <p className="text-xs font-medium">
-                              {reply.user?.fullName ?? reply.guestName ?? 'Anonymous'}
+                              {reply.user?.fullName ?? reply.guestName ?? 'Ẩn danh'}
                             </p>
                             <p className="text-xs text-foreground">{reply.content}</p>
                           </div>

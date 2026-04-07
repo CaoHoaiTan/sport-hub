@@ -137,7 +137,67 @@ export async function seed(db: Kysely<Database>): Promise<void> {
     }
   }
 
-  console.log('Seeded Football tournament with 4 teams, 28 players');
+  // Generate round-robin matches for football (4 teams = 6 matches)
+  const fbMatchups = [
+    [0, 1], [2, 3], // Round 1
+    [0, 2], [1, 3], // Round 2
+    [0, 3], [1, 2], // Round 3
+  ];
+
+  const baseDate = new Date('2026-04-05T15:00:00+07:00');
+  for (let i = 0; i < fbMatchups.length; i++) {
+    const [home, away] = fbMatchups[i];
+    const round = Math.floor(i / 2) + 1;
+    const matchDate = new Date(baseDate);
+    matchDate.setDate(matchDate.getDate() + (round - 1) * 7); // 1 week apart
+    if (i % 2 === 1) matchDate.setHours(matchDate.getHours() + 2); // 2nd match 2h later
+
+    await db.insertInto('matches').values({
+      tournament_id: footballTournament.id,
+      home_team_id: fbTeamIds[home],
+      away_team_id: fbTeamIds[away],
+      round,
+      round_name: `Vòng ${round}`,
+      venue_id: venues[0].id,
+      scheduled_at: matchDate,
+      status: i < 2 ? 'completed' : 'scheduled',
+      home_score: i === 0 ? 2 : i === 1 ? 1 : null,
+      away_score: i === 0 ? 1 : i === 1 ? 1 : null,
+      winner_team_id: i === 0 ? fbTeamIds[home] : null,
+      is_draw: i === 1 ? true : null,
+    }).execute();
+  }
+
+  // Add standings for completed matches
+  const fbStandings = [
+    // Team A: W1 D0 L0 = 3pts, GF2 GA1
+    { teamIdx: 0, played: 1, won: 1, drawn: 0, lost: 0, gf: 2, ga: 1, pts: 3 },
+    // Team B: W0 D0 L1 = 0pts, GF1 GA2
+    { teamIdx: 1, played: 1, won: 0, drawn: 0, lost: 1, gf: 1, ga: 2, pts: 0 },
+    // Team C: W0 D1 L0 = 1pt, GF1 GA1
+    { teamIdx: 2, played: 1, won: 0, drawn: 1, lost: 0, gf: 1, ga: 1, pts: 1 },
+    // Team D: W0 D1 L0 = 1pt, GF1 GA1
+    { teamIdx: 3, played: 1, won: 0, drawn: 1, lost: 0, gf: 1, ga: 1, pts: 1 },
+  ];
+
+  for (let i = 0; i < fbStandings.length; i++) {
+    const s = fbStandings[i];
+    await db.insertInto('standings').values({
+      tournament_id: footballTournament.id,
+      team_id: fbTeamIds[s.teamIdx],
+      played: s.played,
+      won: s.won,
+      drawn: s.drawn,
+      lost: s.lost,
+      goals_for: s.gf,
+      goals_against: s.ga,
+      goal_difference: s.gf - s.ga,
+      points: s.pts,
+      rank: i + 1,
+    }).execute();
+  }
+
+  console.log('Seeded Football tournament with 4 teams, 28 players, 6 matches, standings');
 
   // ═══════════════════════════════════════
   // VOLLEYBALL TOURNAMENT — Single Elimination

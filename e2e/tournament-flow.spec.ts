@@ -5,11 +5,11 @@ import { test, expect, type Page } from '@playwright/test';
  * Tests the complete flow through the browser UI.
  *
  * Prerequisites: API (port 4000) and Web (port 3000) servers running.
- * Uses existing admin account: admin@sporthub.vn / Admin@123
+ * Uses existing admin account: admin@sporthub.vn / Password@123
  */
 
 const ADMIN_EMAIL = 'admin@sporthub.vn';
-const ADMIN_PASSWORD = 'Admin@123';
+const ADMIN_PASSWORD = 'Password@123';
 
 // Helper: login as admin
 async function loginAsAdmin(page: Page) {

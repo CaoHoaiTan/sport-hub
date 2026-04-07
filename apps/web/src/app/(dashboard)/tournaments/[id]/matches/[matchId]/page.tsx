@@ -63,7 +63,7 @@ export default function MatchDetailPage() {
   if (!match) {
     return (
       <div className="text-center text-muted-foreground py-12">
-        Match not found.
+        Không tìm thấy trận đấu.
       </div>
     );
   }
@@ -74,7 +74,7 @@ export default function MatchDetailPage() {
         <Button variant="ghost" size="sm" asChild>
           <Link href={ROUTES.tournamentSchedule(tournamentId)}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Schedule
+            Quay lại lịch thi đấu
           </Link>
         </Button>
       </div>

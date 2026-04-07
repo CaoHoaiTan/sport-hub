@@ -53,7 +53,19 @@ export const venueResolvers = {
   },
 
   Venue: {
-    sportTypes: (v: Venue) => v.sport_types,
+    sportTypes: (v: Venue) => {
+      if (!v.sport_types) return [];
+      if (Array.isArray(v.sport_types)) return v.sport_types;
+      // PostgreSQL may return "{football,volleyball}" as string
+      const str = String(v.sport_types);
+      return str.replace(/[{}]/g, '').split(',').filter(Boolean);
+    },
+    amenities: (v: Venue) => {
+      if (!v.amenities) return [];
+      if (Array.isArray(v.amenities)) return v.amenities;
+      const str = String(v.amenities);
+      return str.replace(/[{}]/g, '').split(',').filter(Boolean);
+    },
     surfaceType: (v: Venue) => v.surface_type,
     contactInfo: (v: Venue) => v.contact_info,
     createdBy: (v: Venue) => v.created_by,

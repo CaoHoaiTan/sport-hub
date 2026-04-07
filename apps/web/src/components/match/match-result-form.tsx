@@ -67,7 +67,7 @@ export function MatchResultForm({ match, tournamentSport }: MatchResultFormProps
     setSets((prev) => [...prev, { homeScore: 0, awayScore: 0 }]);
   }
 
-  function handleXóaSet(index: number) {
+  function handleRemoveSet(index: number) {
     setSets((prev) => prev.filter((_, i) => i !== index));
   }
 
@@ -86,13 +86,12 @@ export function MatchResultForm({ match, tournamentSport }: MatchResultFormProps
 
     const maxSets = tournamentSport === 'volleyball' ? 5 : 3;
     if (sets.length > maxSets) {
-      return `Maximum ${maxSets} sets allowed for ${tournamentSport}.`;
+      return `Tối đa ${maxSets} set cho ${tournamentSport === 'volleyball' ? 'bóng chuyền' : 'cầu lông'}.`;
     }
 
     for (let i = 0; i < sets.length; i++) {
       const set = sets[i];
-      const isFinalSet =
-        tournamentSport === 'volleyball' && i === 4;
+      const isFinalSet = tournamentSport === 'volleyball' && i === 4;
       const targetPoints = isFinalSet
         ? 15
         : tournamentSport === 'volleyball'
@@ -104,11 +103,11 @@ export function MatchResultForm({ match, tournamentSport }: MatchResultFormProps
       const loserScore = Math.min(set.homeScore, set.awayScore);
 
       if (winnerScore < targetPoints) {
-        return `Set ${i + 1}: winner must reach at least ${targetPoints} points.`;
+        return `Set ${i + 1}: đội thắng cần đạt ít nhất ${targetPoints} điểm.`;
       }
 
       if (winnerScore - loserScore < 2 && winnerScore < maxPoints) {
-        return `Set ${i + 1}: need at least 2-point lead (or reach ${maxPoints}).`;
+        return `Set ${i + 1}: cần chênh lệch ít nhất 2 điểm (hoặc đạt ${maxPoints}).`;
       }
     }
 
@@ -126,8 +125,11 @@ export function MatchResultForm({ match, tournamentSport }: MatchResultFormProps
       }
     }
 
+    // For set-based sports, calculate total sets won as homeScore/awayScore
     const input = isSetBased
       ? {
+          homeScore: sets.filter((s) => s.homeScore > s.awayScore).length,
+          awayScore: sets.filter((s) => s.awayScore > s.homeScore).length,
           sets: sets.map((s, i) => ({
             setNumber: i + 1,
             homeScore: s.homeScore,
@@ -151,6 +153,10 @@ export function MatchResultForm({ match, tournamentSport }: MatchResultFormProps
     }
   }
 
+  // Calculate sets won for display
+  const homeSetsWon = sets.filter((s) => s.homeScore > s.awayScore).length;
+  const awaySetsWon = sets.filter((s) => s.awayScore > s.homeScore).length;
+
   return (
     <Card>
       <CardHeader>
@@ -162,11 +168,11 @@ export function MatchResultForm({ match, tournamentSport }: MatchResultFormProps
             <div className="space-y-3">
               <div className="grid grid-cols-[1fr_auto_1fr] gap-2 items-center text-xs font-medium text-muted-foreground">
                 <span className="text-center">
-                  {match.homeTeam?.name ?? 'Home'}
+                  {match.homeTeam?.name ?? 'Đội nhà'}
                 </span>
                 <span />
                 <span className="text-center">
-                  {match.awayTeam?.name ?? 'Away'}
+                  {match.awayTeam?.name ?? 'Đội khách'}
                 </span>
               </div>
 
@@ -202,13 +208,20 @@ export function MatchResultForm({ match, tournamentSport }: MatchResultFormProps
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8"
-                      onClick={() => handleXóaSet(idx)}
+                      onClick={() => handleRemoveSet(idx)}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   )}
                 </div>
               ))}
+
+              {/* Sets won summary */}
+              <div className="flex justify-center gap-4 text-sm font-semibold">
+                <span>{homeSetsWon}</span>
+                <span className="text-muted-foreground">-</span>
+                <span>{awaySetsWon}</span>
+              </div>
 
               <Button
                 type="button"
@@ -226,7 +239,7 @@ export function MatchResultForm({ match, tournamentSport }: MatchResultFormProps
               <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-end">
                 <div className="space-y-1.5">
                   <Label className="text-xs">
-                    {match.homeTeam?.name ?? 'Home'}
+                    {match.homeTeam?.name ?? 'Đội nhà'}
                   </Label>
                   <Input
                     type="number"
@@ -239,7 +252,7 @@ export function MatchResultForm({ match, tournamentSport }: MatchResultFormProps
                 <span className="pb-2 text-muted-foreground font-medium">-</span>
                 <div className="space-y-1.5">
                   <Label className="text-xs">
-                    {match.awayTeam?.name ?? 'Away'}
+                    {match.awayTeam?.name ?? 'Đội khách'}
                   </Label>
                   <Input
                     type="number"

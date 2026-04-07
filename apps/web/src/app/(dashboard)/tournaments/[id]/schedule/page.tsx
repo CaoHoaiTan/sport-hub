@@ -15,6 +15,8 @@ import { GENERATE_MATCHES, UPDATE_MATCH_SCHEDULE } from '@/graphql/mutations/mat
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Dialog,
@@ -38,6 +40,7 @@ export default function TournamentSchedulePage() {
   const { user } = useAuth();
   const tournamentId = params.id as string;
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [showScheduleEditor, setShowScheduleEditor] = useState(false);
 
   const { data: tournamentData } = useQuery(GET_TOURNAMENT, {
     variables: { id: tournamentId },
@@ -59,7 +62,11 @@ export default function TournamentSchedulePage() {
     }
   );
 
-  const { data: venuesData } = useQuery(GET_VENUES, { skip: !user || !isOrganizer(user?.role) });
+  const tournamentSport = tournamentData?.tournament?.sport;
+  const { data: venuesData } = useQuery(GET_VENUES, {
+    variables: { sportType: tournamentSport },
+    skip: !user || !isOrganizer(user?.role) || !tournamentSport,
+  });
 
   const [updateSchedule, { loading: scheduling }] = useMutation(
     UPDATE_MATCH_SCHEDULE,
@@ -147,6 +154,16 @@ export default function TournamentSchedulePage() {
           <h2 className="text-lg font-semibold">Lịch thi đấu</h2>
         </div>
 
+        <div className="flex gap-2">
+        {canManage && hasMatches && (
+          <Button
+            variant="outline"
+            onClick={() => setShowScheduleEditor((v) => !v)}
+          >
+            <Clock className="mr-2 h-4 w-4" />
+            {showScheduleEditor ? 'Ẩn lên lịch' : 'Lên lịch trận đấu'}
+          </Button>
+        )}
         {canManage && !hasMatches && (
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
@@ -177,7 +194,72 @@ export default function TournamentSchedulePage() {
             </DialogContent>
           </Dialog>
         )}
+        </div>
       </div>
+
+      {/* Schedule editor — shown when toggled */}
+      {canManage && hasMatches && showScheduleEditor && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              Lên lịch trận đấu
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {matches
+              .filter((m: Record<string, unknown>) => m.homeTeam && m.awayTeam)
+              .map((m: Record<string, unknown>) => {
+                const home = m.homeTeam as { name: string } | null;
+                const away = m.awayTeam as { name: string } | null;
+                const venue = m.venue as { id: string; name: string } | null;
+                const roundLabel = (m.roundName as string) ?? `Vòng ${m.round}`;
+                return (
+                  <div
+                    key={m.id as string}
+                    className="flex items-center gap-3 rounded-lg border px-3 py-2.5 text-sm flex-wrap"
+                  >
+                    <Badge variant="outline" className="text-[10px] shrink-0">
+                      {roundLabel}
+                    </Badge>
+                    <span className="font-medium min-w-[160px]">
+                      {home?.name ?? 'TBD'} vs {away?.name ?? 'TBD'}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {m.scheduledAt
+                        ? new Date(m.scheduledAt as string).toLocaleString('vi-VN')
+                        : '⏱ Chưa lên lịch'}
+                    </span>
+                    {venue && (
+                      <span className="text-xs text-muted-foreground">
+                        📍 {venue.name}
+                      </span>
+                    )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="ml-auto h-7 text-xs"
+                      onClick={() =>
+                        openScheduleDialog(
+                          m.id as string,
+                          m.scheduledAt as string | null,
+                          venue?.id
+                        )
+                      }
+                    >
+                      {m.scheduledAt ? 'Sửa' : 'Chọn thời gian'}
+                    </Button>
+                  </div>
+                );
+              })}
+            {matches.filter((m: Record<string, unknown>) => m.homeTeam && m.awayTeam).length === 0 && (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                Chưa có trận nào được phân đội. Các trận sẽ được cập nhật khi có kết quả vòng trước.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {!hasMatches ? (
         <div className="text-center py-16 space-y-2">
@@ -205,58 +287,6 @@ export default function TournamentSchedulePage() {
         />
       ) : (
         <MatchSchedule matches={matches} tournamentId={tournamentId} />
-      )}
-
-      {/* Schedule editing for organizers */}
-      {canManage && hasMatches && (
-        <div className="space-y-3">
-          <h3 className="text-sm font-semibold flex items-center gap-2">
-            <Clock className="h-4 w-4" />
-            Lên lịch trận đấu
-          </h3>
-          <div className="space-y-2">
-            {matches
-              .filter((m: Record<string, unknown>) => m.homeTeamId && m.awayTeamId)
-              .map((m: Record<string, unknown>) => {
-                const home = m.homeTeam as { name: string } | null;
-                const away = m.awayTeam as { name: string } | null;
-                const venue = m.venue as { id: string; name: string } | null;
-                return (
-                  <div
-                    key={m.id as string}
-                    className="flex items-center gap-3 rounded-lg border px-3 py-2 text-sm flex-wrap"
-                  >
-                    <span className="font-medium min-w-[180px]">
-                      {home?.name ?? 'TBD'} vs {away?.name ?? 'TBD'}
-                    </span>
-                    <span className="text-xs text-muted-foreground min-w-[100px]">
-                      {m.scheduledAt
-                        ? new Date(m.scheduledAt as string).toLocaleString('vi-VN')
-                        : 'Chưa lên lịch'}
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      {venue?.name ?? ''}
-                    </span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="ml-auto h-7 text-xs"
-                      onClick={() =>
-                        openScheduleDialog(
-                          m.id as string,
-                          m.scheduledAt as string | null,
-                          venue?.id
-                        )
-                      }
-                    >
-                      <Clock className="mr-1 h-3 w-3" />
-                      {m.scheduledAt ? 'Sửa' : 'Lên lịch'}
-                    </Button>
-                  </div>
-                );
-              })}
-          </div>
-        </div>
       )}
 
       {/* Schedule dialog */}
