@@ -10,6 +10,19 @@ const registerTeamSchema = z.object({
   logoUrl: z.string().url().nullable().optional(),
 });
 
+const playerInputSchema = z.object({
+  fullName: z.string().min(1).max(255),
+  jerseyNumber: z.number().int().min(0).max(999),
+  position: z.string().max(50).nullable().optional(),
+});
+
+const registerTeamWithPlayersSchema = z.object({
+  tournamentId: z.string().uuid(),
+  name: z.string().min(1).max(255),
+  logoUrl: z.string().url().nullable().optional(),
+  players: z.array(playerInputSchema).min(1),
+});
+
 const updateTeamSchema = z.object({
   name: z.string().min(1).max(255).optional(),
   logoUrl: z.string().url().nullable().optional(),
@@ -66,6 +79,89 @@ export class TeamService {
         })
         .returningAll()
         .executeTakeFirstOrThrow();
+
+      // Auto-upgrade player to team_manager
+      await trx
+        .updateTable('users')
+        .set({ role: 'team_manager', updated_at: new Date() })
+        .where('id', '=', managerId)
+        .where('role', '=', 'player')
+        .execute();
+
+      return team;
+    });
+  }
+
+  async registerTeamWithPlayers(managerId: string, input: unknown): Promise<Team> {
+    const data = registerTeamWithPlayersSchema.parse(input);
+
+    return this.db.transaction().execute(async (trx) => {
+      // Verify tournament
+      const tournament = await trx
+        .selectFrom('tournaments')
+        .selectAll()
+        .where('id', '=', data.tournamentId)
+        .executeTakeFirst();
+
+      if (!tournament) {
+        throw new GraphQLError('Không tìm thấy giải đấu', { extensions: { code: 'NOT_FOUND' } });
+      }
+      if (tournament.status !== 'registration') {
+        throw new GraphQLError('Giải đấu hiện không mở đăng ký', { extensions: { code: 'BAD_USER_INPUT' } });
+      }
+
+      // Validate player count
+      if (data.players.length < tournament.min_players_per_team) {
+        throw new GraphQLError(
+          `Cần ít nhất ${tournament.min_players_per_team} vận động viên`,
+          { extensions: { code: 'BAD_USER_INPUT' } }
+        );
+      }
+      if (data.players.length > tournament.max_players_per_team) {
+        throw new GraphQLError(
+          `Tối đa ${tournament.max_players_per_team} vận động viên`,
+          { extensions: { code: 'BAD_USER_INPUT' } }
+        );
+      }
+
+      // Check max teams
+      if (tournament.max_teams) {
+        const { count } = await trx
+          .selectFrom('teams')
+          .select(({ fn }) => fn.countAll<number>().as('count'))
+          .where('tournament_id', '=', data.tournamentId)
+          .executeTakeFirstOrThrow();
+        if (Number(count) >= tournament.max_teams) {
+          throw new GraphQLError('Giải đấu đã đủ đội', { extensions: { code: 'BAD_USER_INPUT' } });
+        }
+      }
+
+      // Create team
+      const team = await trx
+        .insertInto('teams')
+        .values({
+          tournament_id: data.tournamentId,
+          name: data.name,
+          logo_url: data.logoUrl ?? null,
+          manager_id: managerId,
+        })
+        .returningAll()
+        .executeTakeFirstOrThrow();
+
+      // Create players
+      for (let i = 0; i < data.players.length; i++) {
+        const p = data.players[i];
+        await trx
+          .insertInto('team_players')
+          .values({
+            team_id: team.id,
+            full_name: p.fullName,
+            jersey_number: p.jerseyNumber,
+            position: p.position ?? null,
+            is_captain: i === 0,
+          })
+          .execute();
+      }
 
       // Auto-upgrade player to team_manager
       await trx

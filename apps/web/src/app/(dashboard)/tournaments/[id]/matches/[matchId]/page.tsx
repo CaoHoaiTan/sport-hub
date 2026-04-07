@@ -49,6 +49,8 @@ export default function MatchDetailPage() {
   const canScore = user && canScoreMatch(user.role);
   const hasSets = match?.sets && match.sets.length > 0;
   const isActive = match?.status === 'live' || match?.status === 'scheduled' || match?.status === 'checkin_open';
+  const isCompleted = match?.status === 'completed';
+  const canEdit = isCompleted && user && (user.role === 'admin' || user.role === 'organizer');
 
   if (loading) {
     return (
@@ -162,7 +164,7 @@ export default function MatchDetailPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Match Events</CardTitle>
+              <CardTitle className="text-base">Sự kiện trận đấu</CardTitle>
             </CardHeader>
             <CardContent>
               <MatchEventFeed events={match.events ?? []} />
@@ -170,27 +172,35 @@ export default function MatchDetailPage() {
           </Card>
         </div>
 
-        {canScore && isActive && (
+        {((canScore && isActive) || canEdit) && (
           <div className="space-y-6">
+            {canEdit && (
+              <div className="flex items-center gap-2 text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-md p-3">
+                <span>Trận đấu đã hoàn thành. Bạn có thể sửa kết quả.</span>
+              </div>
+            )}
             <MatchResultForm
               match={match}
               tournamentSport={tournament?.sport ?? 'football'}
             />
 
-            <Separator />
-
-            <MatchEventForm
-              matchId={match.id}
-              sport={tournament?.sport}
-              teams={{
-                home: match.homeTeam
-                  ? { ...match.homeTeam, players: [] }
-                  : null,
-                away: match.awayTeam
-                  ? { ...match.awayTeam, players: [] }
-                  : null,
-              }}
-            />
+            {isActive && (
+              <>
+                <Separator />
+                <MatchEventForm
+                  matchId={match.id}
+                  sport={tournament?.sport}
+                  teams={{
+                    home: match.homeTeam
+                      ? { ...match.homeTeam, players: [] }
+                      : null,
+                    away: match.awayTeam
+                      ? { ...match.awayTeam, players: [] }
+                      : null,
+                  }}
+                />
+              </>
+            )}
           </div>
         )}
       </div>

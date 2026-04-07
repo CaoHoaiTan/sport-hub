@@ -217,28 +217,18 @@ export default function TournamentSchedulePage() {
                 return (
                   <div
                     key={m.id as string}
-                    className="flex items-center gap-3 rounded-lg border px-3 py-2.5 text-sm flex-wrap"
+                    className="grid grid-cols-[auto_1fr_auto] gap-x-3 gap-y-1 items-center rounded-lg border px-3 py-2.5 text-sm"
                   >
                     <Badge variant="outline" className="text-[10px] shrink-0">
                       {roundLabel}
                     </Badge>
-                    <span className="font-medium min-w-[160px]">
+                    <span className="font-medium truncate">
                       {home?.name ?? 'TBD'} vs {away?.name ?? 'TBD'}
                     </span>
-                    <span className="text-xs text-muted-foreground">
-                      {m.scheduledAt
-                        ? new Date(m.scheduledAt as string).toLocaleString('vi-VN')
-                        : '⏱ Chưa lên lịch'}
-                    </span>
-                    {venue && (
-                      <span className="text-xs text-muted-foreground">
-                        📍 {venue.name}
-                      </span>
-                    )}
                     <Button
                       variant="outline"
                       size="sm"
-                      className="ml-auto h-7 text-xs"
+                      className="h-7 text-xs shrink-0"
                       onClick={() =>
                         openScheduleDialog(
                           m.id as string,
@@ -249,6 +239,14 @@ export default function TournamentSchedulePage() {
                     >
                       {m.scheduledAt ? 'Sửa' : 'Chọn thời gian'}
                     </Button>
+                    <div className="col-start-2 col-span-1 flex gap-3 text-xs text-muted-foreground">
+                      <span>
+                        {m.scheduledAt
+                          ? new Date(m.scheduledAt as string).toLocaleString('vi-VN')
+                          : 'Chưa lên lịch'}
+                      </span>
+                      {venue && <span>{venue.name}</span>}
+                    </div>
                   </div>
                 );
               })}

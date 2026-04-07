@@ -6,6 +6,7 @@ export const playerTypeDefs = gql`
     teamId: ID!
     team: Team!
     userId: ID
+    user: User
     fullName: String!
     jerseyNumber: Int!
     position: String
@@ -27,6 +28,7 @@ export const playerTypeDefs = gql`
     jerseyNumber: Int
     position: String
     isActive: Boolean
+    userId: ID
   }
 
   extend type Query {

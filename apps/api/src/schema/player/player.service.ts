@@ -16,6 +16,7 @@ const updatePlayerSchema = z.object({
   jerseyNumber: z.number().int().min(0).max(999).optional(),
   position: z.string().max(50).nullable().optional(),
   isActive: z.boolean().optional(),
+  userId: z.string().uuid().nullable().optional(),
 });
 
 export class PlayerService {
@@ -37,7 +38,7 @@ export class PlayerService {
       });
     }
 
-    if (team.manager_id !== userId && userRole !== 'admin') {
+    if (team.manager_id !== userId && userRole !== 'admin' && userRole !== 'organizer') {
       throw new GraphQLError('Not authorized', {
         extensions: { code: 'FORBIDDEN' },
       });
@@ -112,7 +113,7 @@ export class PlayerService {
       .where('id', '=', player.team_id)
       .executeTakeFirst();
 
-    if (!team || (team.manager_id !== userId && userRole !== 'admin')) {
+    if (!team || (team.manager_id !== userId && userRole !== 'admin' && userRole !== 'organizer')) {
       throw new GraphQLError('Not authorized', {
         extensions: { code: 'FORBIDDEN' },
       });
@@ -143,7 +144,7 @@ export class PlayerService {
       .where('id', '=', player.team_id)
       .executeTakeFirst();
 
-    if (!team || (team.manager_id !== userId && userRole !== 'admin')) {
+    if (!team || (team.manager_id !== userId && userRole !== 'admin' && userRole !== 'organizer')) {
       throw new GraphQLError('Not authorized', {
         extensions: { code: 'FORBIDDEN' },
       });
@@ -172,6 +173,7 @@ export class PlayerService {
     if (data.jerseyNumber !== undefined) updateData.jersey_number = data.jerseyNumber;
     if (data.position !== undefined) updateData.position = data.position;
     if (data.isActive !== undefined) updateData.is_active = data.isActive;
+    if (data.userId !== undefined) updateData.user_id = data.userId;
 
     if (Object.keys(updateData).length === 0) {
       return player;
@@ -206,7 +208,7 @@ export class PlayerService {
       });
     }
 
-    if (team.manager_id !== userId && userRole !== 'admin') {
+    if (team.manager_id !== userId && userRole !== 'admin' && userRole !== 'organizer') {
       throw new GraphQLError('Not authorized', {
         extensions: { code: 'FORBIDDEN' },
       });

@@ -152,6 +152,23 @@ export class UserService {
       .executeTakeFirstOrThrow();
   }
 
+  async searchUsers(query: string, limit = 10): Promise<User[]> {
+    const searchTerm = `%${query.trim().toLowerCase()}%`;
+    return this.db
+      .selectFrom('users')
+      .selectAll()
+      .where('is_active', '=', true)
+      .where((eb) =>
+        eb.or([
+          eb('email', 'ilike', searchTerm),
+          eb('full_name', 'ilike', searchTerm),
+        ])
+      )
+      .orderBy('full_name', 'asc')
+      .limit(Math.min(limit, 20))
+      .execute();
+  }
+
   async listUsers(pagination?: { first?: number; after?: string }) {
     const limit = Math.min(pagination?.first ?? 20, 100);
     let query = this.db

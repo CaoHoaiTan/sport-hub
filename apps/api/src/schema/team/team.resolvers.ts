@@ -33,6 +33,16 @@ export const teamResolvers = {
       return service.registerTeam(user.id, input);
     },
 
+    registerTeamWithPlayers: async (
+      _: unknown,
+      { input }: { input: unknown },
+      ctx: GraphQLContext
+    ) => {
+      const user = requireAuth(ctx.user);
+      const service = new TeamService(ctx.db);
+      return service.registerTeamWithPlayers(user.id, input);
+    },
+
     updateTeam: async (
       _: unknown,
       { id, input }: { id: string; input: unknown },

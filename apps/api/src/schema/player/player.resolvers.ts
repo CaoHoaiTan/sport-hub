@@ -67,6 +67,14 @@ export const playerResolvers = {
         .executeTakeFirst();
     },
     userId: (p: TeamPlayer) => p.user_id,
+    user: async (p: TeamPlayer, _: unknown, ctx: GraphQLContext) => {
+      if (!p.user_id) return null;
+      return ctx.db
+        .selectFrom('users')
+        .selectAll()
+        .where('id', '=', p.user_id)
+        .executeTakeFirst() ?? null;
+    },
     fullName: (p: TeamPlayer) => p.full_name,
     jerseyNumber: (p: TeamPlayer) => p.jersey_number,
     isCaptain: (p: TeamPlayer) => p.is_captain,

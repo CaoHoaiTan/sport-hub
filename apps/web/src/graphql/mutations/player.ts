@@ -20,6 +20,7 @@ export const UPDATE_PLAYER = gql`
   mutation UpdatePlayer($id: ID!, $input: UpdatePlayerInput!) {
     updatePlayer(id: $id, input: $input) {
       id
+      userId
       fullName
       jerseyNumber
       position

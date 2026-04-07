@@ -21,6 +21,8 @@ interface Player {
   position: string | null;
   isCaptain: boolean;
   isActive: boolean;
+  userId?: string | null;
+  user?: { id: string; email: string; fullName: string } | null;
 }
 
 interface RosterManagerProps {
@@ -118,6 +120,8 @@ export function RosterManager({
                 fullName: editPlayer.fullName,
                 jerseyNumber: editPlayer.jerseyNumber ?? 0,
                 position: editPlayer.position,
+                userId: editPlayer.userId,
+                linkedUser: editPlayer.user ?? null,
               }
             : null
         }

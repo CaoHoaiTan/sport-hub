@@ -60,6 +60,7 @@ export const userTypeDefs = gql`
     me: User
     user(id: ID!): User
     users(pagination: PaginationInput): UserConnection!
+    searchUsers(query: String!, limit: Int): [User!]!
   }
 
   extend type Mutation {

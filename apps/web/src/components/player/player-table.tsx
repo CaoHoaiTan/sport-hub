@@ -3,7 +3,12 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/shared/data-table';
-import { Pencil, Trash2 } from 'lucide-react';
+import { Pencil, Trash2, UserCheck } from 'lucide-react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface Player {
   id: string;
@@ -12,6 +17,8 @@ interface Player {
   position: string | null;
   isCaptain: boolean;
   isActive: boolean;
+  userId?: string | null;
+  user?: { id: string; email: string; fullName: string } | null;
 }
 
 interface PlayerTableProps {
@@ -48,6 +55,16 @@ export function PlayerTable({
             <Badge variant="secondary" className="text-[10px]">
               Đội trưởng
             </Badge>
+          )}
+          {row.userId && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <UserCheck className="h-3.5 w-3.5 text-green-600 shrink-0" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-xs">Đã liên kết: {row.user?.email ?? 'Tài khoản'}</p>
+              </TooltipContent>
+            </Tooltip>
           )}
         </div>
       ),

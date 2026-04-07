@@ -257,8 +257,8 @@ export class MatchService {
       });
     }
 
-    if (match.status === 'completed') {
-      throw new GraphQLError('Match result already submitted', {
+    if (match.status === 'completed' && userRole !== 'admin' && userRole !== 'organizer') {
+      throw new GraphQLError('Kết quả đã được gửi. Chỉ admin/organizer mới có thể sửa.', {
         extensions: { code: 'BAD_USER_INPUT' },
       });
     }

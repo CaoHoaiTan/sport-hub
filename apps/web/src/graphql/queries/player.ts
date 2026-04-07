@@ -12,6 +12,11 @@ export const GET_PLAYERS_BY_TEAM = gql`
       isCaptain
       isActive
       createdAt
+      user {
+        id
+        email
+        fullName
+      }
     }
   }
 `;

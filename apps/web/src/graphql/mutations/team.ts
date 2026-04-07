@@ -11,6 +11,21 @@ export const REGISTER_TEAM = gql`
   }
 `;
 
+export const REGISTER_TEAM_WITH_PLAYERS = gql`
+  ${TEAM_FIELDS}
+  mutation RegisterTeamWithPlayers($input: RegisterTeamWithPlayersInput!) {
+    registerTeamWithPlayers(input: $input) {
+      ...TeamFields
+      players {
+        id
+        fullName
+        jerseyNumber
+        position
+      }
+    }
+  }
+`;
+
 export const UPDATE_TEAM = gql`
   ${TEAM_FIELDS}
   mutation UpdateTeam($id: ID!, $input: UpdateTeamInput!) {

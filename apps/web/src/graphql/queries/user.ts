@@ -22,3 +22,13 @@ export const GET_USERS = gql`
     }
   }
 `;
+
+export const SEARCH_USERS = gql`
+  query SearchUsers($query: String!, $limit: Int) {
+    searchUsers(query: $query, limit: $limit) {
+      id
+      email
+      fullName
+    }
+  }
+`;

@@ -26,6 +26,16 @@ export const userResolvers = {
       const service = new UserService(ctx.db);
       return service.listUsers(pagination);
     },
+
+    searchUsers: async (
+      _: unknown,
+      { query, limit }: { query: string; limit?: number },
+      ctx: GraphQLContext
+    ) => {
+      requireAuth(ctx.user);
+      const service = new UserService(ctx.db);
+      return service.searchUsers(query, limit ?? 10);
+    },
   },
 
   Mutation: {

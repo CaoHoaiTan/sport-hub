@@ -73,7 +73,7 @@ export default function TournamentOverviewPage() {
       await updateStatus({
         variables: { id, status: newStatus },
       });
-      toast.success(`Tournament status updated to ${newStatus}.`);
+      toast.success('Cập nhật trạng thái giải đấu thành công.');
     } catch (error: unknown) {
       const message =
         error instanceof Error ? error.message : 'Failed to update status';

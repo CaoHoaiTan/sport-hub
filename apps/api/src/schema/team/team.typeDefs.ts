@@ -22,6 +22,19 @@ export const teamTypeDefs = gql`
     logoUrl: String
   }
 
+  input PlayerInput {
+    fullName: String!
+    jerseyNumber: Int!
+    position: String
+  }
+
+  input RegisterTeamWithPlayersInput {
+    tournamentId: ID!
+    name: String!
+    logoUrl: String
+    players: [PlayerInput!]!
+  }
+
   input UpdateTeamInput {
     name: String
     logoUrl: String
@@ -34,6 +47,7 @@ export const teamTypeDefs = gql`
 
   extend type Mutation {
     registerTeam(input: RegisterTeamInput!): Team!
+    registerTeamWithPlayers(input: RegisterTeamWithPlayersInput!): Team!
     updateTeam(id: ID!, input: UpdateTeamInput!): Team!
     deleteTeam(id: ID!): Boolean!
     drawGroups(tournamentId: ID!, groupCount: Int!): [Team!]!
