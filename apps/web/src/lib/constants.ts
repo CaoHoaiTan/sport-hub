@@ -21,6 +21,7 @@ export const ROUTES = {
   teamPlayers: (id: string) => `/teams/${id}/players`,
   venues: '/venues',
   venueNew: '/venues/new',
+  venueDetail: (id: string) => `/venues/${id}`,
   notifications: '/notifications',
   profile: '/profile',
   adminUsers: '/admin/users',

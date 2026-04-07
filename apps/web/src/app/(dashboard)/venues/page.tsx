@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@apollo/client';
 import { MapPin, Plus, Users, Dumbbell } from 'lucide-react';
@@ -75,9 +76,9 @@ export default function VenuesPage() {
               capacity: number | null;
               sportTypes: string[];
             }) => (
+              <Link key={venue.id} href={ROUTES.venueDetail(venue.id)}>
               <Card
-                key={venue.id}
-                className="transition-all hover:shadow-md hover:border-primary/20"
+                className="transition-all hover:shadow-md hover:border-primary/20 cursor-pointer"
               >
                 <CardHeader className="pb-3">
                   <CardTitle className="text-sm">{venue.name}</CardTitle>
@@ -109,6 +110,7 @@ export default function VenuesPage() {
                   </div>
                 </CardContent>
               </Card>
+              </Link>
             )
           )}
         </div>
