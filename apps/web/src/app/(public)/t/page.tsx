@@ -7,9 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
 const sportLabels: Record<string, string> = {
-  football: 'Football',
-  volleyball: 'Volleyball',
-  badminton: 'Badminton',
+  football: 'Bóng đá',
+  volleyball: 'Bóng chuyền',
+  badminton: 'Cầu lông',
 };
 
 const statusColors: Record<string, string> = {

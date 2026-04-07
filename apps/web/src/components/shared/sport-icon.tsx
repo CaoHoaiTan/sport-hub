@@ -37,9 +37,9 @@ export function SportIcon({ sport, className }: SportIconProps) {
 
 export function getSportLabel(sport: string): string {
   const labels: Record<string, string> = {
-    football: 'Football',
-    volleyball: 'Volleyball',
-    badminton: 'Badminton',
+    football: 'Bóng đá',
+    volleyball: 'Bóng chuyền',
+    badminton: 'Cầu lông',
   };
   return labels[sport.toLowerCase()] ?? sport;
 }

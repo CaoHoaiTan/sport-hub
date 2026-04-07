@@ -6,10 +6,12 @@ import Link from 'next/link';
 import {
   Users,
   Shield,
-  Trophy,
   Hash,
+  Lock,
 } from 'lucide-react';
 
+import { useAuth } from '@/lib/auth/context';
+import { isOrganizer } from '@/lib/utils/roles';
 import { ROUTES } from '@/lib/constants';
 import { GET_TEAM } from '@/graphql/queries/team';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,10 +19,24 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Separator } from '@/components/ui/separator';
+
+const positionLabels: Record<string, string> = {
+  goalkeeper: 'Thủ môn',
+  defender: 'Hậu vệ',
+  midfielder: 'Tiền vệ',
+  forward: 'Tiền đạo',
+  setter: 'Chuyền hai',
+  libero: 'Libero',
+  outside_hitter: 'Chủ công',
+  middle_blocker: 'Phụ công',
+  opposite: 'Đối chuyền',
+  singles: 'Đơn',
+  doubles: 'Đôi',
+};
 
 export default function TeamDetailPage() {
   const params = useParams();
+  const { user } = useAuth();
   const id = params.id as string;
 
   const { data, loading } = useQuery(GET_TEAM, {
@@ -41,16 +57,19 @@ export default function TeamDetailPage() {
   if (!team) {
     return (
       <div className="text-center text-muted-foreground py-12">
-        Team not found.
+        Không tìm thấy đội.
       </div>
     );
   }
 
   const players = team.players ?? [];
+  const isMyTeam = user && team.managerId === user.id;
+  const canEdit = user && (isMyTeam || isOrganizer(user.role));
 
   return (
     <div className="space-y-6">
-      <Card>
+      {/* Team header */}
+      <Card className={isMyTeam ? 'border-primary/30 bg-primary/5' : ''}>
         <CardContent className="flex items-center gap-4 p-6">
           <Avatar className="h-16 w-16">
             <AvatarImage src={team.logoUrl ?? undefined} />
@@ -59,7 +78,14 @@ export default function TeamDetailPage() {
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
-            <h1 className="text-2xl font-bold tracking-tight">{team.name}</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-bold tracking-tight">{team.name}</h1>
+              {isMyTeam && (
+                <Badge variant="default" className="text-[10px]">
+                  Đội của tôi
+                </Badge>
+              )}
+            </div>
             <div className="flex flex-wrap items-center gap-3 mt-2 text-sm text-muted-foreground">
               {team.manager && (
                 <span className="flex items-center gap-1">
@@ -69,37 +95,45 @@ export default function TeamDetailPage() {
               )}
               {team.groupName && (
                 <Badge variant="outline" className="text-[10px]">
-                  Group {team.groupName}
+                  Bảng {team.groupName}
                 </Badge>
               )}
               {team.seed && (
                 <span className="flex items-center gap-1 text-xs">
                   <Hash className="h-3 w-3" />
-                  Seed {team.seed}
+                  Hạt giống {team.seed}
                 </span>
               )}
             </div>
           </div>
-          <Button asChild variant="outline">
-            <Link href={ROUTES.teamPlayers(id)}>
-              <Users className="mr-2 h-4 w-4" />
-              Manage Players
-            </Link>
-          </Button>
+          {canEdit ? (
+            <Button asChild variant="outline">
+              <Link href={ROUTES.teamPlayers(id)}>
+                <Users className="mr-2 h-4 w-4" />
+                Quản lý VĐV
+              </Link>
+            </Button>
+          ) : (
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Lock className="h-3 w-3" />
+              Chỉ xem
+            </div>
+          )}
         </CardContent>
       </Card>
 
+      {/* Roster */}
       <Card>
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
-            <Trophy className="h-4 w-4" />
-            Roster ({players.length} players)
+            <Users className="h-4 w-4" />
+            Đội hình ({players.length} VĐV)
           </CardTitle>
         </CardHeader>
         <CardContent>
           {players.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">
-              No players registered yet.
+              Chưa có vận động viên nào.
             </p>
           ) : (
             <div className="space-y-2">
@@ -133,15 +167,15 @@ export default function TeamDetailPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       {player.position && (
-                        <span className="text-xs text-muted-foreground capitalize">
-                          {player.position}
+                        <span className="text-xs text-muted-foreground">
+                          {positionLabels[player.position] ?? player.position}
                         </span>
                       )}
                       <Badge
                         variant={player.isActive ? 'success' : 'secondary'}
                         className="text-[10px]"
                       >
-                        {player.isActive ? 'Hoạt động' : 'Ngưng hoạt động'}
+                        {player.isActive ? 'Hoạt động' : 'Ngưng'}
                       </Badge>
                     </div>
                   </div>

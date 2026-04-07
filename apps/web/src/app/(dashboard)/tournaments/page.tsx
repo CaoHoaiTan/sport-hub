@@ -85,16 +85,23 @@ export default function TournamentsPage() {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-16">
-          <p className="text-muted-foreground mb-4">Không tìm thấy giải đấu.</p>
-          {user && isOrganizer(user.role) && (
-            <Button asChild variant="outline">
-              <Link href={ROUTES.tournamentNew}>
-                <Plus className="mr-2 h-4 w-4" />
-                Tạo giải đấu đầu tiên
+        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-16 space-y-4">
+          <p className="text-muted-foreground">Bạn chưa tham gia giải đấu nào.</p>
+          <div className="flex gap-3">
+            <Button asChild>
+              <Link href={ROUTES.publicTournaments}>
+                Khám phá giải đấu
               </Link>
             </Button>
-          )}
+            {user && isOrganizer(user.role) && (
+              <Button asChild variant="outline">
+                <Link href={ROUTES.tournamentNew}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Tạo giải đấu
+                </Link>
+              </Button>
+            )}
+          </div>
         </div>
       )}
     </div>

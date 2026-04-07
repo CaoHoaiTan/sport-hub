@@ -4,14 +4,17 @@ import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useQuery, useMutation } from '@apollo/client';
 import { toast } from 'sonner';
-import { CalendarDays, Loader2, Wand2 } from 'lucide-react';
+import { CalendarDays, Loader2, Wand2, Clock } from 'lucide-react';
 
 import { useAuth } from '@/lib/auth/context';
 import { isOrganizer } from '@/lib/utils/roles';
 import { GET_MATCHES_BY_TOURNAMENT } from '@/graphql/queries/match';
 import { GET_TOURNAMENT } from '@/graphql/queries/tournament';
-import { GENERATE_MATCHES } from '@/graphql/mutations/match';
+import { GET_VENUES } from '@/graphql/queries/venue';
+import { GENERATE_MATCHES, UPDATE_MATCH_SCHEDULE } from '@/graphql/mutations/match';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Dialog,
@@ -56,8 +59,24 @@ export default function TournamentSchedulePage() {
     }
   );
 
+  const { data: venuesData } = useQuery(GET_VENUES, { skip: !user || !isOrganizer(user?.role) });
+
+  const [updateSchedule, { loading: scheduling }] = useMutation(
+    UPDATE_MATCH_SCHEDULE,
+    {
+      refetchQueries: [
+        { query: GET_MATCHES_BY_TOURNAMENT, variables: { tournamentId } },
+      ],
+    }
+  );
+
+  const [scheduleMatchId, setScheduleMatchId] = useState<string | null>(null);
+  const [scheduleDate, setScheduleDate] = useState('');
+  const [scheduleVenueId, setScheduleVenueId] = useState('');
+
   const tournament = tournamentData?.tournament;
   const matches = data?.matchesByTournament ?? [];
+  const venues = venuesData?.venues ?? [];
   const canManage = user && isOrganizer(user.role);
 
   const format = tournament?.format ?? '';
@@ -67,13 +86,46 @@ export default function TournamentSchedulePage() {
   async function handleGenerate() {
     try {
       await generateMatches();
-      toast.success('Matches generated successfully.');
+      toast.success('Đã tạo lịch thi đấu.');
       setDialogOpen(false);
     } catch (error: unknown) {
       const message =
-        error instanceof Error ? error.message : 'Failed to generate matches';
+        error instanceof Error ? error.message : 'Tạo lịch thất bại';
       toast.error(message);
     }
+  }
+
+  function openScheduleDialog(matchId: string, currentScheduledAt?: string | null, currentVenueId?: string | null) {
+    setScheduleMatchId(matchId);
+    setScheduleDate(currentScheduledAt ? toDatetimeLocal(currentScheduledAt) : '');
+    setScheduleVenueId(currentVenueId ?? 'none');
+  }
+
+  async function handleSchedule() {
+    if (!scheduleMatchId) return;
+    try {
+      await updateSchedule({
+        variables: {
+          id: scheduleMatchId,
+          input: {
+            scheduledAt: scheduleDate ? new Date(scheduleDate).toISOString() : null,
+            venueId: scheduleVenueId && scheduleVenueId !== 'none' ? scheduleVenueId : null,
+          },
+        },
+      });
+      toast.success('Đã cập nhật lịch trận đấu.');
+      setScheduleMatchId(null);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Cập nhật thất bại';
+      toast.error(message);
+    }
+  }
+
+  function toDatetimeLocal(iso: string): string {
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
 
   if (loading) {
@@ -92,7 +144,7 @@ export default function TournamentSchedulePage() {
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <CalendarDays className="h-5 w-5 text-muted-foreground" />
-          <h2 className="text-lg font-semibold">Match Schedule</h2>
+          <h2 className="text-lg font-semibold">Lịch thi đấu</h2>
         </div>
 
         {canManage && !hasMatches && (
@@ -107,9 +159,8 @@ export default function TournamentSchedulePage() {
               <DialogHeader>
                 <DialogTitle>Tạo lịch thi đấu</DialogTitle>
                 <DialogDescription>
-                  This will automatically generate the match schedule based on
-                  the tournament format and registered teams. Existing matches
-                  will not be affected.
+                  Hệ thống sẽ tự động tạo lịch thi đấu dựa trên thể thức và
+                  các đội đã đăng ký.
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
@@ -120,7 +171,7 @@ export default function TournamentSchedulePage() {
                   {generating && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
-                  Generate
+                  Tạo lịch
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -132,11 +183,11 @@ export default function TournamentSchedulePage() {
         <div className="text-center py-16 space-y-2">
           <CalendarDays className="h-12 w-12 mx-auto text-muted-foreground/40" />
           <p className="text-muted-foreground">
-            No matches have been scheduled yet.
+            Chưa có trận đấu nào được lên lịch.
           </p>
           {canManage && (
             <p className="text-sm text-muted-foreground">
-              Use the &quot;Tạo lịch thi đấu&quot; button to create the schedule.
+              Nhấn &quot;Tạo lịch thi đấu&quot; để tạo lịch tự động.
             </p>
           )}
         </div>
@@ -155,6 +206,107 @@ export default function TournamentSchedulePage() {
       ) : (
         <MatchSchedule matches={matches} tournamentId={tournamentId} />
       )}
+
+      {/* Schedule editing for organizers */}
+      {canManage && hasMatches && (
+        <div className="space-y-3">
+          <h3 className="text-sm font-semibold flex items-center gap-2">
+            <Clock className="h-4 w-4" />
+            Lên lịch trận đấu
+          </h3>
+          <div className="space-y-2">
+            {matches
+              .filter((m: Record<string, unknown>) => m.homeTeamId && m.awayTeamId)
+              .map((m: Record<string, unknown>) => {
+                const home = m.homeTeam as { name: string } | null;
+                const away = m.awayTeam as { name: string } | null;
+                const venue = m.venue as { id: string; name: string } | null;
+                return (
+                  <div
+                    key={m.id as string}
+                    className="flex items-center gap-3 rounded-lg border px-3 py-2 text-sm flex-wrap"
+                  >
+                    <span className="font-medium min-w-[180px]">
+                      {home?.name ?? 'TBD'} vs {away?.name ?? 'TBD'}
+                    </span>
+                    <span className="text-xs text-muted-foreground min-w-[100px]">
+                      {m.scheduledAt
+                        ? new Date(m.scheduledAt as string).toLocaleString('vi-VN')
+                        : 'Chưa lên lịch'}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {venue?.name ?? ''}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="ml-auto h-7 text-xs"
+                      onClick={() =>
+                        openScheduleDialog(
+                          m.id as string,
+                          m.scheduledAt as string | null,
+                          venue?.id
+                        )
+                      }
+                    >
+                      <Clock className="mr-1 h-3 w-3" />
+                      {m.scheduledAt ? 'Sửa' : 'Lên lịch'}
+                    </Button>
+                  </div>
+                );
+              })}
+          </div>
+        </div>
+      )}
+
+      {/* Schedule dialog */}
+      <Dialog
+        open={scheduleMatchId !== null}
+        onOpenChange={(open) => { if (!open) setScheduleMatchId(null); }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Lên lịch trận đấu</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Thời gian</Label>
+              <Input
+                type="datetime-local"
+                value={scheduleDate}
+                onChange={(e) => setScheduleDate(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Địa điểm</Label>
+              <select
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                value={scheduleVenueId}
+                onChange={(e) => setScheduleVenueId(e.target.value)}
+              >
+                <option value="none">Không chọn</option>
+                {(venues as Array<{ id: string; name: string }>).map((v) => (
+                  <option key={v.id} value={v.id}>
+                    {v.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setScheduleMatchId(null)}
+            >
+              Hủy
+            </Button>
+            <Button onClick={handleSchedule} disabled={scheduling}>
+              {scheduling && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Lưu
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -189,8 +341,8 @@ function GroupKnockoutView({
   return (
     <Tabs defaultValue="groups" className="space-y-4">
       <TabsList>
-        <TabsTrigger value="groups">Group Stage</TabsTrigger>
-        <TabsTrigger value="knockout">Knockout</TabsTrigger>
+        <TabsTrigger value="groups">Vòng bảng</TabsTrigger>
+        <TabsTrigger value="knockout">Loại trực tiếp</TabsTrigger>
       </TabsList>
       <TabsContent value="groups">
         <MatchSchedule matches={groupMatches} tournamentId={tournamentId} />
@@ -204,7 +356,7 @@ function GroupKnockoutView({
           />
         ) : (
           <p className="text-center text-muted-foreground py-8">
-            Knockout stage matches have not been generated yet.
+            Chưa tạo trận đấu vòng loại trực tiếp.
           </p>
         )}
       </TabsContent>

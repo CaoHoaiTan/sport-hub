@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
   Trophy,
+  Compass,
   MapPin,
   Bell,
   Users,
@@ -42,9 +43,15 @@ const navItems: NavItem[] = [
     visible: () => true,
   },
   {
-    label: 'Giải đấu',
+    label: 'Giải đấu của tôi',
     href: ROUTES.tournaments,
     icon: Trophy,
+    visible: () => true,
+  },
+  {
+    label: 'Khám phá giải đấu',
+    href: ROUTES.publicTournaments,
+    icon: Compass,
     visible: () => true,
   },
   {

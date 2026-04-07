@@ -26,16 +26,16 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { TournamentStatusBadge } from '@/components/tournament/tournament-status-badge';
 
 const sportLabels: Record<string, string> = {
-  football: 'Football',
-  volleyball: 'Volleyball',
-  badminton: 'Badminton',
+  football: 'Bóng đá',
+  volleyball: 'Bóng chuyền',
+  badminton: 'Cầu lông',
 };
 
 const formatLabels: Record<string, string> = {
-  round_robin: 'Round Robin',
-  single_elimination: 'Single Elimination',
-  double_elimination: 'Double Elimination',
-  group_stage_knockout: 'Group + KO',
+  round_robin: 'Vòng tròn',
+  single_elimination: 'Loại trực tiếp',
+  double_elimination: 'Loại trực tiếp (kép)',
+  group_stage_knockout: 'Vòng bảng + Loại trực tiếp',
 };
 
 interface TabDef {

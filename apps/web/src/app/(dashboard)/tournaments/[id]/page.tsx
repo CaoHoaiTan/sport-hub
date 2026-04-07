@@ -42,10 +42,10 @@ import {
 import { TournamentStatusBadge } from '@/components/tournament/tournament-status-badge';
 
 const formatLabels: Record<string, string> = {
-  round_robin: 'Round Robin',
-  single_elimination: 'Single Elimination',
-  double_elimination: 'Double Elimination',
-  group_stage_knockout: 'Group Stage + Knockout',
+  round_robin: 'Vòng tròn',
+  single_elimination: 'Loại trực tiếp',
+  double_elimination: 'Loại trực tiếp (kép)',
+  group_stage_knockout: 'Vòng bảng + Loại trực tiếp',
 };
 
 export default function TournamentOverviewPage() {

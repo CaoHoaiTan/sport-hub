@@ -1,10 +1,11 @@
 'use client';
 
 import { useQuery } from '@apollo/client';
-import { Trophy, Swords, Target, HandHelping, Calendar } from 'lucide-react';
+import { Trophy, Swords, Target, HandHelping, Calendar, Compass } from 'lucide-react';
 import Link from 'next/link';
 
 import { ROUTES } from '@/lib/constants';
+import { Button } from '@/components/ui/button';
 import { formatDateTime } from '@/lib/utils/format';
 import { GET_PLAYER_DASHBOARD } from '@/graphql/queries/dashboard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -53,12 +54,12 @@ export function PlayerDashboard() {
           icon={Swords}
         />
         <StatCard
-          title="Goals"
+          title="Bàn thắng"
           value={dashboard.totalGoals}
           icon={Target}
         />
         <StatCard
-          title="Assists"
+          title="Kiến tạo"
           value={dashboard.totalAssists}
           icon={HandHelping}
         />
@@ -110,9 +111,20 @@ export function PlayerDashboard() {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground py-4 text-center">
-              Không có trận đấu sắp tới
-            </p>
+            <div className="text-center py-6 space-y-3">
+              <Compass className="h-8 w-8 mx-auto text-muted-foreground/40" />
+              <p className="text-sm text-muted-foreground">
+                Không có trận đấu sắp tới.
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Tham gia giải đấu để bắt đầu thi đấu!
+              </p>
+              <Button asChild size="sm">
+                <Link href={ROUTES.publicTournaments}>
+                  Khám phá giải đấu
+                </Link>
+              </Button>
+            </div>
           )}
         </CardContent>
       </Card>

@@ -221,12 +221,18 @@ export default function TournamentTeamsPage() {
               id: string;
               name: string;
               logoUrl?: string | null;
+              managerId?: string;
               manager?: { id: string; fullName: string } | null;
               groupName?: string | null;
               seed?: number | null;
-            }) => (
+            }) => {
+              const isMyTeam = user && (team.managerId === user.id || team.manager?.id === user.id);
+              return (
               <div key={team.id} className="relative group">
-                <TeamCard team={team} />
+                <TeamCard
+                  team={team}
+                  className={isMyTeam ? 'border-primary/40 bg-primary/5 ring-1 ring-primary/20' : ''}
+                />
                 {canManage && (
                   <Button
                     variant="ghost"
@@ -241,8 +247,8 @@ export default function TournamentTeamsPage() {
                   </Button>
                 )}
               </div>
-            )
-          )}
+            );
+          })}
         </div>
       )}
 

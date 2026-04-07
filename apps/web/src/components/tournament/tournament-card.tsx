@@ -40,10 +40,10 @@ const sportColors: Record<string, string> = {
 };
 
 const formatLabels: Record<string, string> = {
-  round_robin: 'Round Robin',
-  single_elimination: 'Single Elim',
-  double_elimination: 'Double Elim',
-  group_stage_knockout: 'Group + KO',
+  round_robin: 'Vòng tròn',
+  single_elimination: 'Loại trực tiếp',
+  double_elimination: 'Loại trực tiếp (kép)',
+  group_stage_knockout: 'Vòng bảng + KO',
 };
 
 export function TournamentCard({ tournament, className }: TournamentCardProps) {
