@@ -34,46 +34,62 @@ interface Team {
 
 interface MatchEventFormProps {
   matchId: string;
+  sport?: string;
   teams: {
     home?: Team | null;
     away?: Team | null;
   };
 }
 
-const EVENT_TYPES = [
-  { value: 'goal', label: 'Goal' },
-  { value: 'assist', label: 'Assist' },
-  { value: 'yellow_card', label: 'Yellow Card' },
-  { value: 'red_card', label: 'Red Card' },
-  { value: 'substitution', label: 'Substitution' },
-  { value: 'penalty', label: 'Penalty' },
-  { value: 'own_goal', label: 'Own Goal' },
-  { value: 'point', label: 'Point' },
-];
+const eventTypesBySport: Record<string, { value: string; label: string }[]> = {
+  football: [
+    { value: 'goal', label: 'Bàn thắng' },
+    { value: 'assist', label: 'Kiến tạo' },
+    { value: 'yellow_card', label: 'Thẻ vàng' },
+    { value: 'red_card', label: 'Thẻ đỏ' },
+    { value: 'substitution', label: 'Thay người' },
+    { value: 'penalty', label: 'Phạt đền' },
+    { value: 'own_goal', label: 'Phản lưới' },
+  ],
+  volleyball: [
+    { value: 'point', label: 'Ghi điểm' },
+    { value: 'ace', label: 'Giao bóng trực tiếp (Ace)' },
+    { value: 'block', label: 'Chắn bóng' },
+    { value: 'substitution', label: 'Thay người' },
+    { value: 'timeout', label: 'Hội ý (Timeout)' },
+  ],
+  badminton: [
+    { value: 'point', label: 'Ghi điểm' },
+    { value: 'timeout', label: 'Nghỉ giữa set' },
+  ],
+};
 
-export function MatchEventForm({ matchId, teams }: MatchEventFormProps) {
+export function MatchEventForm({ matchId, sport, teams }: MatchEventFormProps) {
   const [eventType, setEventType] = useState('');
   const [teamId, setTeamId] = useState('');
   const [playerId, setPlayerId] = useState('');
-  const [minute, setPhút] = useState('');
+  const [minute, setMinute] = useState('');
+  const [setNumber, setSetNumber] = useState('');
   const [description, setDescription] = useState('');
 
   const [addEvent, { loading }] = useMutation(ADD_MATCH_EVENT, {
     refetchQueries: [{ query: GET_MATCH, variables: { id: matchId } }],
   });
 
+  const eventTypes = eventTypesBySport[sport ?? 'football'] ?? eventTypesBySport.football;
+  const isSetSport = sport === 'volleyball' || sport === 'badminton';
+
   const selectedTeam =
     teamId === teams.home?.id ? teams.home : teamId === teams.away?.id ? teams.away : null;
-
   const availablePlayers = selectedTeam?.players ?? [];
-
   const teamOptions = [teams.home, teams.away].filter(Boolean) as Team[];
 
   function resetForm() {
     setEventType('');
     setTeamId('');
     setPlayerId('');
-    setPhút('');
+    setMinute('');
+    setSetNumber('');
     setDescription('');
   }
 
@@ -81,7 +97,7 @@ export function MatchEventForm({ matchId, teams }: MatchEventFormProps) {
     e.preventDefault();
 
     if (!eventType || !teamId) {
-      toast.error('Please select event type and team.');
+      toast.error('Vui lòng chọn loại sự kiện và đội.');
       return;
     }
 
@@ -92,17 +108,15 @@ export function MatchEventForm({ matchId, teams }: MatchEventFormProps) {
 
     if (playerId) input.playerId = playerId;
     if (minute) input.minute = parseInt(minute);
+    if (setNumber) input.setNumber = parseInt(setNumber);
     if (description) input.description = description;
 
     try {
-      await addEvent({
-        variables: { matchId, input },
-      });
-      toast.success('Event added.');
+      await addEvent({ variables: { matchId, input } });
+      toast.success('Đã thêm sự kiện.');
       resetForm();
     } catch (error: unknown) {
-      const message =
-        error instanceof Error ? error.message : 'Failed to add event';
+      const message = error instanceof Error ? error.message : 'Thêm sự kiện thất bại';
       toast.error(message);
     }
   }
@@ -110,19 +124,19 @@ export function MatchEventForm({ matchId, teams }: MatchEventFormProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Add Match Event</CardTitle>
+        <CardTitle className="text-base">Thêm sự kiện</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label className="text-xs">Event Type</Label>
+              <Label className="text-xs">Loại sự kiện</Label>
               <Select value={eventType} onValueChange={setEventType}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select event" />
+                  <SelectValue placeholder="Chọn sự kiện" />
                 </SelectTrigger>
                 <SelectContent>
-                  {EVENT_TYPES.map((et) => (
+                  {eventTypes.map((et) => (
                     <SelectItem key={et.value} value={et.value}>
                       {et.label}
                     </SelectItem>
@@ -132,7 +146,7 @@ export function MatchEventForm({ matchId, teams }: MatchEventFormProps) {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs">Team</Label>
+              <Label className="text-xs">Đội</Label>
               <Select
                 value={teamId}
                 onValueChange={(val) => {
@@ -141,7 +155,7 @@ export function MatchEventForm({ matchId, teams }: MatchEventFormProps) {
                 }}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select team" />
+                  <SelectValue placeholder="Chọn đội" />
                 </SelectTrigger>
                 <SelectContent>
                   {teamOptions.map((team) => (
@@ -153,47 +167,59 @@ export function MatchEventForm({ matchId, teams }: MatchEventFormProps) {
               </Select>
             </div>
 
-            <div className="space-y-1.5">
-              <Label className="text-xs">Player (optional)</Label>
-              <Select value={playerId} onValueChange={setPlayerId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select player" />
-                </SelectTrigger>
-                <SelectContent>
-                  {availablePlayers.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>
-                      {p.jerseyNumber != null ? `#${p.jerseyNumber} ` : ''}
-                      {p.fullName}
-                    </SelectItem>
-                  ))}
-                  {availablePlayers.length === 0 && (
-                    <SelectItem value="__none" disabled>
-                      No players available
-                    </SelectItem>
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
+            {availablePlayers.length > 0 && (
+              <div className="space-y-1.5">
+                <Label className="text-xs">VĐV (tùy chọn)</Label>
+                <Select value={playerId} onValueChange={setPlayerId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Chọn VĐV" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Không chọn</SelectItem>
+                    {availablePlayers.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.jerseyNumber != null ? `#${p.jerseyNumber} ` : ''}
+                        {p.fullName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
-            <div className="space-y-1.5">
-              <Label className="text-xs">Phút (optional)</Label>
-              <Input
-                type="number"
-                min={0}
-                max={200}
-                value={minute}
-                onChange={(e) => setPhút(e.target.value)}
-                placeholder="e.g. 45"
-              />
-            </div>
+            {isSetSport ? (
+              <div className="space-y-1.5">
+                <Label className="text-xs">Set</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={5}
+                  value={setNumber}
+                  onChange={(e) => setSetNumber(e.target.value)}
+                  placeholder="Số set"
+                />
+              </div>
+            ) : (
+              <div className="space-y-1.5">
+                <Label className="text-xs">Phút</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  max={200}
+                  value={minute}
+                  onChange={(e) => setMinute(e.target.value)}
+                  placeholder="VD: 45"
+                />
+              </div>
+            )}
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-xs">Description (optional)</Label>
+            <Label className="text-xs">Mô tả (tùy chọn)</Label>
             <Textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Additional details..."
+              placeholder="Chi tiết thêm..."
               rows={2}
             />
           </div>

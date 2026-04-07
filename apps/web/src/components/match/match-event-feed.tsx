@@ -5,6 +5,8 @@ import {
   Target,
   AlertTriangle,
   Zap,
+  Shield,
+  Clock,
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils/cn';
@@ -30,25 +32,28 @@ const eventConfig: Record<
   string,
   { icon: typeof Circle; color: string; label: string }
 > = {
-  goal: { icon: Circle, color: 'text-green-600', label: 'Goal' },
-  assist: { icon: Zap, color: 'text-blue-500', label: 'Assist' },
-  yellow_card: { icon: Square, color: 'text-yellow-500', label: 'Yellow Card' },
-  red_card: { icon: Square, color: 'text-red-600', label: 'Red Card' },
+  goal: { icon: Circle, color: 'text-green-600', label: 'Bàn thắng' },
+  assist: { icon: Zap, color: 'text-blue-500', label: 'Kiến tạo' },
+  yellow_card: { icon: Square, color: 'text-yellow-500', label: 'Thẻ vàng' },
+  red_card: { icon: Square, color: 'text-red-600', label: 'Thẻ đỏ' },
   substitution: {
     icon: ArrowLeftRight,
     color: 'text-sky-500',
-    label: 'Substitution',
+    label: 'Thay người',
   },
-  penalty: { icon: Target, color: 'text-orange-500', label: 'Penalty' },
-  own_goal: { icon: AlertTriangle, color: 'text-red-400', label: 'Own Goal' },
-  point: { icon: Circle, color: 'text-green-500', label: 'Point' },
+  penalty: { icon: Target, color: 'text-orange-500', label: 'Phạt đền' },
+  own_goal: { icon: AlertTriangle, color: 'text-red-400', label: 'Phản lưới' },
+  point: { icon: Circle, color: 'text-green-500', label: 'Ghi điểm' },
+  ace: { icon: Zap, color: 'text-purple-500', label: 'Ace' },
+  block: { icon: Shield, color: 'text-sky-600', label: 'Chắn bóng' },
+  timeout: { icon: Clock, color: 'text-muted-foreground', label: 'Hội ý' },
 };
 
 export function MatchEventFeed({ events, className }: MatchEventFeedProps) {
   if (events.length === 0) {
     return (
       <p className={cn('text-center text-sm text-muted-foreground py-6', className)}>
-        No match events recorded yet.
+        Chưa có sự kiện nào được ghi nhận.
       </p>
     );
   }

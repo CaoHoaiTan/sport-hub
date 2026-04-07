@@ -181,6 +181,7 @@ export default function MatchDetailPage() {
 
             <MatchEventForm
               matchId={match.id}
+              sport={tournament?.sport}
               teams={{
                 home: match.homeTeam
                   ? { ...match.homeTeam, players: [] }
