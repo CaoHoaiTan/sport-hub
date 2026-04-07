@@ -65,5 +65,7 @@ export const userTypeDefs = gql`
   extend type Mutation {
     updateProfile(input: UpdateProfileInput!): User!
     changePassword(input: ChangePasswordInput!): Boolean!
+    updateUserRole(userId: ID!, role: UserRole!): User!
+    toggleUserActive(userId: ID!): User!
   }
 `;

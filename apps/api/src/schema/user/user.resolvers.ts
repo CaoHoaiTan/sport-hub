@@ -48,6 +48,26 @@ export const userResolvers = {
       const service = new UserService(ctx.db);
       return service.changePassword(user.id, input);
     },
+
+    updateUserRole: async (
+      _: unknown,
+      { userId, role }: { userId: string; role: string },
+      ctx: GraphQLContext
+    ) => {
+      const admin = requireRole(ctx.user, 'admin');
+      const service = new UserService(ctx.db);
+      return service.updateRole(userId, role, admin.id);
+    },
+
+    toggleUserActive: async (
+      _: unknown,
+      { userId }: { userId: string },
+      ctx: GraphQLContext
+    ) => {
+      const admin = requireRole(ctx.user, 'admin');
+      const service = new UserService(ctx.db);
+      return service.toggleActive(userId, admin.id);
+    },
   },
 
   User: {

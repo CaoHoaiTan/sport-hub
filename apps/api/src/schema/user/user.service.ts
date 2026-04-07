@@ -87,12 +87,76 @@ export class UserService {
     return true;
   }
 
+  async updateRole(
+    userId: string,
+    newRole: string,
+    requesterId: string
+  ): Promise<User> {
+    const validRoles = ['admin', 'organizer', 'team_manager', 'player', 'referee'];
+    if (!validRoles.includes(newRole)) {
+      throw new GraphQLError('Invalid role', {
+        extensions: { code: 'BAD_USER_INPUT' },
+      });
+    }
+
+    if (userId === requesterId) {
+      throw new GraphQLError('Cannot change your own role', {
+        extensions: { code: 'BAD_USER_INPUT' },
+      });
+    }
+
+    const user = await this.db
+      .selectFrom('users')
+      .selectAll()
+      .where('id', '=', userId)
+      .executeTakeFirst();
+
+    if (!user) {
+      throw new GraphQLError('User not found', {
+        extensions: { code: 'NOT_FOUND' },
+      });
+    }
+
+    return this.db
+      .updateTable('users')
+      .set({ role: newRole as User['role'], updated_at: new Date() })
+      .where('id', '=', userId)
+      .returningAll()
+      .executeTakeFirstOrThrow();
+  }
+
+  async toggleActive(userId: string, requesterId: string): Promise<User> {
+    if (userId === requesterId) {
+      throw new GraphQLError('Cannot deactivate your own account', {
+        extensions: { code: 'BAD_USER_INPUT' },
+      });
+    }
+
+    const user = await this.db
+      .selectFrom('users')
+      .selectAll()
+      .where('id', '=', userId)
+      .executeTakeFirst();
+
+    if (!user) {
+      throw new GraphQLError('User not found', {
+        extensions: { code: 'NOT_FOUND' },
+      });
+    }
+
+    return this.db
+      .updateTable('users')
+      .set({ is_active: !user.is_active, updated_at: new Date() })
+      .where('id', '=', userId)
+      .returningAll()
+      .executeTakeFirstOrThrow();
+  }
+
   async listUsers(pagination?: { first?: number; after?: string }) {
     const limit = Math.min(pagination?.first ?? 20, 100);
     let query = this.db
       .selectFrom('users')
       .selectAll()
-      .where('is_active', '=', true)
       .orderBy('created_at', 'desc')
       .limit(limit + 1);
 
@@ -111,7 +175,6 @@ export class UserService {
     const totalCount = await this.db
       .selectFrom('users')
       .select(({ fn }) => fn.countAll<number>().as('count'))
-      .where('is_active', '=', true)
       .executeTakeFirstOrThrow();
 
     return {

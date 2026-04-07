@@ -56,7 +56,7 @@ export class TeamService {
         }
       }
 
-      return trx
+      const team = await trx
         .insertInto('teams')
         .values({
           tournament_id: data.tournamentId,
@@ -66,6 +66,16 @@ export class TeamService {
         })
         .returningAll()
         .executeTakeFirstOrThrow();
+
+      // Auto-upgrade player to team_manager
+      await trx
+        .updateTable('users')
+        .set({ role: 'team_manager', updated_at: new Date() })
+        .where('id', '=', managerId)
+        .where('role', '=', 'player')
+        .execute();
+
+      return team;
     });
   }
 

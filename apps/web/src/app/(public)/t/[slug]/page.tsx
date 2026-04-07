@@ -255,9 +255,7 @@ export default async function PublicTournamentOverviewPage({ params }: PageProps
                 <CardTitle className="text-base">Điều lệ</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm whitespace-pre-wrap">
-                  {tournament.rulesText}
-                </p>
+                <RulesDisplay rulesText={tournament.rulesText} sport={tournament.sport} />
               </CardContent>
             </Card>
           )}
@@ -386,6 +384,68 @@ function InfoItem({
         <p className="text-xs text-muted-foreground">{label}</p>
         <p className="text-sm font-medium">{value}</p>
       </div>
+    </div>
+  );
+}
+
+const categoryLabels: Record<string, string> = {
+  singles_men: 'Đơn nam',
+  singles_women: 'Đơn nữ',
+  doubles_men: 'Đôi nam',
+  doubles_women: 'Đôi nữ',
+  mixed_doubles: 'Đôi nam nữ (Mixed)',
+  men: 'Nam',
+  women: 'Nữ',
+  mixed: 'Nam nữ (Mixed)',
+  beach_men: 'Bãi biển nam',
+  beach_women: 'Bãi biển nữ',
+  beach_mixed: 'Bãi biển nam nữ',
+};
+
+function RulesDisplay({ rulesText, sport }: { rulesText: string; sport: string }) {
+  let rules: Record<string, unknown>;
+  try {
+    rules = JSON.parse(rulesText);
+  } catch {
+    // Not JSON — show as plain text
+    return <p className="text-sm whitespace-pre-wrap">{rulesText}</p>;
+  }
+
+  const items: { label: string; value: string }[] = [];
+
+  if (sport === 'football') {
+    if (rules.matchDuration) items.push({ label: 'Thời gian thi đấu', value: `${rules.matchDuration} phút` });
+    if (rules.halfCount) items.push({ label: 'Số hiệp', value: String(rules.halfCount) });
+    if (rules.hasExtraTime) items.push({ label: 'Hiệp phụ', value: 'Có' });
+    if (rules.hasPenalty) items.push({ label: 'Đá luân lưu', value: 'Có' });
+  }
+
+  if (sport === 'volleyball') {
+    if (rules.volleyballCategory) items.push({ label: 'Hạng mục', value: categoryLabels[rules.volleyballCategory as string] ?? String(rules.volleyballCategory) });
+    if (rules.setsToWin) items.push({ label: 'Số set thắng', value: String(rules.setsToWin) });
+    if (rules.pointsPerSet) items.push({ label: 'Điểm mỗi set', value: String(rules.pointsPerSet) });
+    if (rules.finalSetPoints) items.push({ label: 'Điểm set cuối', value: String(rules.finalSetPoints) });
+  }
+
+  if (sport === 'badminton') {
+    if (rules.badmintonCategory) items.push({ label: 'Hạng mục', value: categoryLabels[rules.badmintonCategory as string] ?? String(rules.badmintonCategory) });
+    if (rules.setsToWin) items.push({ label: 'Số set thắng', value: String(rules.setsToWin) });
+    if (rules.pointsPerSet) items.push({ label: 'Điểm mỗi set', value: String(rules.pointsPerSet) });
+    if (rules.maxPoints) items.push({ label: 'Điểm tối đa', value: String(rules.maxPoints) });
+  }
+
+  if (items.length === 0) {
+    return <p className="text-sm whitespace-pre-wrap">{rulesText}</p>;
+  }
+
+  return (
+    <div className="grid gap-3 sm:grid-cols-2">
+      {items.map((item) => (
+        <div key={item.label}>
+          <p className="text-xs text-muted-foreground">{item.label}</p>
+          <p className="text-sm font-medium">{item.value}</p>
+        </div>
+      ))}
     </div>
   );
 }
