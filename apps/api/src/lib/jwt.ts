@@ -1,22 +1,40 @@
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET ?? 'dev-secret';
-const ACCESS_EXPIRES = process.env.JWT_ACCESS_EXPIRES_IN ?? '15m';
-const REFRESH_EXPIRES = process.env.JWT_REFRESH_EXPIRES_IN ?? '7d';
-
 export interface TokenPayload {
   userId: string;
   role: string;
 }
 
+function getSecret(): string {
+  const secret = process.env.JWT_SECRET;
+  if (!secret || secret.length < 32) {
+    throw new Error(
+      'JWT_SECRET must be set to a value of at least 32 characters'
+    );
+  }
+  return secret;
+}
+
+function getRefreshSecret(): string {
+  return process.env.JWT_REFRESH_SECRET ?? getSecret();
+}
+
 export function signAccessToken(payload: TokenPayload): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: ACCESS_EXPIRES });
+  const expiresIn = process.env.JWT_ACCESS_EXPIRES_IN ?? '15m';
+  return jwt.sign(payload, getSecret(), { expiresIn });
 }
 
 export function signRefreshToken(payload: TokenPayload): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: REFRESH_EXPIRES });
+  const expiresIn = process.env.JWT_REFRESH_EXPIRES_IN ?? '7d';
+  return jwt.sign({ ...payload, tokenType: 'refresh' }, getRefreshSecret(), {
+    expiresIn,
+  });
 }
 
 export function verifyToken(token: string): TokenPayload {
-  return jwt.verify(token, JWT_SECRET) as TokenPayload;
+  return jwt.verify(token, getSecret()) as TokenPayload;
+}
+
+export function verifyRefreshToken(token: string): TokenPayload {
+  return jwt.verify(token, getRefreshSecret()) as TokenPayload;
 }

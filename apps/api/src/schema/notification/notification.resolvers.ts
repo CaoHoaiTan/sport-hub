@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql';
 import type { Notification } from '@sporthub/db';
 import type { GraphQLContext } from '../../context.js';
 import { requireAuth } from '../../middleware/role.guard.js';
@@ -43,8 +44,14 @@ export const notificationResolvers = {
 
   Subscription: {
     notificationReceived: {
-      subscribe: (_: unknown, { userId }: { userId: string }) => {
-        return pubsub.asyncIterableIterator(EVENTS.NOTIFICATION_RECEIVED);
+      subscribe: (_: unknown, { userId }: { userId: string }, ctx: GraphQLContext) => {
+        const user = requireAuth(ctx.user);
+        if (user.id !== userId && user.role !== 'admin') {
+          throw new GraphQLError('Forbidden', {
+            extensions: { code: 'FORBIDDEN' },
+          });
+        }
+        return pubsub.asyncIterableIterator(`${EVENTS.NOTIFICATION_RECEIVED}.${userId}`);
       },
       resolve: (payload: { notificationReceived: Notification }) => {
         return payload.notificationReceived;

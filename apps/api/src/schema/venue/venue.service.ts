@@ -123,6 +123,12 @@ export class VenueService {
     }
 
     if (sportType) {
+      const validSports = ['football', 'volleyball', 'badminton'];
+      if (!validSports.includes(sportType)) {
+        throw new GraphQLError('Invalid sport type', {
+          extensions: { code: 'BAD_USER_INPUT' },
+        });
+      }
       query = query.where(sql`${sql.lit(sportType)} = ANY(sport_types)` as never);
     }
 

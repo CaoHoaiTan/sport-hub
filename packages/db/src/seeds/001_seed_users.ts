@@ -13,7 +13,7 @@ export async function seed(db: Kysely<Database>): Promise<void> {
     return;
   }
 
-  // bcrypt hash of "Admin@123" with 12 rounds
+  // bcrypt hash with 12 rounds — change password immediately after first login
   const passwordHash =
     '$2b$12$CHjo9Lu0yIC2HVCC1hWqA.JjizRQ/gfTedu5JkrLPadQED.BbdaVG';
 
@@ -29,5 +29,5 @@ export async function seed(db: Kysely<Database>): Promise<void> {
     })
     .execute();
 
-  console.log('Admin user created: admin@sporthub.vn / Admin@123');
+  console.log('Admin user created: admin@sporthub.vn (change password after first login)');
 }

@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql';
 import type { PaymentPlan, Payment, PromoCode } from '@sporthub/db';
 import type { GraphQLContext } from '../../context.js';
 import { requireAuth, requireRole } from '../../middleware/role.guard.js';
@@ -29,7 +30,20 @@ export const paymentResolvers = {
       { teamId }: { teamId: string },
       ctx: GraphQLContext
     ) => {
-      requireAuth(ctx.user);
+      const user = requireAuth(ctx.user);
+      // Verify user is team manager or admin
+      if (user.role !== 'admin' && user.role !== 'organizer') {
+        const team = await ctx.db
+          .selectFrom('teams')
+          .select('manager_id')
+          .where('id', '=', teamId)
+          .executeTakeFirst();
+        if (!team || team.manager_id !== user.id) {
+          throw new GraphQLError('Not authorized', {
+            extensions: { code: 'FORBIDDEN' },
+          });
+        }
+      }
       const service = new PaymentService(ctx.db);
       return service.getPaymentsByTeam(teamId);
     },
@@ -80,6 +94,7 @@ export const paymentResolvers = {
       { paymentId, transactionId, gatewayResponse }: { paymentId: string; transactionId: string; gatewayResponse: string },
       ctx: GraphQLContext
     ) => {
+      requireRole(ctx.user, 'admin');
       const service = new PaymentService(ctx.db);
       return service.handlePaymentCallback(paymentId, transactionId, gatewayResponse);
     },

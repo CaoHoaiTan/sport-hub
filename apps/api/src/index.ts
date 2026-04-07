@@ -18,8 +18,16 @@ import { loggingPlugin } from './plugins/logging.js';
 import { typeDefs, resolvers } from './schema/index.js';
 import { authenticateUser } from './middleware/auth.guard.js';
 import { createLoaders } from './lib/loaders.js';
-import { apiRateLimiter } from './middleware/rate-limit.js';
+import { apiRateLimiter, authRateLimiter } from './middleware/rate-limit.js';
 import type { GraphQLContext } from './context.js';
+
+// Startup env validation
+const requiredEnvVars = ['JWT_SECRET', 'DATABASE_URL'];
+for (const envVar of requiredEnvVars) {
+  if (!process.env[envVar]) {
+    throw new Error(`Required environment variable ${envVar} is not set`);
+  }
+}
 
 const PORT = parseInt(process.env.PORT ?? '4000', 10);
 
@@ -47,6 +55,19 @@ async function start() {
   });
 
   app.use(apiRateLimiter);
+
+  // Stricter rate limit for auth operations
+  app.use('/graphql', (req, res, next) => {
+    if (req.method === 'POST') {
+      const body = req.body as { query?: string } | undefined;
+      const query = body?.query ?? '';
+      const isAuthOp = /mutation\s+\w*\s*\{?\s*(login|register|refreshToken|forgotPassword|resetPassword)\s*\(/i.test(query);
+      if (isAuthOp) {
+        return authRateLimiter(req, res, next);
+      }
+    }
+    next();
+  });
 
   app.use(
     '/graphql',

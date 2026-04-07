@@ -1,3 +1,4 @@
+import { randomInt } from 'node:crypto';
 import { GraphQLError } from 'graphql';
 import { z } from 'zod';
 import type { Kysely } from 'kysely';
@@ -20,50 +21,52 @@ export class TeamService {
   async registerTeam(managerId: string, input: unknown): Promise<Team> {
     const data = registerTeamSchema.parse(input);
 
-    // Verify tournament exists and is in registration status
-    const tournament = await this.db
-      .selectFrom('tournaments')
-      .selectAll()
-      .where('id', '=', data.tournamentId)
-      .executeTakeFirst();
+    return this.db.transaction().execute(async (trx) => {
+      // Verify tournament exists and is in registration status
+      const tournament = await trx
+        .selectFrom('tournaments')
+        .selectAll()
+        .where('id', '=', data.tournamentId)
+        .executeTakeFirst();
 
-    if (!tournament) {
-      throw new GraphQLError('Tournament not found', {
-        extensions: { code: 'NOT_FOUND' },
-      });
-    }
+      if (!tournament) {
+        throw new GraphQLError('Tournament not found', {
+          extensions: { code: 'NOT_FOUND' },
+        });
+      }
 
-    if (tournament.status !== 'registration') {
-      throw new GraphQLError('Tournament is not accepting registrations', {
-        extensions: { code: 'BAD_USER_INPUT' },
-      });
-    }
-
-    // Check max teams slot
-    if (tournament.max_teams) {
-      const { count } = await this.db
-        .selectFrom('teams')
-        .select(({ fn }) => fn.countAll<number>().as('count'))
-        .where('tournament_id', '=', data.tournamentId)
-        .executeTakeFirstOrThrow();
-
-      if (Number(count) >= tournament.max_teams) {
-        throw new GraphQLError('Tournament has reached maximum number of teams', {
+      if (tournament.status !== 'registration') {
+        throw new GraphQLError('Tournament is not accepting registrations', {
           extensions: { code: 'BAD_USER_INPUT' },
         });
       }
-    }
 
-    return this.db
-      .insertInto('teams')
-      .values({
-        tournament_id: data.tournamentId,
-        name: data.name,
-        logo_url: data.logoUrl ?? null,
-        manager_id: managerId,
-      })
-      .returningAll()
-      .executeTakeFirstOrThrow();
+      // Check max teams slot (inside transaction to prevent race condition)
+      if (tournament.max_teams) {
+        const { count } = await trx
+          .selectFrom('teams')
+          .select(({ fn }) => fn.countAll<number>().as('count'))
+          .where('tournament_id', '=', data.tournamentId)
+          .executeTakeFirstOrThrow();
+
+        if (Number(count) >= tournament.max_teams) {
+          throw new GraphQLError('Tournament has reached maximum number of teams', {
+            extensions: { code: 'BAD_USER_INPUT' },
+          });
+        }
+      }
+
+      return trx
+        .insertInto('teams')
+        .values({
+          tournament_id: data.tournamentId,
+          name: data.name,
+          logo_url: data.logoUrl ?? null,
+          manager_id: managerId,
+        })
+        .returningAll()
+        .executeTakeFirstOrThrow();
+    });
   }
 
   async updateTeam(
@@ -108,6 +111,13 @@ export class TeamService {
       });
     }
 
+    // Check authorization first
+    if (team.manager_id !== userId && userRole !== 'admin') {
+      throw new GraphQLError('Not authorized', {
+        extensions: { code: 'FORBIDDEN' },
+      });
+    }
+
     // Verify tournament hasn't started
     const tournament = await this.db
       .selectFrom('tournaments')
@@ -118,12 +128,6 @@ export class TeamService {
     if (tournament && tournament.status === 'in_progress') {
       throw new GraphQLError('Cannot delete team after tournament has started', {
         extensions: { code: 'BAD_USER_INPUT' },
-      });
-    }
-
-    if (team.manager_id !== userId && userRole !== 'admin') {
-      throw new GraphQLError('Not authorized', {
-        extensions: { code: 'FORBIDDEN' },
       });
     }
 
@@ -189,7 +193,7 @@ export class TeamService {
     // Shuffle teams randomly
     const shuffled = [...teams];
     for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
+      const j = randomInt(i + 1);
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
 

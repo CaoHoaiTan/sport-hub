@@ -5,7 +5,7 @@ import type { Kysely } from 'kysely';
 import type { Database, User } from '@sporthub/db';
 import type Redis from 'ioredis';
 import { hashPassword, comparePassword } from '../../lib/password.js';
-import { signAccessToken, signRefreshToken, verifyToken } from '../../lib/jwt.js';
+import { signAccessToken, signRefreshToken, verifyToken, verifyRefreshToken } from '../../lib/jwt.js';
 
 // ─── Validation Schemas ──────────────────────────────────
 const registerSchema = z.object({
@@ -95,7 +95,7 @@ export class AuthService {
   async refreshToken(token: string): Promise<AuthPayload> {
     let payload;
     try {
-      payload = verifyToken(token);
+      payload = verifyRefreshToken(token);
     } catch {
       throw new GraphQLError('Invalid refresh token', {
         extensions: { code: 'UNAUTHENTICATED' },
@@ -172,6 +172,13 @@ export class AuthService {
   }
 
   async resetPassword(token: string, newPassword: string): Promise<boolean> {
+    // Validate token format (hex string, 64 chars)
+    if (!/^[a-f0-9]{64}$/i.test(token)) {
+      throw new GraphQLError('Invalid reset token format', {
+        extensions: { code: 'BAD_USER_INPUT' },
+      });
+    }
+
     if (newPassword.length < 8) {
       throw new GraphQLError('Password must be at least 8 characters', {
         extensions: { code: 'BAD_USER_INPUT' },
