@@ -2,8 +2,10 @@ import { GraphQLError } from 'graphql';
 import { z } from 'zod';
 import type { Kysely } from 'kysely';
 import type { Database, PaymentPlan, Payment, PromoCode } from '@sporthub/db';
-import { createPayment as createMomoPayment } from '../../lib/payment/momo.js';
 import { createPaymentUrl as createVnPayUrl } from '../../lib/payment/vnpay.js';
+
+const FRONTEND_URL = process.env.APP_URL ?? 'http://localhost:3000';
+const API_URL = process.env.API_URL ?? 'http://localhost:4000';
 
 const createPaymentPlanSchema = z.object({
   tournamentId: z.string().uuid(),
@@ -18,7 +20,7 @@ const createPaymentPlanSchema = z.object({
 const initiatePaymentSchema = z.object({
   paymentPlanId: z.string().uuid(),
   teamId: z.string().uuid(),
-  method: z.enum(['bank_transfer', 'momo', 'vnpay', 'zalopay', 'cash']),
+  method: z.enum(['bank_transfer', 'momo', 'vnpay', 'cash']),
   promoCode: z.string().max(50).nullable().optional(),
   returnUrl: z.string().url().nullable().optional(),
 });
@@ -55,7 +57,7 @@ export class PaymentService {
       .executeTakeFirstOrThrow();
   }
 
-  async initiatePayment(input: unknown, userId: string): Promise<Payment> {
+  async initiatePayment(input: unknown, userId: string, userRole: string, clientIp: string): Promise<Payment> {
     const data = initiatePaymentSchema.parse(input);
 
     const plan = await this.db
@@ -68,13 +70,34 @@ export class PaymentService {
       throw new GraphQLError('Payment plan not found', { extensions: { code: 'NOT_FOUND' } });
     }
 
+    // Verify the caller owns the team (or is admin/organizer)
+    const team = await this.db
+      .selectFrom('teams')
+      .select(['id', 'manager_id', 'tournament_id'])
+      .where('id', '=', data.teamId)
+      .executeTakeFirst();
+
+    if (!team) {
+      throw new GraphQLError('Team not found', { extensions: { code: 'NOT_FOUND' } });
+    }
+    if (userRole !== 'admin' && userRole !== 'organizer' && team.manager_id !== userId) {
+      throw new GraphQLError('Not authorized to initiate payment for this team', {
+        extensions: { code: 'FORBIDDEN' },
+      });
+    }
+    if (team.tournament_id !== plan.tournament_id) {
+      throw new GraphQLError('Team does not belong to this tournament', {
+        extensions: { code: 'BAD_USER_INPUT' },
+      });
+    }
+
     // Calculate amount (check early bird)
     let amount = parseFloat(plan.amount);
     if (plan.early_bird_amount && plan.early_bird_deadline && new Date() < plan.early_bird_deadline) {
       amount = parseFloat(plan.early_bird_amount);
     }
 
-    // Handle promo code
+    // Validate promo code (read-only check, increment happens after payment creation)
     let discountAmount = 0;
     let promoCodeStr: string | null = null;
     if (data.promoCode) {
@@ -82,18 +105,17 @@ export class PaymentService {
       if (promo.valid && promo.discountAmount) {
         discountAmount = promo.discountAmount;
         promoCodeStr = data.promoCode;
-
-        // Increment used_count
-        await this.db
-          .updateTable('promo_codes')
-          .set((eb) => ({ used_count: eb('used_count', '+', 1) }))
-          .where('code', '=', data.promoCode!)
-          .where('tournament_id', '=', plan.tournament_id)
-          .execute();
       }
     }
 
     const finalAmount = Math.max(0, amount - discountAmount);
+
+    // Reject unsupported payment methods before creating any records
+    if (data.method === 'momo') {
+      throw new GraphQLError('MoMo chưa được hỗ trợ. Vui lòng chọn phương thức khác.', {
+        extensions: { code: 'BAD_USER_INPUT' },
+      });
+    }
 
     // Create payment record
     const payment = await this.db
@@ -107,31 +129,32 @@ export class PaymentService {
         method: data.method,
         promo_code: promoCodeStr,
         discount_amount: String(discountAmount),
-        expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24h expiry
+        expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000),
       })
       .returningAll()
       .executeTakeFirstOrThrow();
 
+    // Increment promo used_count only after successful payment creation
+    if (promoCodeStr) {
+      await this.db
+        .updateTable('promo_codes')
+        .set((eb) => ({ used_count: eb('used_count', '+', 1) }))
+        .where('code', '=', promoCodeStr)
+        .where('tournament_id', '=', plan.tournament_id)
+        .execute();
+    }
+
     // Generate payment URL based on method
     let paymentUrl: string | null = null;
-    const returnUrl = data.returnUrl ?? 'http://localhost:3000/payment/callback';
+    const tournamentId = plan.tournament_id;
 
-    if (data.method === 'momo') {
-      const result = await createMomoPayment({
-        orderId: payment.id,
-        amount: finalAmount,
-        orderInfo: `Payment for ${plan.name}`,
-        returnUrl,
-        notifyUrl: `${returnUrl}/momo-notify`,
-      });
-      paymentUrl = result.paymentUrl;
-    } else if (data.method === 'vnpay') {
+    if (data.method === 'vnpay') {
       paymentUrl = createVnPayUrl({
         orderId: payment.id,
         amount: finalAmount,
         orderInfo: `Payment for ${plan.name}`,
-        returnUrl,
-        ipAddr: '127.0.0.1',
+        returnUrl: `${API_URL}/payment/vnpay-return`,
+        ipAddr: clientIp,
       });
     }
 
@@ -146,6 +169,58 @@ export class PaymentService {
     }
 
     return payment;
+  }
+
+  async confirmManualPayment(
+    paymentId: string,
+    transactionId: string | null,
+    userId: string,
+    userRole: string
+  ): Promise<Payment> {
+    const payment = await this.db
+      .selectFrom('payments')
+      .selectAll()
+      .where('id', '=', paymentId)
+      .executeTakeFirst();
+
+    if (!payment) {
+      throw new GraphQLError('Payment not found', { extensions: { code: 'NOT_FOUND' } });
+    }
+
+    if (!['bank_transfer', 'cash'].includes(payment.method ?? '')) {
+      throw new GraphQLError(
+        'Only bank_transfer and cash payments can be confirmed manually',
+        { extensions: { code: 'BAD_USER_INPUT' } }
+      );
+    }
+
+    if (payment.status === 'paid') {
+      throw new GraphQLError('Payment already marked as paid', { extensions: { code: 'BAD_USER_INPUT' } });
+    }
+
+    const plan = await this.db
+      .selectFrom('payment_plans')
+      .selectAll()
+      .where('id', '=', payment.payment_plan_id)
+      .executeTakeFirst();
+
+    if (!plan) {
+      throw new GraphQLError('Payment plan not found', { extensions: { code: 'NOT_FOUND' } });
+    }
+
+    await this.verifyOrganizerAccess(plan.tournament_id, userId, userRole);
+
+    return this.db
+      .updateTable('payments')
+      .set({
+        status: 'paid',
+        transaction_id: transactionId ?? null,
+        paid_at: new Date(),
+        updated_at: new Date(),
+      })
+      .where('id', '=', paymentId)
+      .returningAll()
+      .executeTakeFirstOrThrow();
   }
 
   async handlePaymentCallback(
@@ -203,16 +278,18 @@ export class PaymentService {
       throw new GraphQLError('Only paid payments can be refunded', { extensions: { code: 'BAD_USER_INPUT' } });
     }
 
-    // Verify authorization via payment plan -> tournament
     const plan = await this.db
       .selectFrom('payment_plans')
       .selectAll()
       .where('id', '=', payment.payment_plan_id)
       .executeTakeFirst();
 
-    if (plan) {
-      await this.verifyOrganizerAccess(plan.tournament_id, userId, userRole);
+    // Always enforce authorization — throw if plan not found
+    if (!plan) {
+      throw new GraphQLError('Payment plan not found', { extensions: { code: 'NOT_FOUND' } });
     }
+
+    await this.verifyOrganizerAccess(plan.tournament_id, userId, userRole);
 
     return this.db
       .updateTable('payments')
@@ -228,6 +305,19 @@ export class PaymentService {
   }
 
   async getPaymentsByTournament(tournamentId: string): Promise<Payment[]> {
+    // Lazily mark expired pending payments as overdue
+    await this.db
+      .updateTable('payments')
+      .set({ status: 'overdue', updated_at: new Date() })
+      .where('status', '=', 'pending')
+      .where('expires_at', '<', new Date())
+      .where(
+        'payment_plan_id',
+        'in',
+        this.db.selectFrom('payment_plans').select('id').where('tournament_id', '=', tournamentId)
+      )
+      .execute();
+
     return this.db
       .selectFrom('payments')
       .innerJoin('payment_plans', 'payment_plans.id', 'payments.payment_plan_id')
@@ -238,6 +328,15 @@ export class PaymentService {
   }
 
   async getPaymentsByTeam(teamId: string): Promise<Payment[]> {
+    // Lazily mark expired pending payments as overdue
+    await this.db
+      .updateTable('payments')
+      .set({ status: 'overdue', updated_at: new Date() })
+      .where('status', '=', 'pending')
+      .where('expires_at', '<', new Date())
+      .where('team_id', '=', teamId)
+      .execute();
+
     return this.db
       .selectFrom('payments')
       .selectAll()

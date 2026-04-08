@@ -19,6 +19,7 @@ import { typeDefs, resolvers } from './schema/index.js';
 import { authenticateUser } from './middleware/auth.guard.js';
 import { createLoaders } from './lib/loaders.js';
 import { apiRateLimiter, authRateLimiter } from './middleware/rate-limit.js';
+import { createPaymentCallbackRouter } from './routes/payment-callbacks.js';
 import type { GraphQLContext } from './context.js';
 
 // Startup env validation
@@ -54,6 +55,9 @@ async function start() {
     res.json({ status: 'ok' });
   });
 
+  // Payment gateway callbacks (before auth middleware)
+  app.use('/payment', createPaymentCallbackRouter(db));
+
   app.use(apiRateLimiter);
 
   // Stricter rate limit for auth operations
@@ -79,7 +83,11 @@ async function start() {
       context: async ({ req }): Promise<GraphQLContext> => {
         const user = await authenticateUser(req.headers.authorization, db);
         const loaders = createLoaders(db);
-        return { db, redis, user, loaders };
+        const clientIp =
+          (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
+          req.socket.remoteAddress ||
+          '127.0.0.1';
+        return { db, redis, user, loaders, clientIp };
       },
     })
   );

@@ -12,6 +12,7 @@ import {
   GET_PAYMENT_PLANS,
   GET_PAYMENTS_BY_TOURNAMENT,
 } from '@/graphql/queries/payment';
+import { GET_TEAMS_BY_TOURNAMENT } from '@/graphql/queries/team';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -34,6 +35,16 @@ export default function PaymentsPage() {
   } | null>(null);
 
   const canManage = user && (isOrganizer(user.role) || isAdmin(user.role));
+
+  // Find user's team in this tournament
+  const { data: teamsData } = useQuery(GET_TEAMS_BY_TOURNAMENT, {
+    variables: { tournamentId },
+    skip: !tournamentId,
+  });
+  const myTeam = (teamsData?.teamsByTournament ?? []).find(
+    (t: { managerId?: string; manager?: { id: string } }) =>
+      user && (t.managerId === user.id || t.manager?.id === user.id)
+  );
 
   const { data: plansData, loading: plansLoading } = useQuery(
     GET_PAYMENT_PLANS,
@@ -152,6 +163,7 @@ export default function PaymentsPage() {
               isLoading={paymentsLoading}
               showRefund
               onRefunded={() => refetchPayments()}
+              onConfirmed={() => refetchPayments()}
             />
           </TabsContent>
         )}
@@ -168,7 +180,7 @@ export default function PaymentsPage() {
           open={payDialogOpen}
           onOpenChange={setPayDialogOpen}
           paymentPlanId={selectedPlan.id}
-          teamId=""
+          teamId={myTeam?.id ?? ''}
           tournamentId={tournamentId}
           amount={selectedPlan.amount}
         />

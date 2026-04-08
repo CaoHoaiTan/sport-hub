@@ -27,6 +27,15 @@ export const INITIATE_PAYMENT = gql`
   }
 `;
 
+export const CONFIRM_MANUAL_PAYMENT = gql`
+  ${PAYMENT_FIELDS}
+  mutation ConfirmManualPayment($paymentId: ID!, $transactionId: String) {
+    confirmManualPayment(paymentId: $paymentId, transactionId: $transactionId) {
+      ...PaymentFields
+    }
+  }
+`;
+
 export const REFUND_PAYMENT = gql`
   ${PAYMENT_FIELDS}
   mutation RefundPayment($paymentId: ID!, $reason: String!) {

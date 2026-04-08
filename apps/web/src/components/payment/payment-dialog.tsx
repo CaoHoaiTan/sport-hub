@@ -16,6 +16,12 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { PromoCodeInput } from './promo-code-input';
 
 interface PaymentDialogProps {
@@ -28,10 +34,10 @@ interface PaymentDialogProps {
 }
 
 const methods = [
-  { value: 'bank_transfer', label: 'Chuyển khoản', icon: Banknote },
-  { value: 'momo', label: 'MoMo', icon: Smartphone },
-  { value: 'vnpay', label: 'VNPay', icon: Globe },
-  { value: 'cash', label: 'Tiền mặt', icon: CreditCard },
+  { value: 'bank_transfer', label: 'Chuyển khoản', icon: Banknote, disabled: false },
+  { value: 'momo', label: 'MoMo', icon: Smartphone, disabled: true, disabledReason: 'Chưa hỗ trợ' },
+  { value: 'vnpay', label: 'VNPay', icon: Globe, disabled: false },
+  { value: 'cash', label: 'Tiền mặt', icon: CreditCard, disabled: false },
 ] as const;
 
 export function PaymentDialog({
@@ -69,7 +75,7 @@ export function PaymentDialog({
         return;
       }
 
-      toast.success('Payment initiated successfully.');
+      toast.success('Đã ghi nhận thanh toán. Ban tổ chức sẽ xác nhận sau.');
       onOpenChange(false);
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Payment failed';
@@ -92,27 +98,43 @@ export function PaymentDialog({
         <div className="space-y-6">
           <div>
             <p className="text-sm text-muted-foreground mb-3">Payment Method</p>
-            <div className="grid grid-cols-2 gap-2">
-              {methods.map((m) => {
-                const Icon = m.icon;
-                return (
-                  <button
-                    key={m.value}
-                    type="button"
-                    className={cn(
-                      'flex items-center gap-2 rounded-lg border p-3 text-sm transition-colors',
-                      method === m.value
-                        ? 'border-primary bg-primary/5 text-primary'
-                        : 'hover:bg-muted/50'
-                    )}
-                    onClick={() => setMethod(m.value)}
-                  >
-                    <Icon className="h-4 w-4" />
-                    {m.label}
-                  </button>
-                );
-              })}
-            </div>
+            <TooltipProvider>
+              <div className="grid grid-cols-2 gap-2">
+                {methods.map((m) => {
+                  const Icon = m.icon;
+                  const btn = (
+                    <button
+                      key={m.value}
+                      type="button"
+                      disabled={m.disabled}
+                      className={cn(
+                        'flex items-center gap-2 rounded-lg border p-3 text-sm transition-colors',
+                        m.disabled
+                          ? 'cursor-not-allowed opacity-50'
+                          : method === m.value
+                            ? 'border-primary bg-primary/5 text-primary'
+                            : 'hover:bg-muted/50'
+                      )}
+                      onClick={() => !m.disabled && setMethod(m.value)}
+                    >
+                      <Icon className="h-4 w-4" />
+                      {m.label}
+                    </button>
+                  );
+
+                  if (m.disabled && 'disabledReason' in m) {
+                    return (
+                      <Tooltip key={m.value}>
+                        <TooltipTrigger asChild>{btn}</TooltipTrigger>
+                        <TooltipContent>{m.disabledReason}</TooltipContent>
+                      </Tooltip>
+                    );
+                  }
+
+                  return btn;
+                })}
+              </div>
+            </TooltipProvider>
           </div>
 
           <div>

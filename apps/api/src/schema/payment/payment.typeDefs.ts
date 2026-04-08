@@ -13,7 +13,6 @@ export const paymentTypeDefs = gql`
     bank_transfer
     momo
     vnpay
-    zalopay
     cash
   }
 
@@ -121,6 +120,7 @@ export const paymentTypeDefs = gql`
   extend type Mutation {
     createPaymentPlan(input: CreatePaymentPlanInput!): PaymentPlan!
     initiatePayment(input: InitiatePaymentInput!): Payment!
+    confirmManualPayment(paymentId: ID!, transactionId: String): Payment!
     handlePaymentCallback(paymentId: ID!, transactionId: String!, gatewayResponse: String!): Payment!
     refundPayment(paymentId: ID!, reason: String!): Payment!
     createPromoCode(input: CreatePromoCodeInput!): PromoCode!

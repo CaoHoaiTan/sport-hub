@@ -86,7 +86,17 @@ export const paymentResolvers = {
     ) => {
       const user = requireAuth(ctx.user);
       const service = new PaymentService(ctx.db);
-      return service.initiatePayment(input, user.id);
+      return service.initiatePayment(input, user.id, user.role, ctx.clientIp);
+    },
+
+    confirmManualPayment: async (
+      _: unknown,
+      { paymentId, transactionId }: { paymentId: string; transactionId?: string },
+      ctx: GraphQLContext
+    ) => {
+      const user = requireRole(ctx.user, 'organizer', 'admin');
+      const service = new PaymentService(ctx.db);
+      return service.confirmManualPayment(paymentId, transactionId ?? null, user.id, user.role);
     },
 
     handlePaymentCallback: async (

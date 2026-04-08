@@ -8,4 +8,5 @@ export interface GraphQLContext {
   redis: Redis;
   user: User | null;
   loaders: Loaders;
+  clientIp: string;
 }

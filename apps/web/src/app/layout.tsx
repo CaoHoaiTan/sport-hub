@@ -1,20 +1,20 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 
-import { ApolloWrapper } from '@/lib/apollo/provider';
-import { AuthProvider } from '@/lib/auth/context';
-import { Toaster } from '@/components/ui/toaster';
+import { ApolloWrapper } from "@/lib/apollo/provider";
+import { AuthProvider } from "@/lib/auth/context";
+import { Toaster } from "@/components/ui/toaster";
 
-import './globals.css';
+import "./globals.css";
 
 const inter = Inter({
-  subsets: ['latin', 'vietnamese'],
-  variable: '--font-inter',
+  subsets: ["latin", "vietnamese"],
+  variable: "--font-inter",
 });
 
 export const metadata: Metadata = {
-  title: 'SportHub',
-  description: 'Nền tảng quản lý giải đấu thể thao',
+  title: "SportHub",
+  description: "Nền tảng quản lý giải đấu thể thao",
 };
 
 export default function RootLayout({
