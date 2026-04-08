@@ -119,11 +119,13 @@ export default function PublicRegisterPage() {
   }, [user, teams]);
 
   useEffect(() => {
-    // Only auto-set done on initial load (user already registered before)
-    // Don't override payment step after fresh registration
-    if (userTeam && step === 'info') {
-      setStep('done');
+    if (userTeam) {
+      // Always keep teamId in sync
       setTeamId(userTeam.id);
+      // Only auto-set done on initial load (not during payment)
+      if (step === 'info') {
+        setStep('done');
+      }
     }
   }, [userTeam, step]);
   useEffect(() => {
@@ -178,12 +180,21 @@ export default function PublicRegisterPage() {
     }
   }
 
-  async function handlePay(planId: string) {
-    if (!teamId) return;
+  const [paymentInitiated, setPaymentInitiated] = useState(false);
+
+  async function handlePay(planId: string, method: string) {
+    if (!teamId) {
+      toast.error('Lỗi: không tìm thấy ID đội. Vui lòng tải lại trang.');
+      return;
+    }
     try {
-      const r = await initiatePayment({ variables: { input: { paymentPlanId: planId, teamId, method: 'bank_transfer' } } });
-      if (r.data?.initiatePayment?.paymentUrl) window.open(r.data.initiatePayment.paymentUrl, '_blank');
-      toast.success('Thanh toán đã được khởi tạo.'); setStep('done');
+      const r = await initiatePayment({ variables: { input: { paymentPlanId: planId, teamId: String(teamId), method } } });
+      const paymentUrl = r.data?.initiatePayment?.paymentUrl;
+      if (paymentUrl) {
+        window.open(paymentUrl, '_blank');
+        toast.success('Đang chuyển tới trang thanh toán...');
+      }
+      setPaymentInitiated(true);
     } catch (e: unknown) { toast.error(e instanceof Error ? e.message : 'Thất bại'); }
   }
 
@@ -292,38 +303,104 @@ export default function PublicRegisterPage() {
             </form>
           )}
 
-          {/* Step 3 */}
-          {step === 'payment' && (
+          {/* Step: Payment */}
+          {step === 'payment' && !paymentInitiated && (
             <Card>
               <CardHeader><CardTitle className="text-base flex items-center gap-2"><CreditCard className="h-4 w-4" />Thanh toán lệ phí</CardTitle></CardHeader>
               <CardContent className="space-y-4">
                 <div className="rounded-lg border p-4 text-center space-y-1">
                   <p className="text-2xl font-bold">{formatVND(entryFee)}</p>
-                  <p className="text-sm text-muted-foreground">Lệ phí tham gia</p>
+                  <p className="text-sm text-muted-foreground">Lệ phí tham gia giải đấu</p>
+                  {paymentPlans.length > 0 && paymentPlans[0].earlyBirdAmount && (
+                    <p className="text-sm text-success font-medium">Ưu đãi đăng ký sớm: {formatVND(paymentPlans[0].earlyBirdAmount)}</p>
+                  )}
                 </div>
-                {paymentPlans.length > 0 ? (
+
+                <p className="text-sm font-medium">Chọn phương thức thanh toán:</p>
+
+                {paymentPlans.length > 0 && (
                   <div className="space-y-2">
-                    {paymentPlans.map((plan: { id: string; name: string; amount: number; earlyBirdAmount?: number | null }) => (
-                      <div key={plan.id} className="flex items-center justify-between rounded-lg border p-3">
-                        <div>
-                          <p className="text-sm font-medium">{plan.name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {formatVND(plan.amount)}
-                            {plan.earlyBirdAmount && <span className="ml-2 text-success">Ưu đãi: {formatVND(plan.earlyBirdAmount)}</span>}
-                          </p>
-                        </div>
-                        <Button size="sm" onClick={() => handlePay(plan.id)} disabled={paying}>
-                          {paying && <Loader2 className="mr-2 h-3 w-3 animate-spin" />}Thanh toán
-                        </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start h-auto py-3"
+                      disabled={paying}
+                      onClick={() => handlePay(paymentPlans[0].id, 'bank_transfer')}
+                    >
+                      <div className="text-left">
+                        <p className="font-medium">Chuyển khoản ngân hàng</p>
+                        <p className="text-xs text-muted-foreground">Chuyển khoản và chờ ban tổ chức xác nhận</p>
                       </div>
-                    ))}
+                    </Button>
+
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start h-auto py-3"
+                      disabled={paying}
+                      onClick={() => handlePay(paymentPlans[0].id, 'momo')}
+                    >
+                      <div className="text-left">
+                        <p className="font-medium">Ví MoMo</p>
+                        <p className="text-xs text-muted-foreground">Thanh toán qua ví điện tử MoMo</p>
+                      </div>
+                    </Button>
+
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start h-auto py-3"
+                      disabled={paying}
+                      onClick={() => handlePay(paymentPlans[0].id, 'vnpay')}
+                    >
+                      <div className="text-left">
+                        <p className="font-medium">VNPay</p>
+                        <p className="text-xs text-muted-foreground">Thanh toán qua cổng VNPay (ATM, Visa, QR)</p>
+                      </div>
+                    </Button>
+
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start h-auto py-3"
+                      disabled={paying}
+                      onClick={() => handlePay(paymentPlans[0].id, 'cash')}
+                    >
+                      <div className="text-left">
+                        <p className="font-medium">Tiền mặt</p>
+                        <p className="text-xs text-muted-foreground">Thanh toán trực tiếp cho ban tổ chức</p>
+                      </div>
+                    </Button>
                   </div>
-                ) : (
-                  <p className="text-sm text-muted-foreground text-center">Chưa có kế hoạch thanh toán. Liên hệ ban tổ chức.</p>
                 )}
+
+                {paymentPlans.length === 0 && (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    Liên hệ ban tổ chức để thanh toán lệ phí {formatVND(entryFee)}.
+                  </p>
+                )}
+
                 <Separator />
-                <Button variant="outline" className="w-full" onClick={() => { setStep('done'); toast.success('Đăng ký hoàn tất! Thanh toán sau.'); }}>
+                <Button variant="ghost" className="w-full text-muted-foreground" onClick={() => { setStep('done'); window.scrollTo(0, 0); toast.success('Đăng ký hoàn tất! Bạn có thể thanh toán sau tại trang đội.'); }}>
                   Thanh toán sau
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Payment initiated — show instructions */}
+          {step === 'payment' && paymentInitiated && (
+            <Card className="border-primary/30">
+              <CardHeader><CardTitle className="text-base flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-success" />Đã ghi nhận thanh toán</CardTitle></CardHeader>
+              <CardContent className="space-y-4">
+                <div className="rounded-lg bg-muted p-4 space-y-2 text-sm">
+                  <p className="font-medium">Hướng dẫn:</p>
+                  <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                    <li>Nếu thanh toán qua <strong>MoMo/VNPay</strong>: hoàn tất trên trang vừa mở.</li>
+                    <li>Nếu <strong>chuyển khoản</strong>: chuyển khoản theo thông tin ban tổ chức cung cấp, nội dung ghi tên đội.</li>
+                    <li>Nếu <strong>tiền mặt</strong>: liên hệ trực tiếp ban tổ chức.</li>
+                  </ul>
+                  <p className="text-muted-foreground">Ban tổ chức sẽ xác nhận thanh toán. Bạn có thể kiểm tra trạng thái tại trang đội.</p>
+                </div>
+
+                <Button className="w-full" onClick={() => { setStep('done'); window.scrollTo(0, 0); }}>
+                  Hoàn tất
                 </Button>
               </CardContent>
             </Card>
