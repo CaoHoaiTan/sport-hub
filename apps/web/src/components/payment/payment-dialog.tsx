@@ -24,6 +24,13 @@ import {
 } from '@/components/ui/tooltip';
 import { PromoCodeInput } from './promo-code-input';
 
+interface BankInfo {
+  bankName?: string | null;
+  bankAccountNumber?: string | null;
+  bankAccountHolder?: string | null;
+  transferContent?: string | null;
+}
+
 interface PaymentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -31,6 +38,7 @@ interface PaymentDialogProps {
   teamId: string;
   tournamentId: string;
   amount: number;
+  bankInfo?: BankInfo | null;
 }
 
 const methods = [
@@ -47,6 +55,7 @@ export function PaymentDialog({
   teamId,
   tournamentId,
   amount,
+  bankInfo,
 }: PaymentDialogProps) {
   const [method, setMethod] = useState<string>('bank_transfer');
   const [promoCode, setPromoCode] = useState<string | null>(null);
@@ -137,6 +146,42 @@ export function PaymentDialog({
             </TooltipProvider>
           </div>
 
+          {method === 'bank_transfer' && bankInfo?.bankAccountNumber && (
+            <div className="rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950/30 p-4 space-y-2">
+              <p className="text-sm font-medium">Thông tin chuyển khoản</p>
+              <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 text-sm">
+                {bankInfo.bankName && (
+                  <>
+                    <span className="text-muted-foreground">Ngân hàng</span>
+                    <span className="font-medium">{bankInfo.bankName}</span>
+                  </>
+                )}
+                <span className="text-muted-foreground">Số TK</span>
+                <span className="font-mono font-medium">{bankInfo.bankAccountNumber}</span>
+                {bankInfo.bankAccountHolder && (
+                  <>
+                    <span className="text-muted-foreground">Chủ TK</span>
+                    <span className="font-medium">{bankInfo.bankAccountHolder}</span>
+                  </>
+                )}
+                {bankInfo.transferContent && (
+                  <>
+                    <span className="text-muted-foreground">Nội dung CK</span>
+                    <span className="font-medium">{bankInfo.transferContent}</span>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+
+          {method === 'bank_transfer' && !bankInfo?.bankAccountNumber && (
+            <div className="rounded-lg border border-yellow-300 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950/30 p-4">
+              <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                Ban tổ chức chưa cập nhật thông tin chuyển khoản. Vui lòng liên hệ ban tổ chức để biết thông tin tài khoản.
+              </p>
+            </div>
+          )}
+
           <div>
             <p className="text-sm text-muted-foreground mb-2">Mã giảm giá</p>
             <PromoCodeInput
@@ -168,7 +213,10 @@ export function PaymentDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Hủy
           </Button>
-          <Button onClick={handlePay} disabled={loading}>
+          <Button
+            onClick={handlePay}
+            disabled={loading || (method === 'bank_transfer' && !bankInfo?.bankAccountNumber)}
+          >
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Thanh toán
           </Button>

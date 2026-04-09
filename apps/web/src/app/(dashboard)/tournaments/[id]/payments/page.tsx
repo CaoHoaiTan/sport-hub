@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
-import { useQuery } from '@apollo/client';
-import { CreditCard } from 'lucide-react';
+import { useQuery, useMutation } from '@apollo/client';
+import { CreditCard, Pencil, Trash2, Loader2 } from 'lucide-react';
 
 import { useAuth } from '@/lib/auth/context';
 import { isOrganizer, isAdmin } from '@/lib/utils/roles';
@@ -12,6 +12,7 @@ import {
   GET_PAYMENT_PLANS,
   GET_PAYMENTS_BY_TOURNAMENT,
 } from '@/graphql/queries/payment';
+import { DELETE_PAYMENT_PLAN } from '@/graphql/mutations/payment';
 import { GET_TEAMS_BY_TOURNAMENT } from '@/graphql/queries/team';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,7 +20,17 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/shared/empty-state';
+import { toast } from 'sonner';
+import {
+  Dialog as ConfirmDialog,
+  DialogContent as ConfirmDialogContent,
+  DialogHeader as ConfirmDialogHeader,
+  DialogTitle as ConfirmDialogTitle,
+  DialogDescription as ConfirmDialogDescription,
+  DialogFooter as ConfirmDialogFooter,
+} from '@/components/ui/dialog';
 import { PaymentPlanForm } from '@/components/payment/payment-plan-form';
+import { PaymentPlanEditDialog } from '@/components/payment/payment-plan-edit-dialog';
 import { PaymentTable } from '@/components/payment/payment-table';
 import { PaymentDialog } from '@/components/payment/payment-dialog';
 import { FinancialSummary } from '@/components/payment/financial-summary';
@@ -29,10 +40,31 @@ export default function PaymentsPage() {
   const { user } = useAuth();
   const tournamentId = params.id as string;
   const [payDialogOpen, setPayDialogOpen] = useState(false);
+  const [editPlan, setEditPlan] = useState<{
+    id: string;
+    name: string;
+    amount: number;
+    perTeam: boolean;
+    earlyBirdAmount: number | null;
+    earlyBirdDeadline: string | null;
+    bankName: string | null;
+    bankAccountNumber: string | null;
+    bankAccountHolder: string | null;
+    transferContent: string | null;
+  } | null>(null);
+  const [deletePlanId, setDeletePlanId] = useState<string | null>(null);
   const [selectedPlan, setSelectedPlan] = useState<{
     id: string;
     amount: number;
+    bankName?: string | null;
+    bankAccountNumber?: string | null;
+    bankAccountHolder?: string | null;
+    transferContent?: string | null;
   } | null>(null);
+
+  const [deletePlan, { loading: deleting }] = useMutation(DELETE_PAYMENT_PLAN, {
+    refetchQueries: [{ query: GET_PAYMENT_PLANS, variables: { tournamentId } }],
+  });
 
   const canManage = user && (isOrganizer(user.role) || isAdmin(user.role));
 
@@ -113,6 +145,10 @@ export default function PaymentsPage() {
                   perTeam: boolean;
                   earlyBirdAmount: number | null;
                   earlyBirdDeadline: string | null;
+                  bankName: string | null;
+                  bankAccountNumber: string | null;
+                  bankAccountHolder: string | null;
+                  transferContent: string | null;
                   createdAt: string;
                 }) => (
                   <Card key={plan.id}>
@@ -136,12 +172,46 @@ export default function PaymentsPage() {
                           </p>
                         </div>
                       )}
+                      {plan.bankAccountNumber && (
+                        <div className="text-xs text-muted-foreground space-y-0.5">
+                          <p>{plan.bankName} - {plan.bankAccountNumber}</p>
+                          {plan.bankAccountHolder && <p>Chủ TK: {plan.bankAccountHolder}</p>}
+                        </div>
+                      )}
+                      {canManage && (
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1"
+                            onClick={() => setEditPlan(plan)}
+                          >
+                            <Pencil className="mr-1 h-3 w-3" />
+                            Sửa
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-destructive hover:text-destructive"
+                            onClick={() => setDeletePlanId(plan.id)}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      )}
                       {!canManage && (
                         <Button
                           className="w-full"
                           size="sm"
                           onClick={() => {
-                            setSelectedPlan({ id: plan.id, amount: plan.amount });
+                            setSelectedPlan({
+                              id: plan.id,
+                              amount: plan.amount,
+                              bankName: plan.bankName,
+                              bankAccountNumber: plan.bankAccountNumber,
+                              bankAccountHolder: plan.bankAccountHolder,
+                              transferContent: plan.transferContent,
+                            });
                             setPayDialogOpen(true);
                           }}
                         >
@@ -183,8 +253,51 @@ export default function PaymentsPage() {
           teamId={myTeam?.id ?? ''}
           tournamentId={tournamentId}
           amount={selectedPlan.amount}
+          bankInfo={selectedPlan}
         />
       )}
+
+      {editPlan && (
+        <PaymentPlanEditDialog
+          open={!!editPlan}
+          onOpenChange={(open) => { if (!open) setEditPlan(null); }}
+          tournamentId={tournamentId}
+          plan={editPlan}
+        />
+      )}
+
+      <ConfirmDialog open={!!deletePlanId} onOpenChange={(open) => { if (!open) setDeletePlanId(null); }}>
+        <ConfirmDialogContent>
+          <ConfirmDialogHeader>
+            <ConfirmDialogTitle>Xóa gói thanh toán?</ConfirmDialogTitle>
+            <ConfirmDialogDescription>
+              Hành động này không thể hoàn tác. Gói thanh toán sẽ bị xóa vĩnh viễn.
+            </ConfirmDialogDescription>
+          </ConfirmDialogHeader>
+          <ConfirmDialogFooter>
+            <Button variant="outline" onClick={() => setDeletePlanId(null)}>
+              Hủy
+            </Button>
+            <Button
+              variant="destructive"
+              disabled={deleting}
+              onClick={async () => {
+                try {
+                  await deletePlan({ variables: { id: deletePlanId } });
+                  toast.success('Đã xóa gói thanh toán.');
+                  setDeletePlanId(null);
+                } catch (error: unknown) {
+                  const message = error instanceof Error ? error.message : 'Xóa thất bại';
+                  toast.error(message);
+                }
+              }}
+            >
+              {deleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Xóa
+            </Button>
+          </ConfirmDialogFooter>
+        </ConfirmDialogContent>
+      </ConfirmDialog>
     </div>
   );
 }

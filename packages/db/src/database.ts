@@ -286,6 +286,10 @@ export interface PaymentPlansTable {
   per_team: ColumnType<boolean, boolean | undefined, boolean>;
   early_bird_amount: string | null;
   early_bird_deadline: Date | null;
+  bank_name: string | null;
+  bank_account_number: string | null;
+  bank_account_holder: string | null;
+  transfer_content: string | null;
   created_at: ColumnType<Date, Date | undefined, never>;
 }
 

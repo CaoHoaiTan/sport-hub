@@ -13,8 +13,38 @@ export const CREATE_PAYMENT_PLAN = gql`
       perTeam
       earlyBirdAmount
       earlyBirdDeadline
+      bankName
+      bankAccountNumber
+      bankAccountHolder
+      transferContent
       createdAt
     }
+  }
+`;
+
+export const UPDATE_PAYMENT_PLAN = gql`
+  mutation UpdatePaymentPlan($id: ID!, $input: UpdatePaymentPlanInput!) {
+    updatePaymentPlan(id: $id, input: $input) {
+      id
+      tournamentId
+      name
+      amount
+      currency
+      perTeam
+      earlyBirdAmount
+      earlyBirdDeadline
+      bankName
+      bankAccountNumber
+      bankAccountHolder
+      transferContent
+      createdAt
+    }
+  }
+`;
+
+export const DELETE_PAYMENT_PLAN = gql`
+  mutation DeletePaymentPlan($id: ID!) {
+    deletePaymentPlan(id: $id)
   }
 `;
 

@@ -332,14 +332,41 @@ export default function PublicRegisterPage() {
                       </div>
                     </Button>
 
+                    {paymentPlans[0].bankAccountNumber && (
+                      <div className="rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950/30 p-3 space-y-1.5 text-sm">
+                        <p className="font-medium text-xs">Thông tin chuyển khoản:</p>
+                        <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs">
+                          {paymentPlans[0].bankName && (
+                            <>
+                              <span className="text-muted-foreground">Ngân hàng</span>
+                              <span className="font-medium">{paymentPlans[0].bankName}</span>
+                            </>
+                          )}
+                          <span className="text-muted-foreground">Số TK</span>
+                          <span className="font-mono font-medium">{paymentPlans[0].bankAccountNumber}</span>
+                          {paymentPlans[0].bankAccountHolder && (
+                            <>
+                              <span className="text-muted-foreground">Chủ TK</span>
+                              <span className="font-medium">{paymentPlans[0].bankAccountHolder}</span>
+                            </>
+                          )}
+                          {paymentPlans[0].transferContent && (
+                            <>
+                              <span className="text-muted-foreground">Nội dung CK</span>
+                              <span className="font-medium">{paymentPlans[0].transferContent}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
                     <Button
                       variant="outline"
-                      className="w-full justify-start h-auto py-3"
-                      disabled={paying}
-                      onClick={() => handlePay(paymentPlans[0].id, 'momo')}
+                      className="w-full justify-start h-auto py-3 opacity-50 cursor-not-allowed"
+                      disabled
                     >
                       <div className="text-left">
-                        <p className="font-medium">Ví MoMo</p>
+                        <p className="font-medium">Ví MoMo <span className="text-xs text-muted-foreground">(Sắp ra mắt)</span></p>
                         <p className="text-xs text-muted-foreground">Thanh toán qua ví điện tử MoMo</p>
                       </div>
                     </Button>
@@ -392,10 +419,37 @@ export default function PublicRegisterPage() {
                 <div className="rounded-lg bg-muted p-4 space-y-2 text-sm">
                   <p className="font-medium">Hướng dẫn:</p>
                   <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                    <li>Nếu thanh toán qua <strong>MoMo/VNPay</strong>: hoàn tất trên trang vừa mở.</li>
-                    <li>Nếu <strong>chuyển khoản</strong>: chuyển khoản theo thông tin ban tổ chức cung cấp, nội dung ghi tên đội.</li>
+                    <li>Nếu thanh toán qua <strong>VNPay</strong>: hoàn tất trên trang vừa mở.</li>
+                    <li>Nếu <strong>chuyển khoản</strong>: chuyển khoản theo thông tin bên dưới.</li>
                     <li>Nếu <strong>tiền mặt</strong>: liên hệ trực tiếp ban tổ chức.</li>
                   </ul>
+                  {paymentPlans.length > 0 && paymentPlans[0].bankAccountNumber && (
+                    <div className="mt-3 rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950/30 p-3 space-y-1.5">
+                      <p className="font-medium text-xs">Thông tin chuyển khoản:</p>
+                      <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs">
+                        {paymentPlans[0].bankName && (
+                          <>
+                            <span className="text-muted-foreground">Ngân hàng</span>
+                            <span className="font-medium">{paymentPlans[0].bankName}</span>
+                          </>
+                        )}
+                        <span className="text-muted-foreground">Số TK</span>
+                        <span className="font-mono font-medium">{paymentPlans[0].bankAccountNumber}</span>
+                        {paymentPlans[0].bankAccountHolder && (
+                          <>
+                            <span className="text-muted-foreground">Chủ TK</span>
+                            <span className="font-medium">{paymentPlans[0].bankAccountHolder}</span>
+                          </>
+                        )}
+                        {paymentPlans[0].transferContent && (
+                          <>
+                            <span className="text-muted-foreground">Nội dung CK</span>
+                            <span className="font-medium">{paymentPlans[0].transferContent}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  )}
                   <p className="text-muted-foreground">Ban tổ chức sẽ xác nhận thanh toán. Bạn có thể kiểm tra trạng thái tại trang đội.</p>
                 </div>
 

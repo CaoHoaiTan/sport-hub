@@ -15,6 +15,22 @@ const createPaymentPlanSchema = z.object({
   perTeam: z.boolean().default(true),
   earlyBirdAmount: z.number().positive().nullable().optional(),
   earlyBirdDeadline: z.coerce.date().nullable().optional(),
+  bankName: z.string().max(255).nullable().optional(),
+  bankAccountNumber: z.string().max(50).nullable().optional(),
+  bankAccountHolder: z.string().max(255).nullable().optional(),
+  transferContent: z.string().max(500).nullable().optional(),
+});
+
+const updatePaymentPlanSchema = z.object({
+  name: z.string().min(1).max(255).optional(),
+  amount: z.number().positive().optional(),
+  perTeam: z.boolean().optional(),
+  earlyBirdAmount: z.number().positive().nullable().optional(),
+  earlyBirdDeadline: z.coerce.date().nullable().optional(),
+  bankName: z.string().max(255).nullable().optional(),
+  bankAccountNumber: z.string().max(50).nullable().optional(),
+  bankAccountHolder: z.string().max(255).nullable().optional(),
+  transferContent: z.string().max(500).nullable().optional(),
 });
 
 const initiatePaymentSchema = z.object({
@@ -52,9 +68,86 @@ export class PaymentService {
         per_team: data.perTeam,
         early_bird_amount: data.earlyBirdAmount ? String(data.earlyBirdAmount) : null,
         early_bird_deadline: data.earlyBirdDeadline ?? null,
+        bank_name: data.bankName ?? null,
+        bank_account_number: data.bankAccountNumber ?? null,
+        bank_account_holder: data.bankAccountHolder ?? null,
+        transfer_content: data.transferContent ?? null,
       })
       .returningAll()
       .executeTakeFirstOrThrow();
+  }
+
+  async updatePaymentPlan(id: string, input: unknown, userId: string, userRole: string): Promise<PaymentPlan> {
+    const data = updatePaymentPlanSchema.parse(input);
+
+    const plan = await this.db
+      .selectFrom('payment_plans')
+      .selectAll()
+      .where('id', '=', id)
+      .executeTakeFirst();
+
+    if (!plan) {
+      throw new GraphQLError('Payment plan not found', { extensions: { code: 'NOT_FOUND' } });
+    }
+
+    await this.verifyOrganizerAccess(plan.tournament_id, userId, userRole);
+
+    const updates: Record<string, unknown> = {};
+    if (data.name !== undefined) updates.name = data.name;
+    if (data.amount !== undefined) updates.amount = String(data.amount);
+    if (data.perTeam !== undefined) updates.per_team = data.perTeam;
+    if (data.earlyBirdAmount !== undefined) updates.early_bird_amount = data.earlyBirdAmount ? String(data.earlyBirdAmount) : null;
+    if (data.earlyBirdDeadline !== undefined) updates.early_bird_deadline = data.earlyBirdDeadline ?? null;
+    if (data.bankName !== undefined) updates.bank_name = data.bankName ?? null;
+    if (data.bankAccountNumber !== undefined) updates.bank_account_number = data.bankAccountNumber ?? null;
+    if (data.bankAccountHolder !== undefined) updates.bank_account_holder = data.bankAccountHolder ?? null;
+    if (data.transferContent !== undefined) updates.transfer_content = data.transferContent ?? null;
+
+    if (Object.keys(updates).length === 0) {
+      return plan;
+    }
+
+    return this.db
+      .updateTable('payment_plans')
+      .set(updates)
+      .where('id', '=', id)
+      .returningAll()
+      .executeTakeFirstOrThrow();
+  }
+
+  async deletePaymentPlan(id: string, userId: string, userRole: string): Promise<boolean> {
+    const plan = await this.db
+      .selectFrom('payment_plans')
+      .selectAll()
+      .where('id', '=', id)
+      .executeTakeFirst();
+
+    if (!plan) {
+      throw new GraphQLError('Payment plan not found', { extensions: { code: 'NOT_FOUND' } });
+    }
+
+    await this.verifyOrganizerAccess(plan.tournament_id, userId, userRole);
+
+    // Check if any payments exist for this plan
+    const paymentCount = await this.db
+      .selectFrom('payments')
+      .select(({ fn }) => fn.countAll<number>().as('count'))
+      .where('payment_plan_id', '=', id)
+      .executeTakeFirstOrThrow();
+
+    if (Number(paymentCount.count) > 0) {
+      throw new GraphQLError(
+        'Không thể xóa gói thanh toán đã có giao dịch.',
+        { extensions: { code: 'BAD_USER_INPUT' } }
+      );
+    }
+
+    await this.db
+      .deleteFrom('payment_plans')
+      .where('id', '=', id)
+      .execute();
+
+    return true;
   }
 
   async initiatePayment(input: unknown, userId: string, userRole: string, clientIp: string): Promise<Payment> {
@@ -115,6 +208,13 @@ export class PaymentService {
       throw new GraphQLError('MoMo chưa được hỗ trợ. Vui lòng chọn phương thức khác.', {
         extensions: { code: 'BAD_USER_INPUT' },
       });
+    }
+
+    if (data.method === 'bank_transfer' && !plan.bank_account_number) {
+      throw new GraphQLError(
+        'Chưa có thông tin chuyển khoản. Vui lòng liên hệ ban tổ chức.',
+        { extensions: { code: 'BAD_USER_INPUT' } }
+      );
     }
 
     // Create payment record

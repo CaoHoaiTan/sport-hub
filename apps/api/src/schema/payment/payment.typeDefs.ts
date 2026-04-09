@@ -26,6 +26,10 @@ export const paymentTypeDefs = gql`
     perTeam: Boolean!
     earlyBirdAmount: Float
     earlyBirdDeadline: DateTime
+    bankName: String
+    bankAccountNumber: String
+    bankAccountHolder: String
+    transferContent: String
     createdAt: DateTime!
   }
 
@@ -89,6 +93,22 @@ export const paymentTypeDefs = gql`
     perTeam: Boolean
     earlyBirdAmount: Float
     earlyBirdDeadline: DateTime
+    bankName: String
+    bankAccountNumber: String
+    bankAccountHolder: String
+    transferContent: String
+  }
+
+  input UpdatePaymentPlanInput {
+    name: String
+    amount: Float
+    perTeam: Boolean
+    earlyBirdAmount: Float
+    earlyBirdDeadline: DateTime
+    bankName: String
+    bankAccountNumber: String
+    bankAccountHolder: String
+    transferContent: String
   }
 
   input InitiatePaymentInput {
@@ -119,6 +139,8 @@ export const paymentTypeDefs = gql`
 
   extend type Mutation {
     createPaymentPlan(input: CreatePaymentPlanInput!): PaymentPlan!
+    updatePaymentPlan(id: ID!, input: UpdatePaymentPlanInput!): PaymentPlan!
+    deletePaymentPlan(id: ID!): Boolean!
     initiatePayment(input: InitiatePaymentInput!): Payment!
     confirmManualPayment(paymentId: ID!, transactionId: String): Payment!
     handlePaymentCallback(paymentId: ID!, transactionId: String!, gatewayResponse: String!): Payment!

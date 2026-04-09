@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { toast } from 'sonner';
-import { Loader2, Plus } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
-import { CREATE_PAYMENT_PLAN } from '@/graphql/mutations/payment';
+import { UPDATE_PAYMENT_PLAN } from '@/graphql/mutations/payment';
 import { GET_PAYMENT_PLANS } from '@/graphql/queries/payment';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,50 +16,59 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogClose,
   DialogFooter,
 } from '@/components/ui/dialog';
 
-interface PaymentPlanFormProps {
+interface PaymentPlanEditDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   tournamentId: string;
+  plan: {
+    id: string;
+    name: string;
+    amount: number;
+    perTeam: boolean;
+    earlyBirdAmount: number | null;
+    earlyBirdDeadline: string | null;
+    bankName: string | null;
+    bankAccountNumber: string | null;
+    bankAccountHolder: string | null;
+    transferContent: string | null;
+  };
 }
 
-export function PaymentPlanForm({ tournamentId }: PaymentPlanFormProps) {
-  const [open, setOpen] = useState(false);
-  const [name, setName] = useState('');
-  const [amount, setAmount] = useState('');
-  const [perTeam, setPerTeam] = useState(true);
-  const [earlyBirdAmount, setEarlyBirdAmount] = useState('');
-  const [earlyBirdDeadline, setEarlyBirdDeadline] = useState('');
-  const [bankName, setBankName] = useState('');
-  const [bankAccountNumber, setBankAccountNumber] = useState('');
-  const [bankAccountHolder, setBankAccountHolder] = useState('');
-  const [transferContent, setTransferContent] = useState('');
+export function PaymentPlanEditDialog({
+  open,
+  onOpenChange,
+  tournamentId,
+  plan,
+}: PaymentPlanEditDialogProps) {
+  const [name, setName] = useState(plan.name);
+  const [amount, setAmount] = useState(String(plan.amount));
+  const [perTeam, setPerTeam] = useState(plan.perTeam);
+  const [earlyBirdAmount, setEarlyBirdAmount] = useState(
+    plan.earlyBirdAmount ? String(plan.earlyBirdAmount) : ''
+  );
+  const [earlyBirdDeadline, setEarlyBirdDeadline] = useState(
+    plan.earlyBirdDeadline ? plan.earlyBirdDeadline.slice(0, 16) : ''
+  );
+  const [bankName, setBankName] = useState(plan.bankName ?? '');
+  const [bankAccountNumber, setBankAccountNumber] = useState(plan.bankAccountNumber ?? '');
+  const [bankAccountHolder, setBankAccountHolder] = useState(plan.bankAccountHolder ?? '');
+  const [transferContent, setTransferContent] = useState(plan.transferContent ?? '');
 
-  const [createPlan, { loading }] = useMutation(CREATE_PAYMENT_PLAN, {
+  const [updatePlan, { loading }] = useMutation(UPDATE_PAYMENT_PLAN, {
     refetchQueries: [{ query: GET_PAYMENT_PLANS, variables: { tournamentId } }],
   });
-
-  function resetForm() {
-    setName('');
-    setAmount('');
-    setPerTeam(true);
-    setEarlyBirdAmount('');
-    setEarlyBirdDeadline('');
-    setBankName('');
-    setBankAccountNumber('');
-    setBankAccountHolder('');
-    setTransferContent('');
-  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     try {
-      await createPlan({
+      await updatePlan({
         variables: {
+          id: plan.id,
           input: {
-            tournamentId,
             name,
             amount: parseFloat(amount),
             perTeam,
@@ -72,33 +81,25 @@ export function PaymentPlanForm({ tournamentId }: PaymentPlanFormProps) {
           },
         },
       });
-      toast.success('Payment plan created.');
-      resetForm();
-      setOpen(false);
+      toast.success('Đã cập nhật gói thanh toán.');
+      onOpenChange(false);
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Failed to create plan';
+      const message = error instanceof Error ? error.message : 'Cập nhật thất bại';
       toast.error(message);
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Payment Plan
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create Payment Plan</DialogTitle>
+          <DialogTitle>Chỉnh sửa gói thanh toán</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="plan-name">Plan Name</Label>
+            <Label htmlFor="edit-plan-name">Plan Name</Label>
             <Input
-              id="plan-name"
-              placeholder="e.g., Tournament Entry Fee"
+              id="edit-plan-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -106,11 +107,10 @@ export function PaymentPlanForm({ tournamentId }: PaymentPlanFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="plan-amount">Số tiền (VND)</Label>
+            <Label htmlFor="edit-plan-amount">Số tiền (VND)</Label>
             <Input
-              id="plan-amount"
+              id="edit-plan-amount"
               type="number"
-              placeholder="500000"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               required
@@ -129,9 +129,9 @@ export function PaymentPlanForm({ tournamentId }: PaymentPlanFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="early-bird-amount">Early Bird Số tiền (VND)</Label>
+            <Label htmlFor="edit-early-bird-amount">Early Bird Số tiền (VND)</Label>
             <Input
-              id="early-bird-amount"
+              id="edit-early-bird-amount"
               type="number"
               placeholder="Optional discounted amount"
               value={earlyBirdAmount}
@@ -141,9 +141,9 @@ export function PaymentPlanForm({ tournamentId }: PaymentPlanFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="early-bird-deadline">Early Bird Deadline</Label>
+            <Label htmlFor="edit-early-bird-deadline">Early Bird Deadline</Label>
             <Input
-              id="early-bird-deadline"
+              id="edit-early-bird-deadline"
               type="datetime-local"
               value={earlyBirdDeadline}
               onChange={(e) => setEarlyBirdDeadline(e.target.value)}
@@ -152,43 +152,40 @@ export function PaymentPlanForm({ tournamentId }: PaymentPlanFormProps) {
 
           <div className="rounded-lg border p-3 space-y-3">
             <p className="text-sm font-medium">Thông tin chuyển khoản</p>
-            <p className="text-xs text-muted-foreground">
-              Hiển thị cho đội khi chọn phương thức chuyển khoản ngân hàng
-            </p>
             <p className="text-xs text-yellow-600 dark:text-yellow-400">
               * Bắt buộc nếu muốn đội thanh toán qua chuyển khoản
             </p>
             <div className="space-y-2">
-              <Label htmlFor="bank-name">Tên ngân hàng</Label>
+              <Label htmlFor="edit-bank-name">Tên ngân hàng</Label>
               <Input
-                id="bank-name"
+                id="edit-bank-name"
                 placeholder="VD: Vietcombank, MB Bank..."
                 value={bankName}
                 onChange={(e) => setBankName(e.target.value)}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="bank-account">Số tài khoản</Label>
+              <Label htmlFor="edit-bank-account">Số tài khoản</Label>
               <Input
-                id="bank-account"
+                id="edit-bank-account"
                 placeholder="VD: 1234567890"
                 value={bankAccountNumber}
                 onChange={(e) => setBankAccountNumber(e.target.value)}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="bank-holder">Chủ tài khoản</Label>
+              <Label htmlFor="edit-bank-holder">Chủ tài khoản</Label>
               <Input
-                id="bank-holder"
+                id="edit-bank-holder"
                 placeholder="VD: NGUYEN VAN A"
                 value={bankAccountHolder}
                 onChange={(e) => setBankAccountHolder(e.target.value)}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="transfer-content">Nội dung chuyển khoản</Label>
+              <Label htmlFor="edit-transfer-content">Nội dung chuyển khoản</Label>
               <Input
-                id="transfer-content"
+                id="edit-transfer-content"
                 placeholder={name ? `VD: [Tên đội] - ${name}` : 'VD: [Tên đội] - Lệ phí giải ABC'}
                 value={transferContent}
                 onChange={(e) => setTransferContent(e.target.value)}
@@ -204,7 +201,7 @@ export function PaymentPlanForm({ tournamentId }: PaymentPlanFormProps) {
             </DialogClose>
             <Button type="submit" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Create Plan
+              Lưu
             </Button>
           </DialogFooter>
         </form>

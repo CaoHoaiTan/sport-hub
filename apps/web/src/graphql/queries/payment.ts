@@ -13,6 +13,10 @@ export const GET_PAYMENT_PLANS = gql`
       perTeam
       earlyBirdAmount
       earlyBirdDeadline
+      bankName
+      bankAccountNumber
+      bankAccountHolder
+      transferContent
       createdAt
     }
   }

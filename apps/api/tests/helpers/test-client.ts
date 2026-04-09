@@ -50,7 +50,11 @@ export async function createTestClient(options: TestClientOptions) {
       context: async ({ req }): Promise<GraphQLContext> => {
         const user = await authenticateUser(req.headers.authorization, db);
         const loaders = createLoaders(db);
-        return { db, redis, user, loaders };
+        const clientIp =
+          (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
+          req.socket.remoteAddress ||
+          '127.0.0.1';
+        return { db, redis, user, loaders, clientIp };
       },
     })
   );

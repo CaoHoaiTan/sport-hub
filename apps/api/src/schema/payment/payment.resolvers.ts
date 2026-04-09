@@ -79,6 +79,26 @@ export const paymentResolvers = {
       return service.createPaymentPlan(input, user.id, user.role);
     },
 
+    updatePaymentPlan: async (
+      _: unknown,
+      { id, input }: { id: string; input: unknown },
+      ctx: GraphQLContext
+    ) => {
+      const user = requireRole(ctx.user, 'organizer', 'admin');
+      const service = new PaymentService(ctx.db);
+      return service.updatePaymentPlan(id, input, user.id, user.role);
+    },
+
+    deletePaymentPlan: async (
+      _: unknown,
+      { id }: { id: string },
+      ctx: GraphQLContext
+    ) => {
+      const user = requireRole(ctx.user, 'organizer', 'admin');
+      const service = new PaymentService(ctx.db);
+      return service.deletePaymentPlan(id, user.id, user.role);
+    },
+
     initiatePayment: async (
       _: unknown,
       { input }: { input: unknown },
@@ -139,6 +159,10 @@ export const paymentResolvers = {
     perTeam: (p: PaymentPlan) => p.per_team,
     earlyBirdAmount: (p: PaymentPlan) => p.early_bird_amount ? parseFloat(p.early_bird_amount) : null,
     earlyBirdDeadline: (p: PaymentPlan) => p.early_bird_deadline,
+    bankName: (p: PaymentPlan) => p.bank_name,
+    bankAccountNumber: (p: PaymentPlan) => p.bank_account_number,
+    bankAccountHolder: (p: PaymentPlan) => p.bank_account_holder,
+    transferContent: (p: PaymentPlan) => p.transfer_content,
     createdAt: (p: PaymentPlan) => p.created_at,
   },
 

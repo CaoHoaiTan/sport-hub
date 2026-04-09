@@ -34,7 +34,20 @@ function normalizeIp(ip: string): string {
   return ip;
 }
 
-export function createPaymentUrl(params: VnPayParams): string {
+/**
+ * Build a sorted query string using URLSearchParams.
+ * VNPay accepts + for spaces (URLSearchParams default).
+ * Both URL creation and return verification must use the same encoding.
+ */
+function buildSignedQueryString(params: Record<string, string>): string {
+  const sp = new URLSearchParams();
+  for (const key of Object.keys(params).sort()) {
+    sp.append(key, params[key]);
+  }
+  return sp.toString();
+}
+
+export function createPaymentUrl(input: VnPayParams): string {
   const cfg = getConfig();
 
   // VNPay requires date in Asia/Ho_Chi_Minh timezone: YYYYMMDDHHmmss
@@ -42,10 +55,7 @@ export function createPaymentUrl(params: VnPayParams): string {
   const vnDateStr = now.toLocaleString('sv-SE', { timeZone: 'Asia/Ho_Chi_Minh' });
   const createDate = vnDateStr.replace(/[-: T]/g, '').substring(0, 14);
 
-  const ipAddr = normalizeIp(params.ipAddr);
-
-  // Sanitize orderInfo to ASCII-safe characters (VNPay does not encode query values)
-  const safeOrderInfo = params.orderInfo.replace(/[^a-zA-Z0-9 ._-]/g, '');
+  const ipAddr = normalizeIp(input.ipAddr);
 
   const vnpParams: Record<string, string> = {
     vnp_Version: '2.1.0',
@@ -53,18 +63,17 @@ export function createPaymentUrl(params: VnPayParams): string {
     vnp_TmnCode: cfg.tmnCode,
     vnp_Locale: 'vn',
     vnp_CurrCode: 'VND',
-    vnp_TxnRef: params.orderId,
-    vnp_OrderInfo: safeOrderInfo,
+    vnp_TxnRef: input.orderId,
+    vnp_OrderInfo: input.orderInfo,
     vnp_OrderType: 'other',
-    vnp_Amount: String(Math.round(params.amount) * 100),
-    vnp_ReturnUrl: params.returnUrl,
+    vnp_Amount: String(Math.round(input.amount) * 100),
+    vnp_ReturnUrl: input.returnUrl,
     vnp_IpAddr: ipAddr,
     vnp_CreateDate: createDate,
   };
 
-  // VNPay official approach: sign and build URL with the same unencoded query string
-  const sortedKeys = Object.keys(vnpParams).sort();
-  const signData = sortedKeys.map((k) => `${k}=${vnpParams[k]}`).join('&');
+  // Sign the URL-encoded query string (URLSearchParams uses + for spaces)
+  const signData = buildSignedQueryString(vnpParams);
   const signature = crypto
     .createHmac('sha512', cfg.hashSecret)
     .update(Buffer.from(signData, 'utf-8'))
@@ -74,12 +83,12 @@ export function createPaymentUrl(params: VnPayParams): string {
 
   logger.info(
     {
-      orderId: params.orderId,
+      orderId: input.orderId,
       amount: vnpParams.vnp_Amount,
       tmnCode: cfg.tmnCode,
       ipAddr,
       createDate,
-      returnUrl: params.returnUrl,
+      returnUrl: input.returnUrl,
       signaturePrefix: signature.substring(0, 16) + '...',
     },
     '[VNPay] Payment URL created'
@@ -93,7 +102,8 @@ export function verifyReturnUrl(query: Record<string, string>): { valid: boolean
   const secureHash = query.vnp_SecureHash;
   if (!secureHash) return { valid: false, resultCode: '97' };
 
-  // Keep only vnp_* params for signature (exclude non-VNPay params and hash itself)
+  // Keep only vnp_* params for signature (exclude hash params).
+  // Re-encode with URLSearchParams (same encoding used when creating the URL).
   const params: Record<string, string> = {};
   for (const [k, v] of Object.entries(query)) {
     if (k.startsWith('vnp_') && k !== 'vnp_SecureHash' && k !== 'vnp_SecureHashType') {
@@ -101,7 +111,7 @@ export function verifyReturnUrl(query: Record<string, string>): { valid: boolean
     }
   }
 
-  const signData = Object.keys(params).sort().map((k) => `${k}=${params[k]}`).join('&');
+  const signData = buildSignedQueryString(params);
   const expectedHash = crypto
     .createHmac('sha512', cfg.hashSecret)
     .update(Buffer.from(signData, 'utf-8'))
