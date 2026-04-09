@@ -96,6 +96,9 @@ function createLink(): ApolloLink {
 export function makeClient(): ApolloClient<any> {
   return new ApolloClient({
     link: createLink(),
+    devtools: {
+      enabled: process.env.NODE_ENV === 'development',
+    },
     cache: new InMemoryCache({
       typePolicies: {
         Query: {
