@@ -234,14 +234,30 @@ export class PaymentService {
       .returningAll()
       .executeTakeFirstOrThrow();
 
-    // Increment promo used_count only after successful payment creation
+    // Atomically increment promo used_count with max_uses guard to prevent race conditions
     if (promoCodeStr) {
-      await this.db
+      const updated = await this.db
         .updateTable('promo_codes')
         .set((eb) => ({ used_count: eb('used_count', '+', 1) }))
         .where('code', '=', promoCodeStr)
         .where('tournament_id', '=', plan.tournament_id)
-        .execute();
+        .where('is_active', '=', true)
+        .where((eb) =>
+          eb.or([
+            eb('max_uses', 'is', null),
+            eb('used_count', '<', eb.ref('max_uses')),
+          ])
+        )
+        .executeTakeFirst();
+
+      if (!updated || Number(updated.numUpdatedRows) === 0) {
+        // Promo was exhausted between validation and increment — remove discount
+        await this.db
+          .updateTable('payments')
+          .set({ promo_code: null, discount_amount: '0', amount: String(amount), updated_at: new Date() })
+          .where('id', '=', payment.id)
+          .execute();
+      }
     }
 
     // Generate payment URL based on method

@@ -41,9 +41,13 @@ async function start() {
     typeDefs,
     resolvers,
     plugins: [errorHandlerPlugin, loggingPlugin],
+    introspection: process.env.NODE_ENV !== 'production',
   });
 
   await server.start();
+
+  // Trust first proxy (nginx/Cloudflare) for correct IP extraction & rate limiting
+  app.set('trust proxy', 1);
 
   app.use(
     helmet({

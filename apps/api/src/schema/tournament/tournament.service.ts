@@ -28,6 +28,22 @@ const createTournamentSchema = z.object({
   rulesText: z.string().max(10000).nullable().optional(),
 });
 
+const updateTournamentSchema = z.object({
+  name: z.string().min(1).max(255).optional(),
+  description: z.string().max(5000).nullable().optional(),
+  maxTeams: z.number().int().min(2).nullable().optional(),
+  registrationStart: z.coerce.date().nullable().optional(),
+  registrationEnd: z.coerce.date().nullable().optional(),
+  startDate: z.coerce.date().nullable().optional(),
+  endDate: z.coerce.date().nullable().optional(),
+  pointsForWin: z.number().int().min(0).optional(),
+  pointsForDraw: z.number().int().min(0).optional(),
+  pointsForLoss: z.number().int().min(0).optional(),
+  entryFee: z.number().min(0).nullable().optional(),
+  bannerUrl: z.string().url().nullable().optional(),
+  rulesText: z.string().max(10000).nullable().optional(),
+});
+
 export class TournamentService {
   constructor(private db: Kysely<Database>) {}
 
@@ -106,7 +122,7 @@ export class TournamentService {
       throw new GraphQLError('Not authorized', { extensions: { code: 'FORBIDDEN' } });
     }
 
-    const data = input as Record<string, unknown>;
+    const data = updateTournamentSchema.parse(input);
     const updateData: Record<string, unknown> = { updated_at: new Date() };
 
     const fieldMap: Record<string, string> = {
@@ -119,8 +135,8 @@ export class TournamentService {
     };
 
     for (const [gqlField, dbField] of Object.entries(fieldMap)) {
-      if (data[gqlField] !== undefined) {
-        updateData[dbField] = data[gqlField];
+      if ((data as Record<string, unknown>)[gqlField] !== undefined) {
+        updateData[dbField] = (data as Record<string, unknown>)[gqlField];
       }
     }
 
@@ -132,7 +148,7 @@ export class TournamentService {
       .executeTakeFirstOrThrow();
 
     // Sync default payment plan amount when entryFee changes
-    if (data.entryFee !== undefined) {
+    if (data.entryFee != null) {
       await this.db
         .updateTable('payment_plans')
         .set({ amount: String(data.entryFee) })

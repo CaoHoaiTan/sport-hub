@@ -13,15 +13,28 @@ async function markPaymentPaid(
   db: Kysely<Database>,
   paymentId: string,
   transactionId: string,
-  gatewayResponse: Record<string, unknown>
+  gatewayResponse: Record<string, unknown>,
+  expectedAmountInCents?: number
 ): Promise<boolean> {
   const payment = await db
     .selectFrom('payments')
-    .select(['id', 'status'])
+    .select(['id', 'status', 'amount'])
     .where('id', '=', paymentId)
     .executeTakeFirst();
 
   if (!payment || payment.status === 'paid') return false;
+
+  // Verify amount matches if provided (VNPay uses amount * 100)
+  if (expectedAmountInCents != null) {
+    const dbAmountInCents = Math.round(parseFloat(payment.amount) * 100);
+    if (expectedAmountInCents !== dbAmountInCents) {
+      logger.error(
+        { paymentId, expected: expectedAmountInCents, actual: dbAmountInCents },
+        '[Payment] Amount mismatch — possible fraud attempt'
+      );
+      return false;
+    }
+  }
 
   await db
     .updateTable('payments')
@@ -100,7 +113,8 @@ export function createPaymentCallbackRouter(db: Kysely<Database>): Router {
 
     if (resultCode === '00') {
       const transactionId = query.vnp_TransactionNo ?? '';
-      await markPaymentPaid(db, paymentId, transactionId, query as Record<string, unknown>);
+      const vnpAmount = parseInt(query.vnp_Amount ?? '0', 10);
+      await markPaymentPaid(db, paymentId, transactionId, query as Record<string, unknown>, vnpAmount);
       logger.info({ paymentId }, '[VNPay] Payment marked as paid');
       res.redirect(`${getFrontendUrl()}/payment/result?status=success&paymentId=${paymentId}&tournamentId=${tournamentId}`);
     } else {

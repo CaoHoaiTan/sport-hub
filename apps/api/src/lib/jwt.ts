@@ -16,7 +16,13 @@ function getSecret(): string {
 }
 
 function getRefreshSecret(): string {
-  return process.env.JWT_REFRESH_SECRET ?? getSecret();
+  const secret = process.env.JWT_REFRESH_SECRET;
+  if (!secret || secret.length < 32) {
+    throw new Error(
+      'JWT_REFRESH_SECRET must be set to a value of at least 32 characters'
+    );
+  }
+  return secret;
 }
 
 export function signAccessToken(payload: TokenPayload): string {

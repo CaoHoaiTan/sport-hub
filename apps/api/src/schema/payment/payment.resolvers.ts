@@ -11,6 +11,7 @@ export const paymentResolvers = {
       { tournamentId }: { tournamentId: string },
       ctx: GraphQLContext
     ) => {
+      requireAuth(ctx.user);
       const service = new PaymentService(ctx.db);
       return service.getPaymentPlansByTournament(tournamentId);
     },
@@ -73,6 +74,7 @@ export const paymentResolvers = {
       { tournamentId, code, amount }: { tournamentId: string; code: string; amount: number },
       ctx: GraphQLContext
     ) => {
+      requireAuth(ctx.user);
       const service = new PaymentService(ctx.db);
       return service.validatePromoCode(tournamentId, code, amount);
     },

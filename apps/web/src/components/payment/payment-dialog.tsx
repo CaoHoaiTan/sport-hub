@@ -89,6 +89,17 @@ export function PaymentDialog({
 
       const payment = data?.initiatePayment;
       if (payment?.paymentUrl) {
+        try {
+          const url = new URL(payment.paymentUrl);
+          const allowed = ['sandbox.vnpayment.vn', 'pay.vnpay.vn', 'vnpayment.vn'];
+          if (!allowed.some((h) => url.hostname === h || url.hostname.endsWith('.' + h))) {
+            toast.error('URL thanh toán không hợp lệ.');
+            return;
+          }
+        } catch {
+          toast.error('URL thanh toán không hợp lệ.');
+          return;
+        }
         window.location.href = payment.paymentUrl;
         return;
       }
