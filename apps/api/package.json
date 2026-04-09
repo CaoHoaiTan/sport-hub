@@ -10,7 +10,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@apollo/server": "^4.13.0",
+    "@apollo/server": "^5.5.0",
     "@sporthub/db": "workspace:*",
     "@sporthub/shared": "workspace:*",
     "bcryptjs": "^3.0.3",
