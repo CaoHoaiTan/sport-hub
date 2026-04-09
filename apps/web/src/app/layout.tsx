@@ -15,6 +15,19 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "SportHub",
   description: "Nền tảng quản lý giải đấu thể thao",
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon-32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon-64.png', sizes: '64x64', type: 'image/png' },
+    ],
+    apple: '/icon-512.png',
+  },
+  openGraph: {
+    title: 'SportHub',
+    description: 'Nền tảng quản lý giải đấu thể thao',
+    images: [{ url: '/icon-512.png', width: 512, height: 512 }],
+  },
 };
 
 export default function RootLayout({

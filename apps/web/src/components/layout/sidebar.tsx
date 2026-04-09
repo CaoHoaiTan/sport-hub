@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
@@ -108,13 +109,12 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         >
           {!collapsed && (
             <Link href={ROUTES.dashboard} className="flex items-center gap-2">
-              <Trophy className="h-5 w-5 text-sidebar-primary" />
-              <span className="font-bold tracking-tight">SportHub</span>
+              <Image src="/logo-horizontal.svg" alt="SportHub" width={120} height={28} />
             </Link>
           )}
           {collapsed && (
             <Link href={ROUTES.dashboard}>
-              <Trophy className="h-5 w-5 text-sidebar-primary" />
+              <Image src="/icon.svg" alt="SportHub" width={20} height={20} />
             </Link>
           )}
           <Button

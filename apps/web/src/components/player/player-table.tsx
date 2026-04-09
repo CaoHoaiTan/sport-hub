@@ -7,6 +7,7 @@ import { Pencil, Trash2, UserCheck } from 'lucide-react';
 import {
   Tooltip,
   TooltipContent,
+  TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
@@ -57,14 +58,16 @@ export function PlayerTable({
             </Badge>
           )}
           {row.userId && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <UserCheck className="h-3.5 w-3.5 text-green-600 shrink-0" />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="text-xs">Đã liên kết: {row.user?.email ?? 'Tài khoản'}</p>
-              </TooltipContent>
-            </Tooltip>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <UserCheck className="h-3.5 w-3.5 text-green-600 shrink-0" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-xs">Đã liên kết: {row.user?.email ?? 'Tài khoản'}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
         </div>
       ),

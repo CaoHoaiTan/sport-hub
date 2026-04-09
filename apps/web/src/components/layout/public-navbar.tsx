@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Trophy, Menu } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { useState } from 'react';
 
 import { cn } from '@/lib/utils/cn';
@@ -35,8 +36,7 @@ export function PublicNavbar() {
     <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href={ROUTES.home} className="flex items-center gap-2">
-          <Trophy className="h-5 w-5 text-primary" />
-          <span className="text-lg font-bold tracking-tight">SportHub</span>
+          <Image src="/logo-horizontal.svg" alt="SportHub" width={140} height={32} priority />
         </Link>
 
         <nav className="hidden items-center gap-6 md:flex">
@@ -83,7 +83,7 @@ export function PublicNavbar() {
           <SheetContent side="right" className="w-72">
             <SheetHeader>
               <SheetTitle className="flex items-center gap-2">
-                <Trophy className="h-5 w-5 text-primary" />
+                <Image src="/icon.svg" alt="SportHub" width={20} height={20} />
                 SportHub
               </SheetTitle>
             </SheetHeader>

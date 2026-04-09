@@ -1,0 +1,45 @@
+<svg width="360" height="80" viewBox="0 0 360 80" xmlns="http://www.w3.org/2000/svg">
+  <!-- SportHub Horizontal Logo - for navbar / header -->
+
+  <!-- Shield (compact) -->
+  <g transform="translate(40, 40)">
+    <path d="M0 -32 Q20 -30 24 -12 L24 20 Q20 32 0 34 Q-20 32 -24 20 L-24 -12 Q-20 -30 0 -32Z" fill="#1a1a2e"/>
+    <path d="M0 -28 Q17 -26 20.5 -10 L20.5 17.5 Q17 28 0 30 Q-17 28 -20.5 17.5 L-20.5 -10 Q-17 -26 0 -28Z" fill="#0d1b2a"/>
+
+    <!-- Field lines -->
+    <line x1="-20" y1="4" x2="20" y2="4" stroke="#0ea5a0" stroke-width="0.5" opacity="0.3"/>
+    <circle cx="0" cy="4" r="6" fill="none" stroke="#0ea5a0" stroke-width="0.5" opacity="0.3"/>
+
+    <!-- Football -->
+    <g transform="translate(-7, -14)">
+      <circle cx="0" cy="0" r="5.5" fill="#ffffff" opacity="0.95"/>
+      <path d="M0 -5.5 Q1.5 -3 0 -1 Q-2 -3 0 -5.5Z" fill="#1a1a2e" opacity="0.6"/>
+      <path d="M-5 -1.5 Q-2.5 -0.8 -1.5 1.2 Q-3.2 0.4 -5 -1.5Z" fill="#1a1a2e" opacity="0.6"/>
+      <path d="M5 -1.5 Q2.5 -0.8 1.5 1.2 Q3.2 0.4 5 -1.5Z" fill="#1a1a2e" opacity="0.6"/>
+    </g>
+
+    <!-- Volleyball -->
+    <g transform="translate(8, -13)">
+      <circle cx="0" cy="0" r="4.5" fill="#f5e642" opacity="0.9"/>
+      <line x1="-3.5" y1="-1.5" x2="3.5" y2="-1.5" stroke="#c4960a" stroke-width="0.8"/>
+      <line x1="-4" y1="0" x2="4" y2="0" stroke="#c4960a" stroke-width="0.8"/>
+      <line x1="-3.5" y1="1.5" x2="3.5" y2="1.5" stroke="#c4960a" stroke-width="0.8"/>
+    </g>
+
+    <!-- Shuttlecock -->
+    <g transform="translate(0, 12)">
+      <ellipse cx="0" cy="0" rx="1.5" ry="1.5" fill="#ffffff" opacity="0.9"/>
+      <line x1="0" y1="1.5" x2="0" y2="-6" stroke="#ffffff" stroke-width="0.8" opacity="0.8"/>
+      <path d="M-3 -9 Q0 -6 3 -9 Q1.5 -5.5 0 -6 Q-1.5 -5.5 -3 -9Z" fill="none" stroke="#ffffff" stroke-width="0.8" opacity="0.8"/>
+    </g>
+
+    <!-- Badge -->
+    <g transform="translate(0, 24)">
+      <path d="M-12 0 L-5 -4 L5 -4 L12 0 L5 4 L-5 4Z" fill="#0ea5a0" opacity="0.9"/>
+    </g>
+  </g>
+
+  <!-- Wordmark -->
+  <text x="80" y="38" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" letter-spacing="4" fill="#1a1a2e">SPORTHUB</text>
+  <text x="80" y="56" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="400" letter-spacing="3" fill="#555566">TOURNAMENT MANAGEMENT</text>
+</svg>

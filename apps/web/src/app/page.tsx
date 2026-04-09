@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Trophy, ArrowRight, Users, Calendar } from 'lucide-react';
 
 import { useAuth } from '@/lib/auth/context';
@@ -36,8 +37,7 @@ export default function HomePage() {
       <header className="border-b">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link href={ROUTES.home} className="flex items-center gap-2">
-            <Trophy className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold tracking-tight">SportHub</span>
+            <Image src="/logo-horizontal.svg" alt="SportHub" width={140} height={32} priority />
           </Link>
           <div className="flex items-center gap-3">
             <Button variant="ghost" asChild>
@@ -54,7 +54,7 @@ export default function HomePage() {
         <section className="flex flex-1 flex-col items-center justify-center px-4 py-24 text-center">
           <div className="mx-auto max-w-3xl space-y-8">
             <div className="inline-flex items-center gap-2 rounded-full border bg-muted/50 px-4 py-1.5 text-sm text-muted-foreground">
-              <Trophy className="h-4 w-4" />
+              <Image src="/icon.svg" alt="" width={16} height={16} />
               Quản lý giải đấu đơn giản
             </div>
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">

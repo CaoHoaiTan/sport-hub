@@ -1,0 +1,21 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <!-- SportHub Favicon - simplified for small sizes -->
+  <g transform="translate(32, 30)">
+    <path d="M0 -26 Q17 -24 20 -10 L20 16 Q17 26 0 28 Q-17 26 -20 16 L-20 -10 Q-17 -24 0 -26Z" fill="#1a1a2e"/>
+    <path d="M0 -22 Q14 -21 17 -8 L17 14 Q14 22 0 24 Q-14 22 -17 14 L-17 -8 Q-14 -21 0 -22Z" fill="#0d1b2a"/>
+    
+    <!-- Football (simplified) -->
+    <circle cx="-6" cy="-8" r="5" fill="#ffffff" opacity="0.95"/>
+    
+    <!-- Volleyball (simplified) -->
+    <circle cx="7" cy="-7" r="4" fill="#f5e642" opacity="0.9"/>
+    <line x1="4" y1="-7" x2="10" y2="-7" stroke="#c4960a" stroke-width="0.8"/>
+    
+    <!-- Shuttlecock (simplified) -->
+    <circle cx="0" cy="8" r="1.5" fill="#ffffff" opacity="0.9"/>
+    <line x1="0" y1="6.5" x2="0" y2="1" stroke="#ffffff" stroke-width="1" opacity="0.8"/>
+    
+    <!-- Badge -->
+    <path d="M-10 19 L-4 16 L4 16 L10 19 L4 22 L-4 22Z" fill="#0ea5a0" opacity="0.9"/>
+  </g>
+</svg>
