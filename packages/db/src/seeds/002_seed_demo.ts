@@ -379,7 +379,7 @@ export async function seed(db: Kysely<Database>): Promise<void> {
   await db.insertInto('payment_plans').values({
     tournament_id: footballTournament.id,
     name: 'Lệ phí tham gia',
-    amount: 500000,
+    amount: '500000',
     currency: 'VND',
     per_team: true,
   }).execute();
@@ -387,7 +387,7 @@ export async function seed(db: Kysely<Database>): Promise<void> {
   await db.insertInto('payment_plans').values({
     tournament_id: volleyballTournament.id,
     name: 'Lệ phí tham gia',
-    amount: 300000,
+    amount: '300000',
     currency: 'VND',
     per_team: true,
   }).execute();
@@ -395,10 +395,10 @@ export async function seed(db: Kysely<Database>): Promise<void> {
   await db.insertInto('payment_plans').values({
     tournament_id: badmintonTournament.id,
     name: 'Lệ phí tham gia',
-    amount: 200000,
+    amount: '200000',
     currency: 'VND',
     per_team: true,
-    early_bird_amount: 150000,
+    early_bird_amount: '150000',
     early_bird_deadline: new Date('2026-04-10'),
   }).execute();
 
