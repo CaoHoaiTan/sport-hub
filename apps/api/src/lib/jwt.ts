@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken';
 
 export interface TokenPayload {
   userId: string;
@@ -21,14 +21,14 @@ function getRefreshSecret(): string {
 
 export function signAccessToken(payload: TokenPayload): string {
   const expiresIn = process.env.JWT_ACCESS_EXPIRES_IN ?? '15m';
-  return jwt.sign(payload, getSecret(), { expiresIn });
+  return jwt.sign(payload, getSecret(), { expiresIn } as jwt.SignOptions);
 }
 
 export function signRefreshToken(payload: TokenPayload): string {
   const expiresIn = process.env.JWT_REFRESH_EXPIRES_IN ?? '7d';
   return jwt.sign({ ...payload, tokenType: 'refresh' }, getRefreshSecret(), {
     expiresIn,
-  });
+  } as jwt.SignOptions);
 }
 
 export function verifyToken(token: string): TokenPayload {

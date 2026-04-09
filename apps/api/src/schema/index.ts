@@ -1,4 +1,4 @@
-import gql from 'graphql-tag';
+import { gql } from 'graphql-tag';
 import { authTypeDefs } from './auth/auth.typeDefs.js';
 import { authResolvers } from './auth/auth.resolvers.js';
 import { userTypeDefs } from './user/user.typeDefs.js';

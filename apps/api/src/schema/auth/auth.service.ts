@@ -3,7 +3,7 @@ import { z } from 'zod';
 import crypto from 'node:crypto';
 import type { Kysely } from 'kysely';
 import type { Database, User } from '@sporthub/db';
-import type Redis from 'ioredis';
+import type { Redis } from 'ioredis';
 import { hashPassword, comparePassword } from '../../lib/password.js';
 import { signAccessToken, signRefreshToken, verifyToken, verifyRefreshToken } from '../../lib/jwt.js';
 

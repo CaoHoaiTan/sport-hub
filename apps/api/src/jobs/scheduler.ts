@@ -1,4 +1,4 @@
-import cron from 'node-cron';
+import * as cron from 'node-cron';
 import type { Kysely } from 'kysely';
 import type { Database } from '@sporthub/db';
 import { processCheckinWindows } from './checkin-window.js';

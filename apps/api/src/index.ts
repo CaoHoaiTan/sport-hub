@@ -89,7 +89,7 @@ async function start() {
           '127.0.0.1';
         return { db, redis, user, loaders, clientIp };
       },
-    })
+    }) as any
   );
 
   await redis.connect();
