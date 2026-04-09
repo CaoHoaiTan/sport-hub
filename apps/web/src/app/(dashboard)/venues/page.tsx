@@ -57,7 +57,7 @@ export default function VenuesPage() {
       {venues.length === 0 ? (
         <EmptyState
           icon={MapPin}
-          title="No venues"
+          title="Chưa có địa điểm"
           description="Thêm địa điểm để phân bổ cho các trận đấu."
           action={
             canCreate

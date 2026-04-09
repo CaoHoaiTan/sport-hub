@@ -72,11 +72,11 @@ export function PaymentPlanForm({ tournamentId }: PaymentPlanFormProps) {
           },
         },
       });
-      toast.success('Payment plan created.');
+      toast.success('Đã tạo gói thanh toán.');
       resetForm();
       setOpen(false);
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Failed to create plan';
+      const message = error instanceof Error ? error.message : 'Tạo gói thất bại';
       toast.error(message);
     }
   }
@@ -86,19 +86,19 @@ export function PaymentPlanForm({ tournamentId }: PaymentPlanFormProps) {
       <DialogTrigger asChild>
         <Button>
           <Plus className="mr-2 h-4 w-4" />
-          Add Payment Plan
+          Thêm gói thanh toán
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create Payment Plan</DialogTitle>
+          <DialogTitle>Tạo gói thanh toán</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="plan-name">Plan Name</Label>
+            <Label htmlFor="plan-name">Tên gói</Label>
             <Input
               id="plan-name"
-              placeholder="e.g., Tournament Entry Fee"
+              placeholder="VD: Lệ phí tham gia giải đấu"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -120,20 +120,20 @@ export function PaymentPlanForm({ tournamentId }: PaymentPlanFormProps) {
 
           <div className="flex items-center justify-between rounded-lg border p-3">
             <div>
-              <p className="text-sm font-medium">Per Team</p>
+              <p className="text-sm font-medium">Theo từng đội</p>
               <p className="text-xs text-muted-foreground">
-                Charge each team separately
+                Tính phí riêng cho mỗi đội
               </p>
             </div>
             <Switch checked={perTeam} onCheckedChange={setPerTeam} />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="early-bird-amount">Early Bird Số tiền (VND)</Label>
+            <Label htmlFor="early-bird-amount">Giá ưu đãi sớm (VND)</Label>
             <Input
               id="early-bird-amount"
               type="number"
-              placeholder="Optional discounted amount"
+              placeholder="Số tiền giảm giá (tùy chọn)"
               value={earlyBirdAmount}
               onChange={(e) => setEarlyBirdAmount(e.target.value)}
               min={0}
@@ -141,7 +141,7 @@ export function PaymentPlanForm({ tournamentId }: PaymentPlanFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="early-bird-deadline">Early Bird Deadline</Label>
+            <Label htmlFor="early-bird-deadline">Hạn chót ưu đãi sớm</Label>
             <Input
               id="early-bird-deadline"
               type="datetime-local"
@@ -204,7 +204,7 @@ export function PaymentPlanForm({ tournamentId }: PaymentPlanFormProps) {
             </DialogClose>
             <Button type="submit" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Create Plan
+              Tạo gói
             </Button>
           </DialogFooter>
         </form>

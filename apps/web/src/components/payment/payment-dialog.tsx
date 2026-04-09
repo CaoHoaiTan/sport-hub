@@ -110,12 +110,12 @@ export function PaymentDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Make Payment</DialogTitle>
+          <DialogTitle>Thanh toán</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
           <div>
-            <p className="text-sm text-muted-foreground mb-3">Payment Method</p>
+            <p className="text-sm text-muted-foreground mb-3">Phương thức thanh toán</p>
             <TooltipProvider>
               <div className="grid grid-cols-2 gap-2">
                 {methods.map((m) => {

@@ -82,7 +82,7 @@ export default async function PublicStandingsPage({ params }: PageProps) {
   if (!tournament) {
     return (
       <div className="container mx-auto px-4 py-12 text-center text-muted-foreground">
-        Tournament not found.
+        Không tìm thấy giải đấu.
       </div>
     );
   }
@@ -111,7 +111,7 @@ export default async function PublicStandingsPage({ params }: PageProps) {
         <div className="text-center py-16 space-y-2">
           <BarChart3 className="h-12 w-12 mx-auto text-muted-foreground/40" />
           <p className="text-muted-foreground">
-            No standings data available yet.
+            Chưa có dữ liệu bảng xếp hạng.
           </p>
         </div>
       ) : hasGroups ? (

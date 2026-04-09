@@ -146,7 +146,7 @@ export default function PostsPage() {
         <div>
           <h2 className="text-lg font-semibold">Posts</h2>
           <p className="text-sm text-muted-foreground">
-            Tournament announcements and updates.
+            Thông báo và cập nhật giải đấu.
           </p>
         </div>
         {canManage && (

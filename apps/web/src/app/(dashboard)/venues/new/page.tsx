@@ -118,7 +118,7 @@ export default function NewVenuePage() {
                 <Input
                   id="venue-capacity"
                   type="number"
-                  placeholder="Optional"
+                  placeholder="Tùy chọn"
                   value={capacity}
                   onChange={(e) => setCapacity(e.target.value)}
                   min={0}

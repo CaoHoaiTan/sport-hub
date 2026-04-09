@@ -60,9 +60,9 @@ export default async function PublicPostsPage({ params }: Props) {
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
           <MessageSquare className="h-8 w-8 text-muted-foreground" />
         </div>
-        <h3 className="mt-4 text-lg font-semibold">No posts yet</h3>
+        <h3 className="mt-4 text-lg font-semibold">Chưa có bài viết</h3>
         <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-          Tournament announcements and updates will appear here.
+          Các thông báo và cập nhật giải đấu sẽ xuất hiện ở đây.
         </p>
       </div>
     );

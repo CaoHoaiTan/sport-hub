@@ -72,7 +72,7 @@ export default function TournamentStandingsPage() {
         <div className="text-center py-16 space-y-2">
           <BarChart3 className="h-12 w-12 mx-auto text-muted-foreground/40" />
           <p className="text-muted-foreground">
-            No standings data available yet.
+            Chưa có dữ liệu bảng xếp hạng.
           </p>
           <p className="text-sm text-muted-foreground">
             Standings will be generated once matches are played.

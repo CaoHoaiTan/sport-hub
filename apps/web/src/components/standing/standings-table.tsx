@@ -51,7 +51,7 @@ export function StandingsTable({
   if (sorted.length === 0) {
     return (
       <p className="text-center text-sm text-muted-foreground py-8">
-        No standings data available.
+        Không có dữ liệu bảng xếp hạng.
       </p>
     );
   }

@@ -77,7 +77,7 @@ export default async function PublicSchedulePage({ params }: PageProps) {
   if (!tournament) {
     return (
       <div className="container mx-auto px-4 py-12 text-center text-muted-foreground">
-        Tournament not found.
+        Không tìm thấy giải đấu.
       </div>
     );
   }
@@ -86,14 +86,14 @@ export default async function PublicSchedulePage({ params }: PageProps) {
     <div className="container mx-auto px-4 py-8 space-y-6">
       <div className="flex items-center gap-2">
         <CalendarDays className="h-5 w-5 text-muted-foreground" />
-        <h1 className="text-xl font-bold">Match Schedule</h1>
+        <h1 className="text-xl font-bold">Lịch thi đấu</h1>
       </div>
 
       {matches.length === 0 ? (
         <div className="text-center py-16 space-y-2">
           <CalendarDays className="h-12 w-12 mx-auto text-muted-foreground/40" />
           <p className="text-muted-foreground">
-            No matches have been scheduled yet.
+            Chưa có trận đấu nào được lên lịch.
           </p>
         </div>
       ) : (

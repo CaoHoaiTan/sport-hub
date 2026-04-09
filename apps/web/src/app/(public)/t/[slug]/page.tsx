@@ -435,7 +435,23 @@ function RulesDisplay({ rulesText, sport }: { rulesText: string; sport: string }
   }
 
   if (items.length === 0) {
-    return <p className="text-sm whitespace-pre-wrap">{rulesText}</p>;
+    // JSON but no recognized fields — show all key-value pairs nicely
+    const entries = Object.entries(rules).filter(
+      ([, v]) => v != null && v !== '' && v !== false
+    );
+    if (entries.length === 0) {
+      return <p className="text-sm whitespace-pre-wrap">{rulesText}</p>;
+    }
+    return (
+      <div className="grid gap-3 sm:grid-cols-2">
+        {entries.map(([key, value]) => (
+          <div key={key}>
+            <p className="text-xs text-muted-foreground">{key}</p>
+            <p className="text-sm font-medium">{String(value)}</p>
+          </div>
+        ))}
+      </div>
+    );
   }
 
   return (

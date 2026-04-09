@@ -66,18 +66,18 @@ export default function TournamentDetailLayout({
 
   const tabs: TabDef[] = [
     {
-      label: 'Overview',
+      label: 'Tổng quan',
       href: ROUTES.tournamentDetail(id),
       icon: LayoutDashboard,
     },
-    { label: 'Teams', href: ROUTES.tournamentTeams(id), icon: Users },
+    { label: 'Đội', href: ROUTES.tournamentTeams(id), icon: Users },
     {
-      label: 'Schedule',
+      label: 'Lịch thi đấu',
       href: ROUTES.tournamentSchedule(id),
       icon: Calendar,
     },
     {
-      label: 'Standings',
+      label: 'Bảng xếp hạng',
       href: ROUTES.tournamentStandings(id),
       icon: BarChart3,
       hidden: tournament?.format === 'single_elimination' || tournament?.format === 'double_elimination',
@@ -89,18 +89,18 @@ export default function TournamentDetailLayout({
       organizerOnly: true,
     },
     {
-      label: 'Payments',
+      label: 'Thanh toán',
       href: ROUTES.tournamentPayments(id),
       icon: CreditCard,
       organizerOnly: true,
     },
     {
-      label: 'Posts',
+      label: 'Bài viết',
       href: ROUTES.tournamentPosts(id),
       icon: MessageSquare,
     },
     {
-      label: 'Settings',
+      label: 'Cài đặt',
       href: ROUTES.tournamentSettings(id),
       icon: Settings,
       organizerOnly: true,
@@ -146,7 +146,7 @@ export default function TournamentDetailLayout({
         </div>
       ) : (
         <div className="text-center text-muted-foreground py-12">
-          Tournament not found.
+          Không tìm thấy giải đấu.
         </div>
       )}
 

@@ -111,9 +111,9 @@ export default function PaymentsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold">Payments</h2>
+          <h2 className="text-lg font-semibold">Thanh toán</h2>
           <p className="text-sm text-muted-foreground">
-            Manage payment plans, track payments, and view financial summary.
+            Quản lý gói thanh toán, theo dõi giao dịch và xem tổng hợp tài chính.
           </p>
         </div>
       </div>
@@ -121,7 +121,7 @@ export default function PaymentsPage() {
       <Tabs defaultValue="plans">
         <TabsList>
           <TabsTrigger value="plans">Gói thanh toán</TabsTrigger>
-          {canManage && <TabsTrigger value="payments">Payments</TabsTrigger>}
+          {canManage && <TabsTrigger value="payments">Giao dịch</TabsTrigger>}
           {canManage && <TabsTrigger value="promos">Mã giảm giá</TabsTrigger>}
           {canManage && <TabsTrigger value="summary">Tổng hợp tài chính</TabsTrigger>}
         </TabsList>
@@ -136,8 +136,8 @@ export default function PaymentsPage() {
           {plans.length === 0 ? (
             <EmptyState
               icon={CreditCard}
-              title="No payment plans"
-              description="Create a payment plan to start collecting fees."
+              title="Chưa có gói thanh toán"
+              description="Tạo gói thanh toán để bắt đầu thu phí."
             />
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -161,7 +161,7 @@ export default function PaymentsPage() {
                         {plan.name}
                         {plan.perTeam && (
                           <Badge variant="outline" className="text-[10px]">
-                            Per Team
+                            Theo đội
                           </Badge>
                         )}
                       </CardTitle>

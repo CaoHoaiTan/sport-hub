@@ -106,7 +106,7 @@ function RoundGroupedMatches({
   if (roundGroups.length === 0) {
     return (
       <p className="text-center text-muted-foreground py-8">
-        No matches scheduled yet.
+        Chưa có trận đấu nào được lên lịch.
       </p>
     );
   }

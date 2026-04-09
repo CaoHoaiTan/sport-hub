@@ -123,14 +123,14 @@ function MatchCheckinRow({
   const [openCheckin, { loading: opening }] = useMutation(OPEN_CHECKIN, {
     variables: { matchId },
     refetchQueries: [{ query: GET_MATCH_CHECKIN_STATUS, variables: { matchId } }],
-    onCompleted: () => toast.success('Check-in opened.'),
+    onCompleted: () => toast.success('Đã mở check-in.'),
     onError: (err) => toast.error(err.message),
   });
 
   const [closeCheckin, { loading: closing }] = useMutation(CLOSE_CHECKIN, {
     variables: { matchId },
     refetchQueries: [{ query: GET_MATCH_CHECKIN_STATUS, variables: { matchId } }],
-    onCompleted: () => toast.success('Check-in closed.'),
+    onCompleted: () => toast.success('Đã đóng check-in.'),
     onError: (err) => toast.error(err.message),
   });
 

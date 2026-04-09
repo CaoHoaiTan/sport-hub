@@ -24,6 +24,7 @@ import {
 } from '@/graphql/mutations/tournament';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import {
   Form,
@@ -476,23 +477,11 @@ export default function TournamentSettingsPage() {
 
               <Separator />
 
-              <FormField
-                control={form.control}
-                name="rulesText"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Điều lệ</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        {...field}
-                        rows={5}
-                        placeholder="Nhập điều lệ giải đấu..."
-                        disabled={isLocked}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+              <SportRulesFields
+                rulesText={form.watch('rulesText') ?? ''}
+                sport={tournament?.sport ?? ''}
+                isLocked={!!isLocked}
+                onChange={(newRulesText) => form.setValue('rulesText', newRulesText)}
               />
             </CardContent>
           </Card>
@@ -578,6 +567,172 @@ export default function TournamentSettingsPage() {
         confirmLabel="Xóa vĩnh viễn"
         isLoading={deleting}
       />
+    </div>
+  );
+}
+
+const categoryLabels: Record<string, string> = {
+  men_singles: 'Đơn nam',
+  women_singles: 'Đơn nữ',
+  men_doubles: 'Đôi nam',
+  women_doubles: 'Đôi nữ',
+  mixed_doubles: 'Đôi nam nữ',
+  men: 'Nam',
+  women: 'Nữ',
+  mixed: 'Hỗn hợp',
+};
+
+function SportRulesFields({
+  rulesText,
+  sport,
+  isLocked,
+  onChange,
+}: {
+  rulesText: string;
+  sport: string;
+  isLocked: boolean;
+  onChange: (value: string) => void;
+}) {
+  let rules: Record<string, unknown> = {};
+  let isJson = false;
+  try {
+    rules = JSON.parse(rulesText);
+    isJson = true;
+  } catch {
+    // plain text
+  }
+
+  function updateRule(key: string, value: unknown) {
+    const updated = { ...rules, [key]: value };
+    onChange(JSON.stringify(updated));
+  }
+
+  if (!isJson && rulesText) {
+    // Plain text rules — show as textarea
+    return (
+      <div className="space-y-2">
+        <Label>Điều lệ</Label>
+        <Textarea
+          value={rulesText}
+          onChange={(e) => onChange(e.target.value)}
+          rows={5}
+          placeholder="Nhập điều lệ giải đấu..."
+          disabled={isLocked}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <p className="text-sm font-medium">Điều lệ thi đấu</p>
+
+      {sport === 'football' && (
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label>Thời gian thi đấu (phút)</Label>
+            <Input
+              type="number"
+              value={rules.matchDuration ? String(rules.matchDuration) : ''}
+              onChange={(e) => updateRule('matchDuration', parseInt(e.target.value) || null)}
+              placeholder="90"
+              disabled={isLocked}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Số hiệp</Label>
+            <Input
+              type="number"
+              value={rules.halfCount ? String(rules.halfCount) : ''}
+              onChange={(e) => updateRule('halfCount', parseInt(e.target.value) || null)}
+              placeholder="2"
+              disabled={isLocked}
+            />
+          </div>
+        </div>
+      )}
+
+      {sport === 'volleyball' && (
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label>Hạng mục</Label>
+            <p className="text-sm font-medium text-muted-foreground">
+              {categoryLabels[rules.volleyballCategory as string] ?? (rules.volleyballCategory ? String(rules.volleyballCategory) : '—')}
+            </p>
+          </div>
+          <div className="space-y-2">
+            <Label>Số set thắng</Label>
+            <Input
+              type="number"
+              value={rules.setsToWin ? String(rules.setsToWin) : ''}
+              onChange={(e) => updateRule('setsToWin', parseInt(e.target.value) || null)}
+              placeholder="3"
+              disabled={isLocked}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Điểm mỗi set</Label>
+            <Input
+              type="number"
+              value={rules.pointsPerSet ? String(rules.pointsPerSet) : ''}
+              onChange={(e) => updateRule('pointsPerSet', parseInt(e.target.value) || null)}
+              placeholder="25"
+              disabled={isLocked}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Điểm set cuối</Label>
+            <Input
+              type="number"
+              value={rules.finalSetPoints ? String(rules.finalSetPoints) : ''}
+              onChange={(e) => updateRule('finalSetPoints', parseInt(e.target.value) || null)}
+              placeholder="15"
+              disabled={isLocked}
+            />
+          </div>
+        </div>
+      )}
+
+      {sport === 'badminton' && (
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label>Hạng mục</Label>
+            <p className="text-sm font-medium text-muted-foreground">
+              {categoryLabels[rules.badmintonCategory as string] ?? (rules.badmintonCategory ? String(rules.badmintonCategory) : '—')}
+            </p>
+          </div>
+          <div className="space-y-2">
+            <Label>Số set thắng</Label>
+            <Input
+              type="number"
+              value={rules.setsToWin ? String(rules.setsToWin) : ''}
+              onChange={(e) => updateRule('setsToWin', parseInt(e.target.value) || null)}
+              placeholder="2"
+              disabled={isLocked}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Điểm mỗi set</Label>
+            <Input
+              type="number"
+              value={rules.pointsPerSet ? String(rules.pointsPerSet) : ''}
+              onChange={(e) => updateRule('pointsPerSet', parseInt(e.target.value) || null)}
+              placeholder="21"
+              disabled={isLocked}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Điểm tối đa</Label>
+            <Input
+              type="number"
+              value={rules.maxPoints ? String(rules.maxPoints) : ''}
+              onChange={(e) => updateRule('maxPoints', parseInt(e.target.value) || null)}
+              placeholder="30"
+              disabled={isLocked}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

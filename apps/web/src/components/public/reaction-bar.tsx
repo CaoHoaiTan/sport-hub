@@ -14,10 +14,10 @@ interface ReactionBarProps {
 }
 
 const reactions = [
-  { key: 'like', emoji: '\uD83D\uDC4D', label: 'Like' },
-  { key: 'cheer', emoji: '\uD83C\uDF89', label: 'Cheer' },
-  { key: 'fire', emoji: '\uD83D\uDD25', label: 'Fire' },
-  { key: 'clap', emoji: '\uD83D\uDC4F', label: 'Clap' },
+  { key: 'like', emoji: '\uD83D\uDC4D', label: 'Thích' },
+  { key: 'cheer', emoji: '\uD83C\uDF89', label: 'Cổ vũ' },
+  { key: 'fire', emoji: '\uD83D\uDD25', label: 'Bùng cháy' },
+  { key: 'clap', emoji: '\uD83D\uDC4F', label: 'Vỗ tay' },
 ];
 
 export function ReactionBar({ matchId }: ReactionBarProps) {
@@ -42,7 +42,7 @@ export function ReactionBar({ matchId }: ReactionBarProps) {
 
   function handleReact(reaction: string) {
     if (!user) {
-      toast.error('Please log in to react.');
+      toast.error('Vui lòng đăng nhập để tương tác.');
       return;
     }
     addReaction({ variables: { matchId, reaction } });

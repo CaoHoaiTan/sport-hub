@@ -80,7 +80,7 @@ export default async function PublicTournamentLayout({ children, params }: Props
         </div>
       ) : (
         <div className="text-center text-muted-foreground py-12">
-          Tournament not found.
+          Không tìm thấy giải đấu.
         </div>
       )}
 

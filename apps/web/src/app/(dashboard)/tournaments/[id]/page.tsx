@@ -93,7 +93,7 @@ export default function TournamentOverviewPage() {
   if (!tournament) {
     return (
       <div className="text-center text-muted-foreground py-12">
-        Tournament data not available.
+        Không có dữ liệu giải đấu.
       </div>
     );
   }

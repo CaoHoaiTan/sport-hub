@@ -97,7 +97,7 @@ export function PaymentPlanEditDialog({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="edit-plan-name">Plan Name</Label>
+            <Label htmlFor="edit-plan-name">Tên gói</Label>
             <Input
               id="edit-plan-name"
               value={name}
@@ -120,20 +120,20 @@ export function PaymentPlanEditDialog({
 
           <div className="flex items-center justify-between rounded-lg border p-3">
             <div>
-              <p className="text-sm font-medium">Per Team</p>
+              <p className="text-sm font-medium">Theo từng đội</p>
               <p className="text-xs text-muted-foreground">
-                Charge each team separately
+                Tính phí riêng cho mỗi đội
               </p>
             </div>
             <Switch checked={perTeam} onCheckedChange={setPerTeam} />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="edit-early-bird-amount">Early Bird Số tiền (VND)</Label>
+            <Label htmlFor="edit-early-bird-amount">Giá ưu đãi sớm (VND)</Label>
             <Input
               id="edit-early-bird-amount"
               type="number"
-              placeholder="Optional discounted amount"
+              placeholder="Số tiền giảm giá (tùy chọn)"
               value={earlyBirdAmount}
               onChange={(e) => setEarlyBirdAmount(e.target.value)}
               min={0}
@@ -141,7 +141,7 @@ export function PaymentPlanEditDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="edit-early-bird-deadline">Early Bird Deadline</Label>
+            <Label htmlFor="edit-early-bird-deadline">Hạn chót ưu đãi sớm</Label>
             <Input
               id="edit-early-bird-deadline"
               type="datetime-local"
