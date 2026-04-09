@@ -1,4 +1,4 @@
-import * as QRCode from 'qrcode';
+import QRCode from 'qrcode';
 
 /**
  * Generate a QR code as a base64 data URL.
