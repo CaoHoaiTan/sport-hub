@@ -96,8 +96,17 @@ export default function PaymentsPage() {
   });
 
   const plans = plansData?.paymentPlansByTournament ?? [];
-  const payments: Array<{ id: string; paymentPlanId: string; status: string; amount: number }> =
-    paymentsData?.paymentsByTournament ?? [];
+  const payments: Array<{
+    id: string;
+    paymentPlanId: string;
+    status: string;
+    amount: number;
+    method: string | null;
+    transactionId: string | null;
+    paidAt: string | null;
+    team: { id: string; name: string } | null;
+    paymentPlan: { id: string; name: string } | null;
+  }> = paymentsData?.paymentsByTournament ?? [];
 
   // Per-plan payment stats
   function getPlanStats(planId: string) {
