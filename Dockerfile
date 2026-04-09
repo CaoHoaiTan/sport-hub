@@ -8,12 +8,11 @@ RUN corepack enable && corepack prepare yarn@4.6.0 --activate
 
 # Copy workspace config and package files
 COPY package.json yarn.lock .yarnrc.yml ./
-COPY .yarn .yarn
 COPY packages/db/package.json packages/db/package.json
 COPY packages/shared/package.json packages/shared/package.json
 COPY apps/api/package.json apps/api/package.json
 
-RUN yarn install --immutable
+RUN yarn install
 
 # ─── Stage 2: Build ──────────────────────────────────────
 FROM node:20-alpine AS build
@@ -41,7 +40,6 @@ RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 # Copy workspace structure
 COPY --from=deps /app/package.json /app/yarn.lock /app/.yarnrc.yml ./
-COPY --from=deps /app/.yarn .yarn
 COPY --from=deps /app/node_modules node_modules
 COPY --from=deps /app/packages/db/package.json packages/db/package.json
 COPY --from=deps /app/packages/shared/package.json packages/shared/package.json
