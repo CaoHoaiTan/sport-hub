@@ -31,29 +31,31 @@ export function FinancialSummary({ tournamentId }: FinancialSummaryProps) {
   const summary = data?.financialSummary;
   if (!summary) return null;
 
+  const pendingCount = summary.paymentCount - summary.paidCount - summary.overdueCount;
+
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <StatCard
         title="Tổng doanh thu"
         value={formatVND(summary.totalRevenue)}
-        description={`${summary.paidCount} paid`}
+        description={`${summary.paidCount} đã thanh toán`}
         icon={DollarSign}
       />
       <StatCard
-        title="Total Chờ xử lý"
+        title="Chờ xử lý"
         value={formatVND(summary.totalPending)}
-        description={`${summary.paymentCount - summary.paidCount - summary.overdueCount} pending`}
+        description={`${pendingCount} đang chờ · ${summary.overdueCount} quá hạn`}
         icon={Clock}
       />
       <StatCard
-        title="Tổng hoàn tiền"
+        title="Đã hoàn tiền"
         value={formatVND(summary.totalRefunded)}
         icon={RotateCcw}
       />
       <StatCard
-        title="Payment Count"
+        title="Tổng giao dịch"
         value={summary.paymentCount}
-        description={`${summary.overdueCount} overdue`}
+        description={`${summary.paidCount} thành công · ${summary.overdueCount} quá hạn`}
         icon={Receipt}
       />
     </div>

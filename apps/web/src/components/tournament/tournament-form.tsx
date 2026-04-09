@@ -443,7 +443,12 @@ export function TournamentForm() {
       </nav>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          if (step === STEPS.length - 1) {
+            form.handleSubmit(onSubmit)(e);
+          }
+        }}>
           <Card>
             <CardHeader>
               <CardTitle>{STEPS[step].label}</CardTitle>

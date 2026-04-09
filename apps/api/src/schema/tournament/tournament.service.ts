@@ -124,12 +124,24 @@ export class TournamentService {
       }
     }
 
-    return this.db
+    const updated = await this.db
       .updateTable('tournaments')
       .set(updateData)
       .where('id', '=', id)
       .returningAll()
       .executeTakeFirstOrThrow();
+
+    // Sync default payment plan amount when entryFee changes
+    if (data.entryFee !== undefined) {
+      await this.db
+        .updateTable('payment_plans')
+        .set({ amount: String(data.entryFee) })
+        .where('tournament_id', '=', id)
+        .where('name', '=', 'Lệ phí tham gia')
+        .execute();
+    }
+
+    return updated;
   }
 
   async delete(id: string, userId: string, userRole: string): Promise<boolean> {
@@ -165,6 +177,29 @@ export class TournamentService {
         `Cannot transition from '${tournament.status}' to '${newStatus}'`,
         { extensions: { code: 'BAD_USER_INPUT' } }
       );
+    }
+
+    // When opening registration with entry fee, ensure payment plan exists
+    if (newStatus === 'registration' && parseFloat(tournament.entry_fee ?? '0') > 0) {
+      const plans = await this.db
+        .selectFrom('payment_plans')
+        .select('id')
+        .where('tournament_id', '=', id)
+        .execute();
+
+      if (plans.length === 0) {
+        // Auto-create a default payment plan from entryFee
+        await this.db
+          .insertInto('payment_plans')
+          .values({
+            tournament_id: id,
+            name: 'Lệ phí tham gia',
+            amount: tournament.entry_fee!,
+            currency: tournament.currency ?? 'VND',
+            per_team: true,
+          })
+          .execute();
+      }
     }
 
     return this.db

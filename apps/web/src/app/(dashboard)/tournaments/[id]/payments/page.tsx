@@ -96,7 +96,21 @@ export default function PaymentsPage() {
   });
 
   const plans = plansData?.paymentPlansByTournament ?? [];
-  const payments = paymentsData?.paymentsByTournament ?? [];
+  const payments: Array<{ id: string; paymentPlanId: string; status: string; amount: number }> =
+    paymentsData?.paymentsByTournament ?? [];
+
+  // Per-plan payment stats
+  function getPlanStats(planId: string) {
+    const planPayments = payments.filter((p) => p.paymentPlanId === planId);
+    const paid = planPayments.filter((p) => p.status === 'paid');
+    const pending = planPayments.filter((p) => p.status === 'pending' || p.status === 'overdue');
+    return {
+      total: planPayments.length,
+      paidCount: paid.length,
+      pendingCount: pending.length,
+      paidAmount: paid.reduce((sum, p) => sum + p.amount, 0),
+    };
+  }
 
   if (plansLoading) {
     return (
@@ -176,6 +190,27 @@ export default function PaymentsPage() {
                           </p>
                         </div>
                       )}
+                      {canManage && (() => {
+                        const stats = getPlanStats(plan.id);
+                        return stats.total > 0 ? (
+                          <div className="rounded-md bg-muted/50 p-2 space-y-1">
+                            <div className="flex justify-between text-xs">
+                              <span className="text-muted-foreground">Đã thanh toán</span>
+                              <span className="font-medium text-green-600">{stats.paidCount}/{stats.total} đội</span>
+                            </div>
+                            <div className="flex justify-between text-xs">
+                              <span className="text-muted-foreground">Thu được</span>
+                              <span className="font-medium">{formatVND(stats.paidAmount)}</span>
+                            </div>
+                            {stats.pendingCount > 0 && (
+                              <div className="flex justify-between text-xs">
+                                <span className="text-muted-foreground">Chờ xử lý</span>
+                                <span className="font-medium text-yellow-600">{stats.pendingCount} đội</span>
+                              </div>
+                            )}
+                          </div>
+                        ) : null;
+                      })()}
                       {plan.bankAccountNumber && (
                         <div className="text-xs text-muted-foreground space-y-0.5">
                           <p>{plan.bankName} - {plan.bankAccountNumber}</p>
