@@ -49,7 +49,7 @@ export function MatchResultForm({ match, tournamentSport }: MatchResultFormProps
   const [awayScore, setAwayScore] = useState(match.awayScore ?? 0);
   const [sets, setSets] = useState<SetScore[]>(() => {
     if (match.sets && match.sets.length > 0) {
-      return match.sets
+      return [...match.sets]
         .sort((a, b) => a.setNumber - b.setNumber)
         .map((s) => ({ homeScore: s.homeScore, awayScore: s.awayScore }));
     }
@@ -71,13 +71,16 @@ export function MatchResultForm({ match, tournamentSport }: MatchResultFormProps
     setSets((prev) => prev.filter((_, i) => i !== index));
   }
 
+  const maxPoints = tournamentSport === 'badminton' ? 30 : 99;
+
   function handleSetChange(
     index: number,
     field: 'homeScore' | 'awayScore',
     value: number
   ) {
+    const clamped = Math.max(0, Math.min(value, maxPoints));
     setSets((prev) =>
-      prev.map((s, i) => (i === index ? { ...s, [field]: value } : s))
+      prev.map((s, i) => (i === index ? { ...s, [field]: clamped } : s))
     );
   }
 
@@ -194,8 +197,13 @@ export function MatchResultForm({ match, tournamentSport }: MatchResultFormProps
   }
 
   // Calculate sets won for display
+  const setsToWin = tournamentSport === 'volleyball' ? 3 : 2;
+  const maxSets = setsToWin * 2 - 1;
   const homeSetsWon = sets.filter((s) => s.homeScore > s.awayScore).length;
   const awaySetsWon = sets.filter((s) => s.awayScore > s.homeScore).length;
+  const matchDecided = homeSetsWon >= setsToWin || awaySetsWon >= setsToWin;
+  const canAddSet = sets.length < maxSets && !matchDecided;
+  const validationError = validateSets();
 
   return (
     <Card>
@@ -224,6 +232,7 @@ export function MatchResultForm({ match, tournamentSport }: MatchResultFormProps
                   <Input
                     type="number"
                     min={0}
+                    max={maxPoints}
                     value={set.homeScore}
                     onChange={(e) =>
                       handleSetChange(idx, 'homeScore', parseInt(e.target.value) || 0)
@@ -236,6 +245,7 @@ export function MatchResultForm({ match, tournamentSport }: MatchResultFormProps
                   <Input
                     type="number"
                     min={0}
+                    max={maxPoints}
                     value={set.awayScore}
                     onChange={(e) =>
                       handleSetChange(idx, 'awayScore', parseInt(e.target.value) || 0)
@@ -263,16 +273,30 @@ export function MatchResultForm({ match, tournamentSport }: MatchResultFormProps
                 <span>{awaySetsWon}</span>
               </div>
 
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleAddSet}
-                className="w-full"
-              >
-                <Plus className="h-3.5 w-3.5 mr-1" />
-                Thêm set
-              </Button>
+              {canAddSet && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleAddSet}
+                  className="w-full"
+                >
+                  <Plus className="h-3.5 w-3.5 mr-1" />
+                  Thêm set
+                </Button>
+              )}
+
+              {matchDecided && (
+                <p className="text-xs text-center text-green-600 font-medium">
+                  {homeSetsWon > awaySetsWon
+                    ? `${match.homeTeam?.name ?? 'Đội nhà'} thắng ${homeSetsWon}-${awaySetsWon}`
+                    : `${match.awayTeam?.name ?? 'Đội khách'} thắng ${awaySetsWon}-${homeSetsWon}`}
+                </p>
+              )}
+
+              {validationError && !matchDecided && (
+                <p className="text-xs text-center text-destructive">{validationError}</p>
+              )}
             </div>
           ) : (
             <div className="space-y-3">
@@ -308,7 +332,7 @@ export function MatchResultForm({ match, tournamentSport }: MatchResultFormProps
 
           <Separator />
 
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button type="submit" className="w-full" disabled={loading || (isSetBased && !!validationError)}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Gửi kết quả
           </Button>

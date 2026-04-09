@@ -48,6 +48,16 @@ export const paymentResolvers = {
       return service.getPaymentsByTeam(teamId);
     },
 
+    promoCodesByTournament: async (
+      _: unknown,
+      { tournamentId }: { tournamentId: string },
+      ctx: GraphQLContext
+    ) => {
+      requireRole(ctx.user, 'organizer', 'admin');
+      const service = new PaymentService(ctx.db);
+      return service.getPromoCodesByTournament(tournamentId);
+    },
+
     financialSummary: async (
       _: unknown,
       { tournamentId }: { tournamentId: string },

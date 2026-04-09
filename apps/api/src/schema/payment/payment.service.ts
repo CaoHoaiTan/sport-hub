@@ -445,6 +445,15 @@ export class PaymentService {
       .execute();
   }
 
+  async getPromoCodesByTournament(tournamentId: string): Promise<PromoCode[]> {
+    return this.db
+      .selectFrom('promo_codes')
+      .selectAll()
+      .where('tournament_id', '=', tournamentId)
+      .orderBy('created_at', 'desc')
+      .execute();
+  }
+
   async getPaymentPlansByTournament(tournamentId: string): Promise<PaymentPlan[]> {
     return this.db
       .selectFrom('payment_plans')

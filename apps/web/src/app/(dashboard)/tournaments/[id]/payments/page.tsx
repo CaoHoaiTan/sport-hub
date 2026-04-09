@@ -31,6 +31,7 @@ import {
 } from '@/components/ui/dialog';
 import { PaymentPlanForm } from '@/components/payment/payment-plan-form';
 import { PaymentPlanEditDialog } from '@/components/payment/payment-plan-edit-dialog';
+import { PromoCodeForm } from '@/components/payment/promo-code-form';
 import { PaymentTable } from '@/components/payment/payment-table';
 import { PaymentDialog } from '@/components/payment/payment-dialog';
 import { FinancialSummary } from '@/components/payment/financial-summary';
@@ -56,6 +57,8 @@ export default function PaymentsPage() {
   const [selectedPlan, setSelectedPlan] = useState<{
     id: string;
     amount: number;
+    earlyBirdAmount?: number | null;
+    earlyBirdDeadline?: string | null;
     bankName?: string | null;
     bankAccountNumber?: string | null;
     bankAccountHolder?: string | null;
@@ -119,6 +122,7 @@ export default function PaymentsPage() {
         <TabsList>
           <TabsTrigger value="plans">Gói thanh toán</TabsTrigger>
           {canManage && <TabsTrigger value="payments">Payments</TabsTrigger>}
+          {canManage && <TabsTrigger value="promos">Mã giảm giá</TabsTrigger>}
           {canManage && <TabsTrigger value="summary">Tổng hợp tài chính</TabsTrigger>}
         </TabsList>
 
@@ -207,6 +211,8 @@ export default function PaymentsPage() {
                             setSelectedPlan({
                               id: plan.id,
                               amount: plan.amount,
+                              earlyBirdAmount: plan.earlyBirdAmount,
+                              earlyBirdDeadline: plan.earlyBirdDeadline,
                               bankName: plan.bankName,
                               bankAccountNumber: plan.bankAccountNumber,
                               bankAccountHolder: plan.bankAccountHolder,
@@ -239,6 +245,12 @@ export default function PaymentsPage() {
         )}
 
         {canManage && (
+          <TabsContent value="promos" className="mt-4">
+            <PromoCodeForm tournamentId={tournamentId} />
+          </TabsContent>
+        )}
+
+        {canManage && (
           <TabsContent value="summary" className="mt-4">
             <FinancialSummary tournamentId={tournamentId} />
           </TabsContent>
@@ -253,6 +265,8 @@ export default function PaymentsPage() {
           teamId={myTeam?.id ?? ''}
           tournamentId={tournamentId}
           amount={selectedPlan.amount}
+          earlyBirdAmount={selectedPlan.earlyBirdAmount}
+          earlyBirdDeadline={selectedPlan.earlyBirdDeadline}
           bankInfo={selectedPlan}
         />
       )}

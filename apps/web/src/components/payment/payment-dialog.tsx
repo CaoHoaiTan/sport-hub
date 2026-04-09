@@ -38,6 +38,8 @@ interface PaymentDialogProps {
   teamId: string;
   tournamentId: string;
   amount: number;
+  earlyBirdAmount?: number | null;
+  earlyBirdDeadline?: string | null;
   bankInfo?: BankInfo | null;
 }
 
@@ -55,6 +57,8 @@ export function PaymentDialog({
   teamId,
   tournamentId,
   amount,
+  earlyBirdAmount,
+  earlyBirdDeadline,
   bankInfo,
 }: PaymentDialogProps) {
   const [method, setMethod] = useState<string>('bank_transfer');
@@ -63,7 +67,12 @@ export function PaymentDialog({
 
   const [initiatePayment, { loading }] = useMutation(INITIATE_PAYMENT);
 
-  const finalAmount = Math.max(0, amount - discount);
+  const isEarlyBird =
+    earlyBirdAmount != null &&
+    earlyBirdDeadline != null &&
+    new Date() < new Date(earlyBirdDeadline);
+  const displayAmount = isEarlyBird ? earlyBirdAmount : amount;
+  const finalAmount = Math.max(0, displayAmount - discount);
 
   async function handlePay() {
     try {
@@ -186,24 +195,32 @@ export function PaymentDialog({
             <p className="text-sm text-muted-foreground mb-2">Mã giảm giá</p>
             <PromoCodeInput
               tournamentId={tournamentId}
-              amount={amount}
+              amount={displayAmount}
               onValidated={handlePromoValidated}
             />
           </div>
 
           <div className="rounded-lg border p-4 space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Subtotal</span>
-              <span>{formatVND(amount)}</span>
+              <span className="text-muted-foreground">Giá gốc</span>
+              <span className={isEarlyBird ? 'line-through text-muted-foreground' : ''}>
+                {formatVND(amount)}
+              </span>
             </div>
+            {isEarlyBird && (
+              <div className="flex justify-between text-sm text-green-600">
+                <span>Early bird</span>
+                <span>{formatVND(earlyBirdAmount)}</span>
+              </div>
+            )}
             {discount > 0 && (
               <div className="flex justify-between text-sm text-green-600">
-                <span>Discount</span>
+                <span>Giảm giá</span>
                 <span>-{formatVND(discount)}</span>
               </div>
             )}
             <div className="flex justify-between text-sm font-bold border-t pt-2">
-              <span>Total</span>
+              <span>Tổng cộng</span>
               <span>{formatVND(finalAmount)}</span>
             </div>
           </div>

@@ -133,6 +133,7 @@ export const paymentTypeDefs = gql`
     paymentPlansByTournament(tournamentId: ID!): [PaymentPlan!]!
     paymentsByTournament(tournamentId: ID!): [Payment!]!
     paymentsByTeam(teamId: ID!): [Payment!]!
+    promoCodesByTournament(tournamentId: ID!): [PromoCode!]!
     financialSummary(tournamentId: ID!): FinancialSummary!
     validatePromoCode(tournamentId: ID!, code: String!, amount: Float!): PromoValidation!
   }

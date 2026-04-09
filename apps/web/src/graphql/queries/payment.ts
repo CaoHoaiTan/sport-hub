@@ -53,6 +53,24 @@ export const GET_FINANCIAL_SUMMARY = gql`
   }
 `;
 
+export const GET_PROMO_CODES = gql`
+  query GetPromoCodesByTournament($tournamentId: ID!) {
+    promoCodesByTournament(tournamentId: $tournamentId) {
+      id
+      tournamentId
+      code
+      discountType
+      discountValue
+      maxUses
+      usedCount
+      validFrom
+      validUntil
+      isActive
+      createdAt
+    }
+  }
+`;
+
 export const VALIDATE_PROMO_CODE = gql`
   query ValidatePromoCode($tournamentId: ID!, $code: String!, $amount: Float!) {
     validatePromoCode(tournamentId: $tournamentId, code: $code, amount: $amount) {
